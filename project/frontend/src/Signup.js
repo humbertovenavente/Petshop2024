@@ -14,25 +14,30 @@ function Signup() {
 
   const navigate = useNavigate();
 
+  // Maneja la entrada del formulario y actualiza el estado
   const handleInput = (event) => {
-    // Actualiza el estado con los valores correctos
     setValues({
       ...values, 
       [event.target.name]: event.target.value
     });
   };
 
+  // Maneja el envío del formulario
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Enviar los datos directamente a la base de datos sin validación
-    axios.post('http://localhost:8081/signup', values)
+    // Enviar los datos al servidor PHP mediante Axios
+    axios.post('http://192.168.0.20/signup.php', values)  // Cambia la IP por la de tu máquina virtual
       .then(res => {
         console.log("Account created:", res.data);
+        if (res.data.message) {
+          alert('Usuario creado con éxito');
+        }
         navigate('/');
       })
       .catch(err => {
         console.log("Error:", err);
+        alert('Hubo un error al crear el usuario');
       });
   };
 
@@ -90,8 +95,6 @@ function Signup() {
             />
           </div>
 
-          
-
           <button type='submit' className='btn btn-success w-100'>Create an account</button>
           <p></p>
           <Link to="/" className='btn btn-default border w-100 gb-light rounded-0 text-decoration-none'>Back</Link>
@@ -101,5 +104,5 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Signup
 
