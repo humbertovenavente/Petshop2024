@@ -5,8 +5,9 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Habilitar CORS para permitir las solicitudes desde el frontend
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Origin: *");  // Esto permite que cualquier dominio acceda
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");  // Asegúrate de permitir los métodos que necesitas
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
@@ -27,7 +28,7 @@ if ($conn->connect_error) {
 $data = json_decode(file_get_contents("php://input"), true);
 
 // Validar que los campos requeridos existan
-if (!isset($data['name'], $data['lastname'], $data['email'], $data['password'])) {
+if (!isset($data['name'], $data['lastname'], $data['email'], $data['password'],  $data['id_rol'])) {
     echo json_encode(['error' => 'Faltan campos obligatorios']);
     exit();
 }
@@ -37,9 +38,10 @@ $name = $data['name'];
 $lastname = $data['lastname'];
 $email = $data['email'];
 $password = $data['password'];
+$id_rol = $data['id_rol'];
 
 // Preparar la consulta SQL para insertar el usuario
-$sql = "INSERT INTO User (name, lastname, email, password) VALUES (?, ?, ?, ?)";
+$sql = "INSERT INTO User (name, lastname, email, password, id_rol) VALUES (?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
 
 // Comprobar si la preparación de la consulta fue exitosa
@@ -49,7 +51,7 @@ if ($stmt === false) {
 }
 
 // Vincular los parámetros a la consulta
-$stmt->bind_param("ssss", $name, $lastname, $email, $password);
+$stmt->bind_param("ssssi", $name, $lastname, $email, $password, $id_rol);
 
 // Ejecutar la consulta y devolver una respuesta en JSON
 if ($stmt->execute()) {

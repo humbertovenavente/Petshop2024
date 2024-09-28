@@ -10,6 +10,7 @@ function Signup() {
     lastname: '',
     email: '',
     password: '',
+    id_rol: '1' // I would like to put a default, since I can only use 1-2-3, it must starts as a default 1, id_role from role is 
   });
 
   const navigate = useNavigate();
@@ -31,13 +32,13 @@ function Signup() {
       .then(res => {
         console.log("Account created:", res.data);
         if (res.data.message) {
-          alert('Usuario creado con éxito');
+          alert('The user was created successfully');
         }
         navigate('/');
       })
       .catch(err => {
         console.log("Error:", err);
-        alert('Hubo un error al crear el usuario');
+        alert('Error ocurred when try to create the user');
       });
   };
 
@@ -95,6 +96,16 @@ function Signup() {
             />
           </div>
 
+          <div>
+            <label className = 'mb-3'>Role</label>
+            <select className = 'form-control rounded-0' name='id_rol' onChange={handleInput} value={values.id_rol}>
+              <option value='1'>User</option>
+              <option value='2'>Employee</option>
+              <option value='3'> Administrator </option>
+            </select>
+      
+          </div>
+          <p></p>
           <button type='submit' className='btn btn-success w-100'>Create an account</button>
           <p></p>
           <Link to="/" className='btn btn-default border w-100 gb-light rounded-0 text-decoration-none'>Back</Link>
