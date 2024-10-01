@@ -8,6 +8,7 @@ function Login() {
 
   // acceso como invitado
   const handleGuestAccess = () => {
+    localStorage.setItem('userRole', 'guest'); 
     navigate('/guest'); 
   };
 
@@ -21,27 +22,31 @@ function Login() {
   
     try {
       // Enviar los datos al backend para autenticación
-      const response = await axios.post('http://192.168.0.20/login.php', values);
+      const response = await axios.post('http://172.16.72.12/login.php', values);
       
       // Supongamos que el backend devuelve el rol del usuario
       const { data } = response;
-      const userRole = data.role;
-      const userName = data.name;
-
-      console.log('Rol ', userRole);
-      console.log('Nombre', userName);
   
-      // Redirigir según el rol del usuario
-      if (userRole === 3) {
-       localStorage.setItem('userName', userName); // Usamos localStorage para mantener el nombre
-        navigate('/admin');
-      } else if (userRole === 2) {
-        localStorage.setItem('userName', userName); // Usamos localStorage para mantener el nombre
-        navigate('/emp');
-      } else if (userRole === 2) {
-        localStorage.setItem('userName', userName); // Usamos localStorage para mantener el nombre
-        navigate('/user');
+
+      if (data.rol) {
+        // Guardamos el rol y otros detalles en localStorage
+        localStorage.setItem('email', values.email);  // Guardar el email
+        localStorage.setItem('password', values.password);  // Guardar la contraseña (no recomendable en proyectos reales)
+        localStorage.setItem('userRole', data.rol);  // Guardar el rol
+        localStorage.setItem('userName', data.name);  // Guardar el nombre
+      
+        // Redirigir al dashboard o página correspondiente según el rol
+        if (data.rol === 3) {
+          navigate('/admin');
+        } else if (data.rol === 2) {
+          navigate('/emp');
+        } else if (data.rol === 1) {
+          navigate('/user');
+        }
+      } else {
+        alert('Credenciales incorrectas');
       }
+
     } catch (error) {
       console.log("Error:", error);
       alert('Error al iniciar sesión. Verifica tus credenciales.');
