@@ -11,6 +11,7 @@ import Footer from './footer';
 import Header from './header';
 import Guest from './guest';
 import Account from './Account';
+import UserAdmin from './UserAdmin';
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
     <Route path='/footer' element={ <Footer/>}></Route>
     <Route path='/header' element={ <Header/>}></Route>
     <Route path='/Account' element={ <Account/>}></Route>
+    <Route path='/UserAdmin' element={ <UserAdmin/>}></Route>
 
     </Routes>
     </BrowserRouter>

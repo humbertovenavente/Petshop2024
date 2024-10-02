@@ -43,7 +43,7 @@ function Header() {
         {/* Funcionalidades solo para administradores */}
         {userRole === 3 && (
           <>
-            <Link to="/admin-panel" className="nav-link">Admin Panel</Link>
+            <Link to="/UserAdmin" className="nav-link">Admin Panel</Link>
             <Link to="/manage-users" className="nav-link">Manage Users</Link>
           </>
         )}

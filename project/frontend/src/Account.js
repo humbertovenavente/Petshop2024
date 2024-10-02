@@ -3,6 +3,7 @@ import {  useNavigate } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
 import axios from 'axios';
+import { Modal, Button } from 'react-bootstrap'; 
 
 
 
@@ -21,6 +22,9 @@ function Account(){
         cvv: ''
     });
 
+    const [showModal, setShowModal] = useState(false); // it will control the estatus of the modal
+    const [editedProfile, setEditedProfile] = useState({ ...profile }); // Copia del perfil para editar
+
     const email = localStorage.getItem('email');
     const password = localStorage.getItem('password');
 
@@ -29,9 +33,10 @@ function Account(){
 
     const fetchProfile = async () => {
         try {
-          const response = await axios.post('http://172.16.72.12/profile.php', { email, password });
+          const response = await axios.post('http:/192.168.0.8/profile.php', { email, password });
           console.log(response.data);  // Agrega este console.log para ver la respuesta
           setProfile(response.data); // Guardar los datos obtenidos en el estado
+          setEditedProfile(response.data);
         } catch (error) {
           console.error('Error al obtener los datos del usuario:', error);
         }
@@ -42,6 +47,34 @@ function Account(){
         if (email && password) {
         fetchProfile();}
       }, []);
+
+      const handleEditClick = () => {
+        setShowModal(true);
+      };
+
+      const handleClose = () => {
+        setShowModal(false);
+      };
+
+      // Guardar los cambios
+  const handleSaveChanges = async () => {
+    try {
+      await axios.post('http://192.168.0.8/updateProfile.php', editedProfile); // Llamada al backend para actualizar los datos
+      setProfile(editedProfile); // Actualizar el perfil en el frontend
+      setShowModal(false); // Cerrar el modal
+    } catch (error) {
+      console.error('Error al actualizar el perfil:', error);
+    }
+  };
+
+       // Manejar los cambios en los campos del formulario dentro del modal
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setEditedProfile(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
 
       if (!email || !password) {
         return (
@@ -68,7 +101,7 @@ function Account(){
         <div className="profile-pic">
           <img src="https://img.icons8.com/ios-filled/50/000000/user-male-circle.png" alt="Profile" />
         </div>
-        <button className="edit-profile-btn">Edit Profile</button>
+        <button className="edit-profile-btn" onClick={handleEditClick} >Edit Profile</button>
       </div>
 
       <div className="account-details">
@@ -98,9 +131,67 @@ function Account(){
         </div>
       </div>
     </div>
+    {/* Modal para editar perfil */}
+    <Modal show={showModal} onHide={handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Profile</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <form>
+              <div className="form-group">
+                <label>Name</label>
+                <input type="text" name="name" value={editedProfile.name} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Lastname</label>
+                <input type="text" name="lastname" value={editedProfile.lastname} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input type="email" name="email" value={editedProfile.email} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Password</label>
+                <input type="password" name="password" value={editedProfile.password} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Shipping Address</label>
+                <input type="text" name="address" value={editedProfile.address} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Country</label>
+                <input type="text" name="country" value={editedProfile.country} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Zip Code</label>
+                <input type="text" name="zipcode" value={editedProfile.zipcode} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Credit Card Name</label>
+                <input type="text" name="credit_card_name" value={editedProfile.credit_card_name} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Credit Card Number</label>
+                <input type="text" name="credit_card_number" value={editedProfile.credit_card_number} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>CVV</label>
+                <input type="text" name="cvv" value={editedProfile.cvv} onChange={handleInputChange} className="form-control" />
+              </div>
+            </form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSaveChanges}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
         
           </main>
       <Footer /> </div>
     );
   }
-export default Account
+export default Account;
