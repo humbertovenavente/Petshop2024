@@ -6,11 +6,12 @@ import axios from 'axios';
 function UserAdmin() {
 
     const [user, setUser] = useState([]);
+    
 
     // Función para obtener los usuarios desde el backend
     const fetchUsers = async () => {
         try {
-            const response = await axios.get('http://172.16.72.12/user.php');
+            const response = await axios.get('http://192.168.0.10/user.php');
             console.log("Respuesta de la API:", response.data); // Depuración para ver los datos devueltos
             if (Array.isArray(response.data)) {
                 setUser(response.data);  // Guardar los usuarios en el estado si es un array
@@ -74,11 +75,11 @@ function UserAdmin() {
                             <td>{user.credit_card_name}</td>
                             <td>{user.credit_card_number}</td>
                             <td>{user.credit_card_exp}</td>
-                            <td>{user.CVV}</td>
+                            <td>{user.cvv}</td>
                             <td>{user.status}</td>
                             <td>{user.last_login}</td>
-                            <td> <button className="edit-profile-btn"  >Edit Profile</button></td>
-                            <td> <button className="edit-profile-btn"  >Delete Profile</button></td>
+                            <td> <button className="edit-profile-btn"  >Edit</button></td>
+                            <td> <button className="edit-profile-btn"  >Delete</button></td>
                             <td> <button className="edit-profile-btn"  >Status</button></td>
                            
                         </tr>

@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
-$host = '172.16.72.12';
+$host = '192.168.0.10';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
@@ -35,25 +35,40 @@ $address = $data['address'];
 $city = $data['city'];
 $country = $data['country'];
 $zipcode = $data['zipcode'];
-$telephone = $data['telephone']
+$telephone = $data['telephone'];
 $credit_card_name = $data['credit_card_name'];
 $credit_card_number = $data['credit_card_number'];
-$credit_card_exp = $data['credit_card_exp']
-$cvv = $data['cvv'];
-$status = $data['status']
-$last_login = $data['last_login']
+$credit_card_exp = $data['credit_card_exp'];
+$cvv = (int)$data['cvv'];  // Convertimos CVV a entero
 
 // Actualizar el perfil en la base de datos
-$sql = "UPDATE User SET name = ?, lastname = ?, password = ?, address = ?, city = ?, country = ?, zipcode = ?, telephone = ?, credit_card_name = ?, credit_card_number = ?, credit_card_exp = ?, cvv = ?, status = ?, last_login = ? WHERE email = ?";
+$sql = "UPDATE User SET name = ?, lastname = ?, password = ?, address = ?, city = ?, country = ?, zipcode = ?, telephone = ?, credit_card_name = ?, credit_card_number = ?, credit_card_exp = ?, cvv = ? WHERE email = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ssssssssss", $name, $lastname, $password, $address, $country, $zipcode, $credit_card_name, $credit_card_number, $cvv, $email);
+
+// Bind de parámetros con los tipos correctos
+$stmt->bind_param("sssssssssssis", 
+    $name,                 // string
+    $lastname,             // string
+    $password,             // string
+    $address,              // string
+    $city,                 // string
+    $country,              // string
+    $zipcode,              // string
+    $telephone,            // string
+    $credit_card_name,     // string
+    $credit_card_number,   // string
+    $credit_card_exp,      // string
+    $cvv,                  // integer
+    $email                 // string
+);
+
 $stmt->execute();
 
 // Verificar si la actualización fue exitosa
 if ($stmt->affected_rows > 0) {
     echo json_encode(['message' => 'Perfil actualizado exitosamente']);
 } else {
-    echo json_encode(['error' => 'Error al actualizar el perfil']);
+    echo json_encode(['error' => 'Error al actualizar el perfil', 'details' => $stmt->error]);
 }
 
 $stmt->close();

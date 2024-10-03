@@ -10,7 +10,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");  // Asegúrate de permitir los métodos que necesitas
 
 // Configuración de la base de datos
-$host = '172.16.72.12';
+$host = '192.168.0.10';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
@@ -38,7 +38,18 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     // Usuario encontrado
     $row = $result->fetch_assoc();
+
+if ($row['status'] == 1){
+       // Actualizar el campo last_login al iniciar sesión
+       $last_login = date('Y-m-d H:i:s'); // Fecha y hora actual
+       $update_sql = "UPDATE User SET last_login = ? WHERE email = ?";
+       $update_stmt = $conn->prepare($update_sql);
+       $update_stmt->bind_param("ss", $last_login, $email);
+       $update_stmt->execute();
+
     echo json_encode(['rol' => $row['id_rol'], 'name' => $row['name']]);
+
+}
 } else {
     // Si no existe, devolver un error
     echo json_encode(['error' => 'Credenciales incorrectas']);
