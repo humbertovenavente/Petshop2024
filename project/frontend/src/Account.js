@@ -15,11 +15,15 @@ function Account(){
         email: '',
         password: '',
         address: '',
+        city: '',
         country: '',
         zipcode: '',
         credit_card_name: '',
         credit_card_number: '',
-        cvv: ''
+        credit_card_exp: '',
+        cvv: '',
+        status: '',
+        last_login: '',
     });
 
     const [showModal, setShowModal] = useState(false); // it will control the estatus of the modal
@@ -31,22 +35,22 @@ function Account(){
 
     const navigate = useNavigate();
 
-    const fetchProfile = async () => {
+    useEffect(() => {
+      const fetchProfile = async () => {
         try {
-          const response = await axios.post('http:/192.168.0.8/profile.php', { email, password });
-          console.log(response.data);  // Agrega este console.log para ver la respuesta
-          setProfile(response.data); // Guardar los datos obtenidos en el estado
-          setEditedProfile(response.data);
+          const response = await axios.post('http://172.16.72.12/profile.php', { email, password });
+          console.log(response.data);  // Log response for debugging
+          setProfile(response.data); // Save profile data
+          setEditedProfile(response.data); // Copy for editing
         } catch (error) {
           console.error('Error al obtener los datos del usuario:', error);
         }
       };
     
-      // Cargar los datos del usuario al montar el componente
-      useEffect(() => {
-        if (email && password) {
-        fetchProfile();}
-      }, []);
+      if (email && password) {
+        fetchProfile();
+      }
+    }, [email, password]);
 
       const handleEditClick = () => {
         setShowModal(true);
@@ -59,7 +63,7 @@ function Account(){
       // Guardar los cambios
   const handleSaveChanges = async () => {
     try {
-      await axios.post('http://192.168.0.8/updateProfile.php', editedProfile); // Llamada al backend para actualizar los datos
+      await axios.post('http://172.16.72.12/updateProfile.php', editedProfile); // Llamada al backend para actualizar los datos
       setProfile(editedProfile); // Actualizar el perfil en el frontend
       setShowModal(false); // Cerrar el modal
     } catch (error) {
@@ -114,11 +118,14 @@ function Account(){
           <p>{profile.email}</p>  {/* Mostrar el email real */}
           <h4>Password</h4>
           <p>{profile.password}</p>  {/* Mostrar el email real */}
+          <h4>Telephone</h4>
+          <p>{profile.telephone}</p>  {/* Mostrar el email real */}
         </div>
 
         <div className="details-section">
           <h4>Shipping Address</h4>
           <p>{profile.address}</p>  {/* Mostrar la dirección real */}
+          <p>City: {profile.city}</p>  {/* Mostrar el país real */}
           <p>Country: {profile.country}</p>  {/* Mostrar el país real */}
           <p>Zip Code: {profile.zipcode}</p>  {/* Mostrar el código postal real */}
         </div>
@@ -127,8 +134,15 @@ function Account(){
           <h4>Name of the Credit Card</h4>
           <p>{profile.credit_card_name}</p>  {/* Mostrar el nombre de la tarjeta */}
           <p>Credit Card Number: {profile.credit_card_number}</p>  {/* Mostrar el número de tarjeta */}
+          <p>Credit Card Expiration Date: {profile.credit_card_exp}</p>  {/* Mostrar el número de tarjeta */}
           <p>CVV: {profile.cvv}</p>  {/* Mostrar el CVV */}
         </div>
+
+        <div className="details-section">
+          <p>Status: {profile.status}</p>  {/* Mostrar el número de tarjeta */}
+          <p>Last Login: {profile.last_login}</p>  {/* Mostrar el número de tarjeta */}
+        </div>
+
       </div>
     </div>
     {/* Modal para editar perfil */}
@@ -159,6 +173,10 @@ function Account(){
                 <input type="text" name="address" value={editedProfile.address} onChange={handleInputChange} className="form-control" />
               </div>
               <div className="form-group">
+                <label>City</label>
+                <input type="text" name="city" value={editedProfile.city} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
                 <label>Country</label>
                 <input type="text" name="country" value={editedProfile.country} onChange={handleInputChange} className="form-control" />
               </div>
@@ -167,12 +185,20 @@ function Account(){
                 <input type="text" name="zipcode" value={editedProfile.zipcode} onChange={handleInputChange} className="form-control" />
               </div>
               <div className="form-group">
+                <label>Telephone</label>
+                <input type="text" name="telephone" value={editedProfile.telephone} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
                 <label>Credit Card Name</label>
                 <input type="text" name="credit_card_name" value={editedProfile.credit_card_name} onChange={handleInputChange} className="form-control" />
               </div>
               <div className="form-group">
                 <label>Credit Card Number</label>
                 <input type="text" name="credit_card_number" value={editedProfile.credit_card_number} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Credit Card Expiration date</label>
+                <input type="text" name="credit_card_number" value={editedProfile.credit_card_exp} onChange={handleInputChange} className="form-control" />
               </div>
               <div className="form-group">
                 <label>CVV</label>

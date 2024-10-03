@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
-$host = '172.16.72.12';  // Cambia esto a tu IP si es diferente
+$host = '172.16.72.12'; 
 $db = 'project';   
 $user = 'humbe';  
 $pass = 'tu_contraseña';  
@@ -19,33 +19,27 @@ $pass = 'tu_contraseña';
 // Conexión a la base de datos
 $conn = new mysqli($host, $user, $pass, $db);
 
-// Verificar la conexión a la base de datos
+// Verificar la conexión
 if ($conn->connect_error) {
     die(json_encode(['error' => "Conexión fallida: " . $conn->connect_error]));
 }
 
-// Consulta SQL para obtener los datos de los usuarios
-$sql = "SELECT id_user, name, lastname, email, password, address, country, zipcode, telephone, credit_card_name, credit_card_exp, cvv, status, last_login FROM User";
-$result = $conn->query($sql);
+// Leer los datos enviados
+$data = json_decode(file_get_contents("php://input"), true);
+$email = $data['email'];  // Se espera que el email esté en el `localStorage`
 
-// Verificar si la consulta fue exitosa
-if (!$result) {
-    echo json_encode(['error' => 'Error en la consulta SQL: ' . $conn->error]);
-    $conn->close();
-    exit();
-}
+// Actualizar el last_login con la fecha y hora actual
+$sql = "UPDATE User SET last_login = NOW() WHERE email = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $email);
+$stmt->execute();
 
-// Comprobar si hay resultados
-if ($result->num_rows > 0) {
-    $user = [];
-    while($row = $result->fetch_assoc()) {
-        $user[] = $row;
-    }
-    // Devolver los datos en formato JSON
-    echo json_encode($user);
+if ($stmt->affected_rows > 0) {
+    echo json_encode(['message' => 'Last login updated successfully']);
 } else {
-    echo json_encode(['message' => 'No users found']);
+    echo json_encode(['error' => 'Failed to update last login']);
 }
 
+$stmt->close();
 $conn->close();
 ?>

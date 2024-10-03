@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
-$host = '192.168.0.8';
+$host = '172.16.72.12';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
@@ -32,14 +32,19 @@ $lastname = $data['lastname'];
 $email = $data['email'];
 $password = $data['password'];
 $address = $data['address'];
+$city = $data['city'];
 $country = $data['country'];
 $zipcode = $data['zipcode'];
+$telephone = $data['telephone']
 $credit_card_name = $data['credit_card_name'];
 $credit_card_number = $data['credit_card_number'];
+$credit_card_exp = $data['credit_card_exp']
 $cvv = $data['cvv'];
+$status = $data['status']
+$last_login = $data['last_login']
 
 // Actualizar el perfil en la base de datos
-$sql = "UPDATE User SET name = ?, lastname = ?, password = ?, address = ?, country = ?, zipcode = ?, credit_card_name = ?, credit_card_number = ?, cvv = ? WHERE email = ?";
+$sql = "UPDATE User SET name = ?, lastname = ?, password = ?, address = ?, city = ?, country = ?, zipcode = ?, telephone = ?, credit_card_name = ?, credit_card_number = ?, credit_card_exp = ?, cvv = ?, status = ?, last_login = ? WHERE email = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ssssssssss", $name, $lastname, $password, $address, $country, $zipcode, $credit_card_name, $credit_card_number, $cvv, $email);
 $stmt->execute();
