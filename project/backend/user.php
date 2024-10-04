@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
-$host = '192.168.0.10';  // Cambia esto a tu IP si es diferente
+$host = '172.16.72.12';  // Cambia esto a tu IP si es diferente
 $db = 'project';   
 $user = 'humbe';  
 $pass = 'tu_contraseña';  
@@ -25,7 +25,7 @@ if ($conn->connect_error) {
 }
 
 // Consulta SQL para obtener los datos de los usuarios
-$sql = "SELECT id_user, name, lastname, email, password, address, country, city, zipcode, telephone, credit_card_name, credit_card_number, credit_card_exp, cvv, status, last_login FROM User";
+$sql = "SELECT id_user, name, lastname, email, password, address, country, city, zipcode, telephone, credit_card_name, credit_card_number, credit_card_exp, cvv, status, last_login, id_rol FROM User";
 $result = $conn->query($sql);
 
 // Verificar si la consulta fue exitosa

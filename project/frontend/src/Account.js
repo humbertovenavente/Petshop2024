@@ -21,7 +21,8 @@ function Account() {
         cvv: '',
         status: '',
         last_login: '',
-        telephone: ''
+        telephone: '',
+        id_rol: '1'
     });
 
     const [showModal, setShowModal] = useState(false); 
@@ -35,7 +36,7 @@ function Account() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.post('http://192.168.0.10/profile.php', { email, password });
+                const response = await axios.post('http://172.16.72.12/profile.php', { email, password });
                 const data = response.data;
 
                 // Handling undefined/null values
@@ -54,7 +55,8 @@ function Account() {
                     cvv: data.cvv || '',
                     status: data.status || '',
                     last_login: data.last_login || '',
-                    telephone: data.telephone || ''
+                    telephone: data.telephone || '',
+                    id_rol: data.id_rol,
                 });
 
                 setEditedProfile(data); 
@@ -78,8 +80,10 @@ function Account() {
 
     // Save changes to backend
     const handleSaveChanges = async () => {
+        console.log('Datos enviados:', editedProfile);  // Esto imprimirá los datos que se envían al backend
+
         try {
-            await axios.post('http://192.168.0.10/updateProfile.php', editedProfile); 
+            await axios.post('http://172.16.72.12/updateProfile.php', editedProfile); 
             setProfile(editedProfile); 
             setShowModal(false); 
         } catch (error) {
@@ -155,6 +159,7 @@ function Account() {
                         </div>
 
                         <div className="details-section">
+                            <p>ROL: {profile.id_rol}</p>
                             <p>Status: {profile.status}</p>
                             <p>Last Login: {profile.last_login}</p>
                         </div>
@@ -219,6 +224,8 @@ function Account() {
                             <div className="form-group">
                                 <label>CVV</label>
                                 <input type="text" name="cvv" value={editedProfile.cvv || ""} onChange={handleInputChange} className="form-control" />
+
+       
                             </div>
                         </form>
                     </Modal.Body>
