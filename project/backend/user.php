@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
-$host = '172.16.72.12';  // Cambia esto a tu IP si es diferente
+$host = '192.168.0.10';  // Cambia esto a tu IP si es diferente
 $db = 'project';   
 $user = 'humbe';  
 $pass = 'tu_contraseña';  

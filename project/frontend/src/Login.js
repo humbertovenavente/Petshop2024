@@ -22,7 +22,7 @@ function Login() {
   
     try {
       // Enviar los datos al backend para autenticación
-      const response = await axios.post('http://172.16.72.12/login.php', values);
+      const response = await axios.post('http://192.168.0.10/login.php', values);
       
       // Supongamos que el backend devuelve el rol del usuario
       const { data } = response;

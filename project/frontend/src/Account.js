@@ -36,7 +36,7 @@ function Account() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.post('http://172.16.72.12/profile.php', { email, password });
+                const response = await axios.post('http://192.168.0.10/profile.php', { email, password });
                 const data = response.data;
 
                 // Handling undefined/null values
@@ -83,7 +83,7 @@ function Account() {
         console.log('Datos enviados:', editedProfile);  // Esto imprimirá los datos que se envían al backend
 
         try {
-            await axios.post('http://172.16.72.12/updateProfile.php', editedProfile); 
+            await axios.post('http://192.168.0.10/updateProfile.php', editedProfile); 
             setProfile(editedProfile); 
             setShowModal(false); 
         } catch (error) {

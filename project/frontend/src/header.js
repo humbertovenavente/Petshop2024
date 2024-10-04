@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 function Header() {
   const userRole = parseInt(localStorage.getItem('userRole')); 
+  
   return (
     <>
       <header className="header">
@@ -11,6 +12,7 @@ function Header() {
           <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="Logo" className="logo" />
           {/* Search Bar */}
           <input type="text" className="search-bar" placeholder="Search" />
+          
         </div>
 
         <div className="account-and-cart">

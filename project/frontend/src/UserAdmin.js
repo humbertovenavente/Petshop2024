@@ -5,13 +5,15 @@ import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 
 function UserAdmin() {
+
   const [user, setUser] = useState([]);
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
+  const [showModal, setShowModal] = useState(false); // Control del modal
+  const [isEditing, setIsEditing] = useState(false); // Si estamos editando o agregando
   const [newUser, setNewUser] = useState({
     name: '',
     lastname: '',
     email: '',
-    password: '', // Aquí agregamos el password
+    password: '',
     telephone: '',
     address: '',
     city: '',
@@ -21,22 +23,17 @@ function UserAdmin() {
     credit_card_number: '',
     credit_card_exp: '',
     cvv: '',
-    id_rol: '1', // Por defecto, se empieza con rol 1
-    status: '1'  // Por defecto, se empieza como usuario activo (1)
+    id_rol: '1', // Rol por defecto
+    status: '1'  // Status por defecto (Activo)
   });
-
-  // Función para abrir el modal
-  const handleShowModal = () => setShowModal(true);
-  // Función para cerrar el modal
-  const handleCloseModal = () => setShowModal(false);
 
   // Función para obtener los usuarios desde el backend
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://172.16.72.12/user.php');
-      console.log("Respuesta de la API:", response.data); // Verificación de la respuesta devuelta
+      const response = await axios.get('http://192.168.0.10/user.php');
+      console.log("Respuesta de la API:", response.data);
       if (Array.isArray(response.data)) {
-        setUser(response.data);  // Guardar los usuarios en el estado
+        setUser(response.data);
       } else {
         console.error("La respuesta no es un array:", response.data);
       }
@@ -50,25 +47,94 @@ function UserAdmin() {
     const { name, value } = e.target;
     setNewUser(prevState => ({
       ...prevState,
-      [name]: name === 'id_rol' || name === 'status' ? parseInt(value, 10) : value // Asegúrate de que id_rol y status sean números enteros
+      [name]: name === 'id_rol' || name === 'status' ? parseInt(value, 10) : value
     }));
+  };
+
+
+  // Función para abrir el modal para agregar
+  const handleShowModal = () => {
+    setNewUser({
+      name: '',
+      lastname: '',
+      email: '',
+      password: '',
+      telephone: '',
+      address: '',
+      city: '',
+      country: '',
+      zipcode: '',
+      credit_card_name: '',
+      credit_card_number: '',
+      credit_card_exp: '',
+      cvv: '',
+      id_rol: '1',
+      status: '1'
+    });
+    setIsEditing(false); // No estamos editando, estamos agregando
+    setShowModal(true);
+  };
+
+ // Función para cerrar el modal
+ const handleCloseModal = () => setShowModal(false);
+  // Función para abrir el modal para editar
+  const handleEditUser = (user) => {
+    setNewUser(user); // Cargar los datos del usuario seleccionado
+    setIsEditing(true); // Estamos en modo edición
+    setShowModal(true); // Mostrar el modal
   };
 
   // Función para agregar un nuevo usuario
   const handleAddUser = async () => {
     try {
       console.log("Datos que se envían:", newUser);
-      const response = await axios.post('http://172.16.72.12/addProfile.php', newUser);
+      const response = await axios.post('http://192.168.0.10/addProfile.php', newUser);
       console.log("Usuario agregado:", response.data);
       fetchUsers(); // Refrescar la lista de usuarios después de agregar
-      handleCloseModal(); // Cerrar el modal
+      setShowModal(false); // Cerrar el modal
     } catch (error) {
       console.error("Error al agregar el usuario:", error);
     }
   };
 
+  // Función para actualizar un usuario
+  const handleUpdateUser = async () => {
+    try {
+      console.log("Datos que se envían para actualizar:", newUser);
+      const response = await axios.post('http://192.168.0.10/updateProfile2.php', newUser); // Asegúrate de tener un endpoint de actualización
+      console.log("Usuario actualizado:", response.data);
+      fetchUsers(); // Refrescar la lista de usuarios después de actualizar
+      setShowModal(false); // Cerrar el modal
+    } catch (error) {
+      console.error("Error al actualizar el usuario:", error);
+    }
+  };
+
+  // Función que decide si agregar o actualizar en el modal
+  const handleSaveChanges = () => {
+    if (isEditing) {
+      handleUpdateUser();
+    } else {
+      handleAddUser();
+    }
+  };
+
+  // Función para eliminar un usuario
+const handleDeleteUser = async (id_user) => {
+  if (window.confirm("Are you sure you want to delete this profile?")) { // Confirmación antes de eliminar
+    try {
+      const response = await axios.post('http://192.168.0.10/deleteProfile.php', { id_user });
+      console.log("Usuario eliminado:", response.data);
+      fetchUsers(); // Refrescar la lista de usuarios después de eliminar
+    } catch (error) {
+      console.error("Error al eliminar el usuario:", error);
+    }
+  }
+};
+
+
   useEffect(() => {
-    fetchUsers();  // Llamar a la función al cargar el componente
+    fetchUsers(); // Llamar a la función al cargar el componente
   }, []);
 
   return (
@@ -88,7 +154,7 @@ function UserAdmin() {
               <th>Name</th>
               <th>Last Name</th>
               <th>Email</th>
-              <th>Password</th> {/* Mostramos la columna de password */}
+              <th>Password</th>
               <th>Telephone</th>
               <th>Address</th>
               <th>City</th>
@@ -101,8 +167,7 @@ function UserAdmin() {
               <th>Rol</th>
               <th>Status</th>
               <th>Last Login</th>
-              <th>Option</th>
-
+              <th>Options</th>
             </tr>
           </thead>
           <tbody>
@@ -113,7 +178,7 @@ function UserAdmin() {
                   <td>{user.name}</td>
                   <td>{user.lastname}</td>
                   <td>{user.email}</td>
-                  <td>{user.password}</td> {/* Mostrar el campo password */}
+                  <td>{user.password}</td>
                   <td>{user.telephone}</td>
                   <td>{user.address}</td>
                   <td>{user.city}</td>
@@ -123,14 +188,13 @@ function UserAdmin() {
                   <td>{user.credit_card_number}</td>
                   <td>{user.credit_card_exp}</td>
                   <td>{user.cvv}</td>
-                  <td>{user.id_rol }</td>
+                  <td>{user.id_rol}</td>
                   <td>{user.status === 1 ? 'Active' : 'Inactive'}</td>
                   <td>{user.last_login}</td>
-                  <td>{user.option}</td>
-                  <div className="account-profile">
-          <button className="edit-profile-btn" >Edit Profile</button>
-          <button className="edit-profile-btn" >Delete Profile</button>
-        </div>
+                  <td>
+                    <button className="edit-profile-btn" onClick={() => handleEditUser(user)}>Edit Profile</button>
+                    <button className="delete-profile-btn" onClick={() => handleDeleteUser(user.id_user)}>Delete Profile</button>
+                  </td>
                 </tr>
               ))
             ) : (
@@ -142,10 +206,10 @@ function UserAdmin() {
         </table>
       </div>
 
-      {/* Modal para agregar nuevo usuario */}
-      <Modal show={showModal} onHide={handleCloseModal}>
+      {/* Modal para agregar o editar usuario */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Add New User</Modal.Title>
+          <Modal.Title>{isEditing ? 'Edit User' : 'Add New User'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form>
@@ -216,16 +280,14 @@ function UserAdmin() {
                 <option value="0">Inactive</option>
               </select>
             </div>
-          
-
           </form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleAddUser}>
-            Add User
+          <Button variant="primary" onClick={handleSaveChanges}>
+            {isEditing ? 'Save Changes' : 'Add User'}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -236,4 +298,3 @@ function UserAdmin() {
 }
 
 export default UserAdmin;
-
