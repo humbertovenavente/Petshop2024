@@ -3,6 +3,7 @@ import Footer from './footer';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
+import Select from 'react-select';  // Import react-select
 
 function ProductAdmin() {
   const [products, setProducts] = useState([]); // Array to store products
@@ -16,7 +17,7 @@ function ProductAdmin() {
     description: '',
     price: '',
     inventory: '',
-    stock: 0,
+    stock: '1', // Stock will be '1' (in stock) or '0' (out of stock)
     comment: '',
     color: '',
     size: '',
@@ -42,7 +43,7 @@ function ProductAdmin() {
     try {
       const response = await axios.get('http://192.168.0.11/category.php');
       if (Array.isArray(response.data)) {
-        setCategories(response.data);
+        setCategories(response.data.map(cat => ({ value: cat.id_category, label: cat.name }))); // Format categories for react-select
       } else {
         console.error("Response is not an array:", response.data);
       }
@@ -60,16 +61,9 @@ function ProductAdmin() {
     }));
   };
 
-  // Function to handle category selection (multiple)
-  const handleCategoryChange = (e) => {
-    const { options } = e.target;
-    const selectedValues = [];
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].selected) {
-        selectedValues.push(options[i].value);
-      }
-    }
-    setSelectedCategories(selectedValues);
+  // Function to handle category selection (using react-select)
+  const handleCategoryChange = (selected) => {
+    setSelectedCategories(selected.map(item => item.value));
   };
 
   // Function to open the modal to add a new product
@@ -79,7 +73,7 @@ function ProductAdmin() {
       description: '',
       price: '',
       inventory: '',
-      stock: 0,
+      stock: '1', // Default stock as "In Stock"
       comment: '',
       color: '',
       size: '',
@@ -97,7 +91,7 @@ function ProductAdmin() {
       description: product.description,
       price: product.price,
       inventory: product.inventory,
-      stock: product.stock,
+      stock: product.stock.toString(), // Convert stock to string for the select box
       comment: product.comment,
       color: product.color,
       size: product.size,
@@ -115,7 +109,10 @@ function ProductAdmin() {
   // Function to add a new product
   const handleAddProduct = async () => {
     try {
-      const response = await axios.post('http://192.168.0.11/addProduct.php', { ...newProduct, categories: selectedCategories });
+      const response = await axios.post('http://192.168.0.11/addProduct.php', { 
+        ...newProduct, 
+        categories: selectedCategories 
+      });
       fetchProducts(); // Refresh the product list after adding
       setShowModal(false); // Close the modal
     } catch (error) {
@@ -172,7 +169,7 @@ function ProductAdmin() {
         <h1>Product Management</h1>
 
         <div className="account-profile">
-          <button className="edit-profile-btn" onClick={handleShowModal}>Add New Product </button>
+          <button className="edit-profile-btn" onClick={handleShowModal}>Add New Product</button>
         </div>
 
         <table className="table table-striped">
@@ -189,31 +186,28 @@ function ProductAdmin() {
             </tr>
           </thead>
           <tbody>
-  {Array.isArray(products) && products.length > 0 ? (
-    products.map(product => (
-      <tr key={product.id_product}>
-        <td>{product.id_product}</td>
-        <td>{product.name}</td>
-        <td>{product.description}</td>
-        <td>{product.price}</td>
-        <td>{product.inventory}</td>
-        <td>{product.stock ? "In Stock" : "Out of Stock"}</td>
-        {/* Show categories properly */}
-        <td>{Array.isArray(product.categories) && product.categories.length > 0 ? product.categories.join(', ') : 'No categories'}</td> 
-        <td>
-          <button className="edit-profile-btn" onClick={() => handleEditProduct(product)}>Edit</button>
-          <button className="delete-profile-btn" onClick={() => handleDeleteProduct(product.id_product)}>Delete</button>
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="8">No products found</td>
-    </tr>
-  )}
-</tbody>
-
-
+            {Array.isArray(products) && products.length > 0 ? (
+              products.map(product => (
+                <tr key={product.id_product}>
+                  <td>{product.id_product}</td>
+                  <td>{product.name}</td>
+                  <td>{product.description}</td>
+                  <td>{product.price}</td>
+                  <td>{product.inventory}</td>
+                  <td>{product.stock === '1' ? "In Stock" : "Out of Stock"}</td> {/* Stock as '1' or '0' */}
+                  <td>{Array.isArray(product.categories) ? product.categories.join(', ') : 'No categories'}</td>
+                  <td>
+                    <button className="edit-profile-btn" onClick={() => handleEditProduct(product)}>Edit</button>
+                    <button className="delete-profile-btn" onClick={() => handleDeleteProduct(product.id_product)}>Delete</button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8">No products found</td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </div>
 
@@ -239,21 +233,28 @@ function ProductAdmin() {
             <div className="form-group">
               <label>Inventory</label>
               <input type="number" name="inventory" value={newProduct.inventory} onChange={handleInputChange} className="form-control" />
-              </div>
+            </div>
+
             <div className="form-group">
               <label>Stock</label>
-              <input type="checkbox" name="stock" checked={newProduct.stock} onChange={(e) => setNewProduct(prevState => ({ ...prevState, stock: e.target.checked }))} />
-            </div>
-            <div className="form-group">
-              <label>Categories (Tags)</label>
-              <select multiple className="form-control" value={selectedCategories} onChange={handleCategoryChange}>
-                {categories.map(category => (
-                  <option key={category.id_category} value={category.id_category}>
-                    {category.name}
-                  </option>
-                ))}
+              <select className="form-control" name="stock" onChange={handleInputChange} value={newProduct.stock}>
+                <option value="1">In Stock</option>
+                <option value="0">Out of Stock</option>
               </select>
             </div>
+
+            <div className="form-group">
+              <label>Categories (Tags)</label>
+              <Select
+                options={categories} // Categories for the dropdown
+                isMulti
+                value={categories.filter(category => selectedCategories.includes(category.value))}
+                onChange={handleCategoryChange}
+                className="basic-multi-select"
+                classNamePrefix="select"
+              />
+            </div>
+
             <div className="form-group">
               <label>Color</label>
               <input type="text" name="color" value={newProduct.color} onChange={handleInputChange} className="form-control" />
@@ -282,6 +283,10 @@ function ProductAdmin() {
 }
 
 export default ProductAdmin;
+
+
+
+
 
               
 
