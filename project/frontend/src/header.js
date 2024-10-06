@@ -32,7 +32,7 @@ function Header() {
 
       <nav className="nav-bar">
         <Link to="/" className="nav-link">Home</Link>
-        <Link to="/category" className="nav-link">Category</Link>
+        <Link to="/Category" className="nav-link">Category</Link>
 
         {/* Funcionalidades adicionales solo para empleados y administradores */}
         {userRole >= 2 && (
@@ -45,8 +45,9 @@ function Header() {
         {/* Funcionalidades solo para administradores */}
         {userRole === 3 && (
           <>
-            <Link to="/UserAdmin" className="nav-link">Admin Panel</Link>
-            <Link to="/manage-users" className="nav-link">Manage Users</Link>
+            <Link to="/UserAdmin" className="nav-link">Manage Users</Link>
+            <Link to="/CategoryAdmin" className="nav-link">Manage Category</Link>
+            <Link to="/ProductAdmin" className="nav-link">Manage Product</Link>
           </>
         )}
       </nav>

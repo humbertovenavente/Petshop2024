@@ -12,6 +12,9 @@ import Header from './header';
 import Guest from './guest';
 import Account from './Account';
 import UserAdmin from './UserAdmin';
+import CategoryAdmin from './CategoryAdmin';
+import Category from './Category';
+import ProductAdmin from './ProductAdmin';
 
 
 function App() {
@@ -36,6 +39,9 @@ function App() {
     <Route path='/header' element={ <Header/>}></Route>
     <Route path='/Account' element={ <Account/>}></Route>
     <Route path='/UserAdmin' element={ <UserAdmin/>}></Route>
+    <Route path='/CategoryAdmin' element={ <CategoryAdmin/>}></Route>
+    <Route path='/ProductAdmin' element={ <ProductAdmin/>}></Route>
+    <Route path='/Category' element={ <Category/>}></Route>
 
     </Routes>
     </BrowserRouter>

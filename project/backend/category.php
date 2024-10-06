@@ -24,8 +24,8 @@ if ($conn->connect_error) {
     die(json_encode(['error' => "Conexión fallida: " . $conn->connect_error]));
 }
 
-// Consulta SQL para obtener los datos de los usuarios
-$sql = "SELECT id_user, name, lastname, email, password, address, country, city, zipcode, telephone, credit_card_name, credit_card_number, credit_card_exp, cvv, status, last_login, id_rol FROM User";
+// Consulta SQL para obtener los datos de las categorías
+$sql = "SELECT id_category, name FROM Category";
 $result = $conn->query($sql);
 
 // Verificar si la consulta fue exitosa
@@ -37,14 +37,14 @@ if (!$result) {
 
 // Comprobar si hay resultados
 if ($result->num_rows > 0) {
-    $user = [];
+    $categories = [];
     while($row = $result->fetch_assoc()) {
-        $user[] = $row;
+        $categories[] = $row;
     }
     // Devolver los datos en formato JSON
-    echo json_encode($user);
+    echo json_encode($categories);
 } else {
-    echo json_encode(['message' => 'No users found']);
+    echo json_encode(['message' => 'No se encontraron categorías']);
 }
 
 $conn->close();

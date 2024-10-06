@@ -27,16 +27,16 @@ if ($conn->connect_error) {
 // Leer los datos enviados en el cuerpo de la solicitud POST
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Verificar que el id_user está presente
-if (!isset($data['id_user'])) {
-    echo json_encode(['error' => 'Falta el id_user']);
+// Verificar que el id_category está presente
+if (!isset($data['id_category'])) {
+    echo json_encode(['error' => 'Falta el id_category']);
     exit();
 }
 
-$id_user = $data['id_user'];
+$id_category = $data['id_category'];
 
-// Preparar la consulta SQL para eliminar el usuario
-$sql = "DELETE FROM User WHERE id_user = ?";
+// Preparar la consulta SQL para eliminar la categoría
+$sql = "DELETE FROM Category WHERE id_category = ?";
 $stmt = $conn->prepare($sql);
 
 // Verificar si la preparación de la consulta falló
@@ -47,15 +47,17 @@ if (!$stmt) {
 }
 
 // Asignar el valor a la consulta
-$stmt->bind_param("i", $id_user);
+$stmt->bind_param("i", $id_category);
 
 // Ejecutar la consulta y verificar si fue exitosa
 if ($stmt->execute()) {
-    echo json_encode(['message' => 'Usuario eliminado exitosamente']);
+    echo json_encode(['message' => 'Categoría eliminada exitosamente']);
 } else {
-    echo json_encode(['error' => 'Error al eliminar el usuario', 'details' => $stmt->error]);
+    echo json_encode(['error' => 'Error al eliminar la categoría', 'details' => $stmt->error]);
 }
 
 // Cerrar la declaración y la conexión
 $stmt->close();
 $conn->close();
+?>
+

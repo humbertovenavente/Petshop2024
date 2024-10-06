@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");  // Asegúrate de pe
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
-$host = '192.168.0.10'; // En la máquina virtual, MySQL y PHP están en la misma máquina
+$host = '192.168.0.11'; // En la máquina virtual, MySQL y PHP están en la misma máquina
 $db = 'project';  // Nombre de la base de datos
 $user = 'humbe';  // Usuario de la base de datos
 $pass = 'tu_contraseña';  // Contraseña de la base de datos

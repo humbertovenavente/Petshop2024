@@ -4,16 +4,16 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Habilitar CORS
+// Habilitar CORS para permitir las solicitudes desde el frontend
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
-$host = '192.168.0.11';  // Cambia esto a tu IP si es diferente
+$host = '192.168.0.11';
 $db = 'project';
-$user = 'humbe';  
+$user = 'humbe';
 $pass = 'tu_contraseña';
 
 // Conexión a la base de datos
@@ -27,16 +27,18 @@ if ($conn->connect_error) {
 // Leer los datos enviados en el cuerpo de la solicitud POST
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Verificar que el id_user está presente
-if (!isset($data['id_user'])) {
-    echo json_encode(['error' => 'Falta el id_user']);
+// Extraer los datos del array recibido
+$name = $data['name'] ?? '';
+
+// Verificar si todos los campos requeridos están presentes
+if (empty($name)) {
+    echo json_encode(['error' => 'Falta el campo obligatorio nombre']);
     exit();
 }
 
-$id_user = $data['id_user'];
+// Preparar la consulta SQL para insertar la nueva categoría
+$sql = "INSERT INTO Category (name) VALUES (?)";
 
-// Preparar la consulta SQL para eliminar el usuario
-$sql = "DELETE FROM User WHERE id_user = ?";
 $stmt = $conn->prepare($sql);
 
 // Verificar si la preparación de la consulta falló
@@ -46,16 +48,17 @@ if (!$stmt) {
     exit();
 }
 
-// Asignar el valor a la consulta
-$stmt->bind_param("i", $id_user);
+// Asignar el valor al parámetro de la consulta
+$stmt->bind_param("s", $name);
 
 // Ejecutar la consulta y verificar si fue exitosa
 if ($stmt->execute()) {
-    echo json_encode(['message' => 'Usuario eliminado exitosamente']);
+    echo json_encode(['message' => 'Categoría agregada exitosamente']);
 } else {
-    echo json_encode(['error' => 'Error al eliminar el usuario', 'details' => $stmt->error]);
+    echo json_encode(['error' => 'Error al agregar la categoría', 'details' => $stmt->error]);
 }
 
 // Cerrar la declaración y la conexión
 $stmt->close();
 $conn->close();
+?>
