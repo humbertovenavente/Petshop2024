@@ -22,24 +22,37 @@ if ($conn->connect_error) {
     die(json_encode(['error' => "Connection failed: " . $conn->connect_error]));
 }
 
-// Retrieve product inventory and set stock automatically
-$sql = "SELECT id_product, name, price, inventory, IF(inventory < 1, '0', '1') AS stock FROM Product";
+// SQL query to fetch product inventory and related details
+$sql = "
+    SELECT 
+        id_product, 
+        name, 
+        price, 
+        inventory, 
+        IF(inventory < 1, 'Out of Stock', 'In Stock') AS stock,  
+        color, 
+        size, 
+        rate  
+    FROM Product
+";
+
 $result = $conn->query($sql);
 
-// Check if query was successful
+// Check if the query was successful
 if (!$result) {
     echo json_encode(['error' => 'Error in SQL query: ' . $conn->error]);
     $conn->close();
     exit();
 }
 
+// Organize products into an array
 $inventory = [];
 while ($row = $result->fetch_assoc()) {
     $inventory[] = $row;
 }
 
-// Return inventory data in JSON format
-echo json_encode($inventory);
+// Ensure the response is an array (even if empty)
+echo json_encode($inventory ?: []);
 
 $conn->close();
 ?>

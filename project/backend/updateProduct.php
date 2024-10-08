@@ -37,7 +37,6 @@ $name = $data['name'] ?? null;
 $description = $data['description'] ?? null;
 $price = $data['price'] ?? null;
 $inventory = $data['inventory'] ?? null;
-$stock = $data['stock'] ?? null;
 $comment = $data['comment'] ?? null;
 $color = $data['color'] ?? null;
 $size = $data['size'] ?? null;
@@ -50,12 +49,8 @@ if (empty($id_product) || empty($name) || empty($categories)) {
     exit();
 }
 
-// Automatically set stock to 0 if inventory is 0 or less
-if ($inventory <= 0) {
-    $stock = 0;
-} else {
-    $stock = 1; // Set stock to "In Stock" if inventory is greater than 0
-}
+// Determine the stock status based on inventory
+$stock = $inventory == 0 ? 0 : 1; // 0 for Out of Stock, 1 for In Stock
 
 // Update the product in the Product table
 $sql = "UPDATE Product SET name = ?, description = ?, price = ?, inventory = ?, stock = ?, comment = ?, color = ?, size = ?, rate = ? WHERE id_product = ?";
@@ -103,5 +98,3 @@ if ($stmt->execute()) {
 $stmt->close();
 $conn->close();
 ?>
-
-

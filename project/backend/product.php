@@ -30,11 +30,10 @@ $sql = "
         p.description, 
         p.price, 
         p.inventory, 
-        IF(p.inventory < 1, '0', p.stock) AS stock,  /* Automatically set stock to '0' (Out of Stock) if inventory is less than 1 */
+        IF(p.inventory < 1, 'Out of Stock', 'In Stock') AS stock,  /* Mostrar 'Out of Stock' o 'In Stock' según el inventario */
         p.comment, 
         p.color, 
         p.size, 
-        p.rate, 
         c.id_category,
         c.name AS category_name
     FROM 
@@ -65,11 +64,9 @@ while ($row = $result->fetch_assoc()) {
             'description' => $row['description'],
             'price' => $row['price'],
             'inventory' => $row['inventory'],
-            'stock' => $row['stock'],
             'comment' => $row['comment'],
             'color' => $row['color'],
             'size' => $row['size'],
-            'rate' => $row['rate'],
             'categories' => []
         ];
     }

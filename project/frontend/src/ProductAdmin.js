@@ -21,7 +21,6 @@ function ProductAdmin() {
     comment: '',
     color: '',
     size: '',
-    rate: 0,
   });
 
   // Function to fetch products from the backend
@@ -55,10 +54,20 @@ function ProductAdmin() {
   // Function to handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewProduct(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
+    
+    setNewProduct(prevState => {
+      const updatedProduct = {
+        ...prevState,
+        [name]: value,
+      };
+
+      // Actualizamos el stock según el valor del inventario
+      if (name === 'inventory') {
+        updatedProduct.stock = parseInt(value) === 0 ? '0' : '1'; // Si inventario es 0, el stock es 'Out of Stock'
+      }
+
+      return updatedProduct;
+    });
   };
 
   // Function to handle category selection (using react-select)
@@ -77,7 +86,6 @@ function ProductAdmin() {
       comment: '',
       color: '',
       size: '',
-      rate: 0,
     });
     setSelectedCategories([]); // Clear the selected categories
     setIsEditing(false); // We're adding, not editing
@@ -91,11 +99,10 @@ function ProductAdmin() {
       description: product.description,
       price: product.price,
       inventory: product.inventory,
-      stock: product.stock.toString(), // Convert stock to string for the select box
+      stock: product.inventory === 0 ? '0' : '1', // Asignamos stock basado en el inventario
       comment: product.comment,
       color: product.color,
       size: product.size,
-      rate: product.rate,
     });
     setCurrentProductId(product.id_product); // Set the current product ID being edited
     setSelectedCategories(product.categories || []); // Set the selected categories for this product
@@ -109,7 +116,7 @@ function ProductAdmin() {
   // Function to add a new product
   const handleAddProduct = async () => {
     try {
-      const response = await axios.post('http://172.16.71.178/addProduct.php', { 
+      await axios.post('http://172.16.71.178/addProduct.php', { 
         ...newProduct, 
         categories: selectedCategories 
       });
@@ -123,7 +130,7 @@ function ProductAdmin() {
   // Function to update a product
   const handleUpdateProduct = async () => {
     try {
-      const response = await axios.post('http://172.16.71.178/updateProduct.php', { 
+      await axios.post('http://172.16.71.178/updateProduct.php', { 
         id_product: currentProductId, 
         ...newProduct,
         categories: selectedCategories
@@ -148,7 +155,7 @@ function ProductAdmin() {
   const handleDeleteProduct = async (id_product) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        const response = await axios.post('http://172.16.71.178/deleteProduct.php', { id_product });
+        await axios.post('http://172.16.71.178/deleteProduct.php', { id_product });
         fetchProducts(); // Refresh the product list after deletion
       } catch (error) {
         console.error("Error deleting product:", error);
@@ -180,7 +187,6 @@ function ProductAdmin() {
               <th>Description</th>
               <th>Price</th>
               <th>Inventory</th>
-              <th>Stock</th>
               <th>Categories</th>
               <th>Options</th>
             </tr>
@@ -194,7 +200,6 @@ function ProductAdmin() {
                   <td>{product.description}</td>
                   <td>{product.price}</td>
                   <td>{product.inventory}</td>
-                  <td>{product.stock === '1' ? "In Stock" : "Out of Stock"}</td> {/* Stock as '1' or '0' */}
                   <td>{Array.isArray(product.categories) ? product.categories.join(', ') : 'No categories'}</td>
                   <td>
                     <button className="edit-profile-btn" onClick={() => handleEditProduct(product)}>Edit</button>
@@ -204,7 +209,7 @@ function ProductAdmin() {
               ))
             ) : (
               <tr>
-                <td colSpan="8">No products found</td>
+                <td colSpan="7">No products found</td>
               </tr>
             )}
           </tbody>
@@ -234,10 +239,9 @@ function ProductAdmin() {
               <label>Inventory</label>
               <input type="number" name="inventory" value={newProduct.inventory} onChange={handleInputChange} className="form-control" />
             </div>
-
             <div className="form-group">
               <label>Stock</label>
-              <select className="form-control" name="stock" onChange={handleInputChange} value={newProduct.stock} disabled={newProduct.inventory === '0'}>
+              <select className="form-control" name="stock" onChange={handleInputChange} value={newProduct.stock} disabled={parseInt(newProduct.inventory) === 0}>
                 <option value="1">In Stock</option>
                 <option value="0">Out of Stock</option>
               </select>
@@ -263,10 +267,6 @@ function ProductAdmin() {
               <label>Size</label>
               <input type="text" name="size" value={newProduct.size} onChange={handleInputChange} className="form-control" />
             </div>
-            <div className="form-group">
-              <label>Rate</label>
-              <input type="number" name="rate" value={newProduct.rate} onChange={handleInputChange} className="form-control" />
-            </div>
           </form>
         </Modal.Body>
         <Modal.Footer>
@@ -286,11 +286,3 @@ export default ProductAdmin;
 
 
 
-
-
-
-
-
-              
-
-              
