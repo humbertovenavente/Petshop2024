@@ -15,6 +15,7 @@ import UserAdmin from './UserAdmin';
 import CategoryAdmin from './CategoryAdmin';
 import Category from './Category';
 import ProductAdmin from './ProductAdmin';
+import InventoryAdmin from './inventory';
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
     <Route path='/CategoryAdmin' element={ <CategoryAdmin/>}></Route>
     <Route path='/ProductAdmin' element={ <ProductAdmin/>}></Route>
     <Route path='/Category' element={ <Category/>}></Route>
+    <Route path='/inventory' element={ <InventoryAdmin/>}></Route>
 
     </Routes>
     </BrowserRouter>

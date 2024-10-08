@@ -7,11 +7,11 @@ error_reporting(E_ALL);
 // Habilitar CORS para permitir las solicitudes desde el frontend
 header("Access-Control-Allow-Origin: *");  // Esto permite que cualquier dominio acceda
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");  // Asegúrate de permitir los métodos que necesitas
+header("Access-Control-Allow-Methods: POST, GEAT, OPTIONS");  
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
-$host = '192.168.0.11'; // En la máquina virtual, MySQL y PHP están en la misma máquina
+$host = '172.16.71.178'; // En la máquina virtual, MySQL y PHP están en la misma máquina
 $db = 'project';  // Nombre de la base de datos
 $user = 'humbe';  // Usuario de la base de datos
 $pass = 'tu_contraseña';  // Contraseña de la base de datos

@@ -17,7 +17,7 @@ function CategoryAdmin() {
   // Function to fetch categories from the backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://192.168.0.11/category.php');
+      const response = await axios.get('http://172.16.71.178/category.php');
       console.log("API Response:", response.data);
       if (Array.isArray(response.data)) {
         setCategories(response.data);
@@ -65,7 +65,7 @@ function CategoryAdmin() {
   // Function to add a new category
   const handleAddCategory = async () => {
     try {
-      const response = await axios.post('http://192.168.0.11/addCategory.php', newCategory);
+      const response = await axios.post('http://172.16.71.178/addCategory.php', newCategory);
       console.log("Category added:", response.data);
       fetchCategories(); // Refresh category list after adding
       setShowModal(false); // Close the modal
@@ -77,7 +77,7 @@ function CategoryAdmin() {
    // Function to update a category
    const handleUpdateCategory = async () => {
     try {
-      const response = await axios.post('http://192.168.0.11/updateCategory.php', { 
+      const response = await axios.post('http://172.16.71.178/updateCategory.php', { 
         id_category: currentCategoryId, 
         name: newCategory.name 
       });
@@ -102,7 +102,7 @@ function CategoryAdmin() {
   const handleDeleteCategory = async (id_category) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
-        const response = await axios.post('http://192.168.0.11/deleteCategory.php', { id_category });
+        const response = await axios.post('http://172.16.71.178/deleteCategory.php', { id_category });
         console.log("Category deleted:", response.data);
         fetchCategories(); // Refresh category list after deletion
       } catch (error) {

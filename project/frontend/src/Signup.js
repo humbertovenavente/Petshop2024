@@ -27,8 +27,8 @@ function Signup() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Enviar los datos al servidor PHP mediante Axios
-    axios.post('http://192.168.0.11/signup.php', values)  // Cambia la IP por la de tu máquina virtual
+    
+    axios.post('http://172.16.71.178/signup.php', values)   
       .then(res => {
         console.log("Account created:", res.data);
         if (res.data.message) {

@@ -30,7 +30,7 @@ function UserAdmin() {
   // Función para obtener los usuarios desde el backend
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://192.168.0.11/user.php');
+      const response = await axios.get('http://172.16.71.178/user.php');
       console.log("Respuesta de la API:", response.data);
       if (Array.isArray(response.data)) {
         setUser(response.data);
@@ -88,7 +88,7 @@ function UserAdmin() {
   const handleAddUser = async () => {
     try {
       console.log("Datos que se envían:", newUser);
-      const response = await axios.post('http://192.168.0.11/addProfile.php', newUser);
+      const response = await axios.post('http://172.16.71.178/addProfile.php', newUser);
       console.log("Usuario agregado:", response.data);
       fetchUsers(); // Refrescar la lista de usuarios después de agregar
       setShowModal(false); // Cerrar el modal
@@ -101,7 +101,7 @@ function UserAdmin() {
   const handleUpdateUser = async () => {
     try {
       console.log("Datos que se envían para actualizar:", newUser);
-      const response = await axios.post('http://192.168.0.11/updateProfile2.php', newUser); // Asegúrate de tener un endpoint de actualización
+      const response = await axios.post('http://172.16.71.178/updateProfile2.php', newUser); // Asegúrate de tener un endpoint de actualización
       console.log("Usuario actualizado:", response.data);
       fetchUsers(); // Refrescar la lista de usuarios después de actualizar
       setShowModal(false); // Cerrar el modal
@@ -123,7 +123,7 @@ function UserAdmin() {
 const handleDeleteUser = async (id_user) => {
   if (window.confirm("Are you sure you want to delete this profile?")) { // Confirmación antes de eliminar
     try {
-      const response = await axios.post('http://192.168.0.11/deleteProfile.php', { id_user });
+      const response = await axios.post('http://172.16.71.178/deleteProfile.php', { id_user });
       console.log("Usuario eliminado:", response.data);
       fetchUsers(); // Refrescar la lista de usuarios después de eliminar
     } catch (error) {

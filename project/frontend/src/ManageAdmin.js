@@ -15,7 +15,7 @@ function CategoryAdmin() {
   // Función para obtener las categorías desde el backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://192.168.0.11/category.php');
+      const response = await axios.get('http://172.16.71.178/category.php');
       console.log("Respuesta de la API:", response.data);
       if (Array.isArray(response.data)) {
         setCategories(response.data);

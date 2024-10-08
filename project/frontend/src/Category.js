@@ -9,7 +9,7 @@ function Category() {
   // Function to fetch categories from the backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://192.168.0.11/category.php');
+      const response = await axios.get('http://172.16.71.178/category.php');
       console.log("API Response:", response.data);
       if (Array.isArray(response.data)) {
         setCategories(response.data);

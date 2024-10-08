@@ -27,7 +27,7 @@ function ProductAdmin() {
   // Function to fetch products from the backend
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://192.168.0.11/product.php');
+      const response = await axios.get('http://172.16.71.178/product.php');
       if (Array.isArray(response.data)) {
         setProducts(response.data);
       } else {
@@ -41,7 +41,7 @@ function ProductAdmin() {
   // Function to fetch categories (tags) from the backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://192.168.0.11/category.php');
+      const response = await axios.get('http://172.16.71.178/category.php');
       if (Array.isArray(response.data)) {
         setCategories(response.data.map(cat => ({ value: cat.id_category, label: cat.name }))); // Format categories for react-select
       } else {
@@ -109,7 +109,7 @@ function ProductAdmin() {
   // Function to add a new product
   const handleAddProduct = async () => {
     try {
-      const response = await axios.post('http://192.168.0.11/addProduct.php', { 
+      const response = await axios.post('http://172.16.71.178/addProduct.php', { 
         ...newProduct, 
         categories: selectedCategories 
       });
@@ -123,7 +123,7 @@ function ProductAdmin() {
   // Function to update a product
   const handleUpdateProduct = async () => {
     try {
-      const response = await axios.post('http://192.168.0.11/updateProduct.php', { 
+      const response = await axios.post('http://172.16.71.178/updateProduct.php', { 
         id_product: currentProductId, 
         ...newProduct,
         categories: selectedCategories
@@ -148,7 +148,7 @@ function ProductAdmin() {
   const handleDeleteProduct = async (id_product) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        const response = await axios.post('http://192.168.0.11/deleteProduct.php', { id_product });
+        const response = await axios.post('http://172.16.71.178/deleteProduct.php', { id_product });
         fetchProducts(); // Refresh the product list after deletion
       } catch (error) {
         console.error("Error deleting product:", error);
@@ -237,7 +237,7 @@ function ProductAdmin() {
 
             <div className="form-group">
               <label>Stock</label>
-              <select className="form-control" name="stock" onChange={handleInputChange} value={newProduct.stock}>
+              <select className="form-control" name="stock" onChange={handleInputChange} value={newProduct.stock} disabled={newProduct.inventory === '0'}>
                 <option value="1">In Stock</option>
                 <option value="0">Out of Stock</option>
               </select>
@@ -283,6 +283,9 @@ function ProductAdmin() {
 }
 
 export default ProductAdmin;
+
+
+
 
 
 

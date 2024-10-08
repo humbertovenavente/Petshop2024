@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Database connection
-$host = '192.168.0.11';
+$host = '172.16.71.178';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
@@ -30,7 +30,7 @@ $sql = "
         p.description, 
         p.price, 
         p.inventory, 
-        p.stock, 
+        IF(p.inventory < 1, '0', p.stock) AS stock,  /* Automatically set stock to '0' (Out of Stock) if inventory is less than 1 */
         p.comment, 
         p.color, 
         p.size, 
@@ -86,4 +86,3 @@ echo json_encode($products);
 
 $conn->close();
 ?>
-

@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 // Database connection
-$host = '192.168.0.11';
+$host = '172.16.71.178';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
@@ -48,6 +48,13 @@ $categories = $data['categories'] ?? []; // Array of selected category IDs
 if (empty($id_product) || empty($name) || empty($categories)) {
     echo json_encode(['error' => 'Missing required fields']);
     exit();
+}
+
+// Automatically set stock to 0 if inventory is 0 or less
+if ($inventory <= 0) {
+    $stock = 0;
+} else {
+    $stock = 1; // Set stock to "In Stock" if inventory is greater than 0
 }
 
 // Update the product in the Product table
