@@ -31,7 +31,7 @@ function Header() {
       </header>
 
       <nav className="nav-bar">
-        <Link to="/" className="nav-link">Home</Link>
+        <Link to="/Home" className="nav-link">Home</Link>
         <Link to="/Category" className="nav-link">Category</Link>
 
         {/* Funcionalidades adicionales solo para empleados y administradores */}

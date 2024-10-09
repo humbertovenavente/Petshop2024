@@ -16,6 +16,10 @@ import CategoryAdmin from './CategoryAdmin';
 import Category from './Category';
 import ProductAdmin from './ProductAdmin';
 import InventoryAdmin from './inventory';
+import Home from './Home';
+import CarouselComponent from './CarouselC';
+import ProductCard from './ProductCard';
+import VideoComponent from './VideoC';
 
 
 function App() {
@@ -44,6 +48,14 @@ function App() {
     <Route path='/ProductAdmin' element={ <ProductAdmin/>}></Route>
     <Route path='/Category' element={ <Category/>}></Route>
     <Route path='/inventory' element={ <InventoryAdmin/>}></Route>
+    <Route path='/Home' element={ <Home/>}></Route>
+    <Route path='/CarouselC' element={ <CarouselComponent/>}></Route>
+    <Route path='/ProductC' element={ <ProductCard/>}></Route>
+    <Route path='/VideoC' element={ <VideoComponent/>}></Route>
+
+
+
+
 
     </Routes>
     </BrowserRouter>
