@@ -38,10 +38,16 @@ function CategoryAdmin() {
     }));
   };
 
-  // Función para manejar la selección de múltiples categorías padre usando el select HTML nativo
-  const handleParentCategoryChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-    setSelectedParentCategories(selectedOptions);
+  // Manejar la selección de categorías padre (con checkboxes)
+  const handleCheckboxChange = (e) => {
+    const categoryId = e.target.value;
+    setSelectedParentCategories((prevSelected) => {
+      if (prevSelected.includes(categoryId)) {
+        return prevSelected.filter(id => id !== categoryId); // Deseleccionar si ya estaba seleccionada
+      } else {
+        return [...prevSelected, categoryId]; // Agregar si no estaba seleccionada
+      }
+    });
   };
 
   // Abrir el modal para agregar una nueva categoría
@@ -140,29 +146,30 @@ function CategoryAdmin() {
             <tr>
               <th>ID</th>
               <th>Name</th>
-              <th>Parent Categories</th> {/* Nueva columna para mostrar las categorías padre */}
+              <th>Main Category</th> {/* Nueva columna para mostrar las categorías padre */}
               <th>Options</th>
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(categories) && categories.length > 0 ? (
-              categories.map(category => (
-                <tr key={category.id_category}>
-                  <td>{category.id_category}</td>
-                  <td>{category.name}</td>
-                  <td>{category.parentCategories ? category.parentCategories.join(', ') : 'None'}</td> {/* Mostrar las categorías padre */}
-                  <td>
-                    <button className="edit-profile-btn" onClick={() => handleEditCategory(category)}>Edit</button>
-                    <button className="delete-profile-btn" onClick={() => handleDeleteCategory(category.id_category)}>Delete</button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4">No categories found</td>
-              </tr>
-            )}
-          </tbody>
+  {Array.isArray(categories) && categories.length > 0 ? (
+    categories.map(category => (
+      <tr key={category.id_category}>
+        <td>{category.id_category}</td>
+        <td>{category.name}</td>
+        <td>{category.parent_names ? category.parent_names : 'This is a category'}</td> {/* Mostrar los nombres de las categorías padres */}
+        <td>
+          <button className="edit-profile-btn" onClick={() => handleEditCategory(category)}>Edit</button>
+          <button className="delete-profile-btn" onClick={() => handleDeleteCategory(category.id_category)}>Delete</button>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="4">No categories found</td>
+    </tr>
+  )}
+</tbody>
+
         </table>
       </div>
 
@@ -179,11 +186,17 @@ function CategoryAdmin() {
             </div>
             <div className="form-group">
               <label>Parent Categories</label>
-              <select multiple className="form-control" value={selectedParentCategories} onChange={handleParentCategoryChange}>
-                {categories.map(cat => (
-                  <option key={cat.id_category} value={cat.id_category}>{cat.name}</option>
-                ))}
-              </select>
+              {categories.map(cat => (
+                <div key={cat.id_category}>
+                  <input 
+                    type="checkbox" 
+                    value={cat.id_category} 
+                    checked={selectedParentCategories.includes(cat.id_category)}
+                    onChange={handleCheckboxChange} 
+                  />
+                  {cat.name}
+                </div>
+              ))}
             </div>
           </form>
         </Modal.Body>
@@ -201,3 +214,5 @@ function CategoryAdmin() {
 }
 
 export default CategoryAdmin;
+
+

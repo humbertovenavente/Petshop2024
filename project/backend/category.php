@@ -24,33 +24,30 @@ if ($conn->connect_error) {
 }
 
 // Consulta SQL para obtener categorías
-$sql = "SELECT c.id_category, c.name, GROUP_CONCAT(cp.id_parent) AS parentCategories
-        FROM Category c 
+
+
+// Tu código actual para obtener las categorías
+$sql = "SELECT c.id_category, c.name, GROUP_CONCAT(p.name) AS parent_names 
+        FROM Category c
         LEFT JOIN CategoryParent cp ON c.id_category = cp.id_category
+        LEFT JOIN Category p ON cp.id_parent = p.id_category
         GROUP BY c.id_category";
 
 $result = $conn->query($sql);
 
-// Verificar si hay resultados
-if (!$result) {
-    echo json_encode(['error' => 'Error en la consulta SQL: ' . $conn->error]);
-    $conn->close();
-    exit();
-}
-
 $categories = [];
-
 if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
+    while ($row = $result->fetch_assoc()) {
         $categories[] = [
             'id_category' => $row['id_category'],
             'name' => $row['name'],
-            'parentCategories' => $row['parentCategories'] ? explode(',', $row['parentCategories']) : []
+            'parent_names' => $row['parent_names'] // Esta es la concatenación de los nombres de las categorías padres
         ];
     }
 }
 
 echo json_encode($categories);
+
 $conn->close();
 ?>
 
