@@ -5,20 +5,20 @@ import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 
 function CategoryAdmin() {
-
-  const [categories, setCategories] = useState([]); // Array to store categories
-  const [showModal, setShowModal] = useState(false); // Modal control
-  const [isEditing, setIsEditing] = useState(false); // State to track if we're editing or adding
-  const [currentCategoryId, setCurrentCategoryId] = useState(null); // Store the ID of the category being edited
+  const [categories, setCategories] = useState([]); // Array para almacenar categorías
+  const [selectedParentCategories, setSelectedParentCategories] = useState([]); // Array para categorías padre seleccionadas
+  const [showModal, setShowModal] = useState(false); // Control del modal
+  const [isEditing, setIsEditing] = useState(false); // Estado para saber si estamos editando o agregando
+  const [currentCategoryId, setCurrentCategoryId] = useState(null); // Almacenar el ID de la categoría que se está editando
   const [newCategory, setNewCategory] = useState({
-    name: '' // Only need the category name
+    name: '',
+    parentCategories: []
   });
 
-  // Function to fetch categories from the backend
+  // Función para obtener categorías del backend
   const fetchCategories = async () => {
     try {
       const response = await axios.get('http://172.16.71.178/category.php');
-      console.log("API Response:", response.data);
       if (Array.isArray(response.data)) {
         setCategories(response.data);
       } else {
@@ -29,67 +29,77 @@ function CategoryAdmin() {
     }
   };
 
-  // Function to handle form input changes
+  // Función para manejar cambios en el formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewCategory(prevState => ({
+    setNewCategory((prevState) => ({
       ...prevState,
       [name]: value
     }));
   };
 
-  // Function to open the modal to add a new category
+  // Función para manejar la selección de múltiples categorías padre usando el select HTML nativo
+  const handleParentCategoryChange = (e) => {
+    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+    setSelectedParentCategories(selectedOptions);
+  };
+
+  // Abrir el modal para agregar una nueva categoría
   const handleShowModal = () => {
     setNewCategory({
-      name: '' // Clear form input
+      name: '',
+      parentCategories: []
     });
-    setIsEditing(false); // We're not editing, we're adding
+    setSelectedParentCategories([]);
+    setIsEditing(false); // Estamos agregando, no editando
     setShowModal(true);
   };
 
-  
-
-   // Function to open the modal to edit a category
-   const handleEditCategory = (category) => {
+  // Abrir el modal para editar una categoría
+  const handleEditCategory = (category) => {
     setNewCategory({
-      name: category.name // Load the selected category's name into the input
+      name: category.name,
+      parentCategories: category.parentCategories || []
     });
-    setCurrentCategoryId(category.id_category); // Store the ID of the category being edited
-    setIsEditing(true); // We're editing
-    setShowModal(true); // Open the modal
+    setCurrentCategoryId(category.id_category); // Establecemos el ID de la categoría actual que se está editando
+    setSelectedParentCategories(category.parentCategories || []); // Establecemos las categorías padre seleccionadas
+    setIsEditing(true); // Estamos editando
+    setShowModal(true); // Abrimos el modal
   };
 
-  // Function to close the modal
+  // Cerrar el modal
   const handleCloseModal = () => setShowModal(false);
 
-  // Function to add a new category
+  // Agregar una nueva categoría
   const handleAddCategory = async () => {
     try {
-      const response = await axios.post('http://172.16.71.178/addCategory.php', newCategory);
-      console.log("Category added:", response.data);
-      fetchCategories(); // Refresh category list after adding
-      setShowModal(false); // Close the modal
+      await axios.post('http://172.16.71.178/addCategory.php', { 
+        ...newCategory, 
+        parentCategories: selectedParentCategories 
+      });
+      fetchCategories(); // Refrescamos la lista de categorías después de agregar
+      setShowModal(false); // Cerramos el modal
     } catch (error) {
       console.error("Error adding category:", error);
     }
   };
 
-   // Function to update a category
-   const handleUpdateCategory = async () => {
+  // Actualizar una categoría existente
+  const handleUpdateCategory = async () => {
     try {
-      const response = await axios.post('http://172.16.71.178/updateCategory.php', { 
+      await axios.post('http://172.16.71.178/updateCategory.php', { 
         id_category: currentCategoryId, 
-        name: newCategory.name 
+        name: newCategory.name,
+        parentCategories: selectedParentCategories
       });
-      console.log("Category updated:", response.data);
-      fetchCategories(); // Refresh category list after updating
-      setShowModal(false); // Close the modal
+      fetchCategories(); // Refrescamos la lista de categorías después de actualizar
+      setShowModal(false); // Cerramos el modal
     } catch (error) {
       console.error("Error updating category:", error);
     }
   };
 
-  // Function to save changes (either add or edit)
+  // Guardar cambios (agregar o editar)
   const handleSaveChanges = () => {
     if (isEditing) {
       handleUpdateCategory();
@@ -98,20 +108,19 @@ function CategoryAdmin() {
     }
   };
 
-  // Function to delete a category
+  // Eliminar una categoría
   const handleDeleteCategory = async (id_category) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
-        const response = await axios.post('http://172.16.71.178/deleteCategory.php', { id_category });
-        console.log("Category deleted:", response.data);
-        fetchCategories(); // Refresh category list after deletion
+        await axios.post('http://172.16.71.178/deleteCategory.php', { id_category });
+        fetchCategories(); // Refrescamos la lista de categorías después de eliminar
       } catch (error) {
         console.error("Error deleting category:", error);
       }
     }
   };
 
-  // Fetch categories when component loads
+  // Obtener las categorías cuando el componente se cargue
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -131,6 +140,7 @@ function CategoryAdmin() {
             <tr>
               <th>ID</th>
               <th>Name</th>
+              <th>Parent Categories</th> {/* Nueva columna para mostrar las categorías padre */}
               <th>Options</th>
             </tr>
           </thead>
@@ -140,25 +150,26 @@ function CategoryAdmin() {
                 <tr key={category.id_category}>
                   <td>{category.id_category}</td>
                   <td>{category.name}</td>
+                  <td>{category.parentCategories ? category.parentCategories.join(', ') : 'None'}</td> {/* Mostrar las categorías padre */}
                   <td>
-                  <button className="delete-profile-btn" onClick={() => handleEditCategory(category)}>Edit</button>
+                    <button className="edit-profile-btn" onClick={() => handleEditCategory(category)}>Edit</button>
                     <button className="delete-profile-btn" onClick={() => handleDeleteCategory(category.id_category)}>Delete</button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="3">No categories found</td>
+                <td colSpan="4">No categories found</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Modal for adding a new category */}
+      {/* Modal para agregar o editar una categoría */}
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-        <Modal.Title>{isEditing ? 'Edit Category' : 'Add New Category'}</Modal.Title>
+          <Modal.Title>{isEditing ? 'Edit Category' : 'Add New Category'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form>
@@ -166,12 +177,21 @@ function CategoryAdmin() {
               <label>Category Name</label>
               <input type="text" name="name" value={newCategory.name} onChange={handleInputChange} className="form-control" />
             </div>
+            <div className="form-group">
+              <label>Parent Categories</label>
+              <select multiple className="form-control" value={selectedParentCategories} onChange={handleParentCategoryChange}>
+                {categories.map(cat => (
+                  <option key={cat.id_category} value={cat.id_category}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
           </form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
           <Button variant="primary" onClick={handleSaveChanges}>
-          {isEditing ? 'Save Changes' : 'Add'} </Button>
+            {isEditing ? 'Save Changes' : 'Add'}
+          </Button>
         </Modal.Footer>
       </Modal>
 

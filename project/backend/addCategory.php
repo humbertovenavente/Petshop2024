@@ -4,19 +4,18 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Habilitar CORS para permitir las solicitudes desde el frontend
+// Habilitar CORS
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
-// Configuración de la base de datos
+// Conexión a la base de datos
 $host = '172.16.71.178';
-db = 'project';
-user = 'humbe';
+$db = 'project';
+$user = 'humbe';
 $pass = 'tu_contraseña';
 
-// Conexión a la base de datos
 $conn = new mysqli($host, $user, $pass, $db);
 
 // Verificar la conexión
@@ -24,41 +23,46 @@ if ($conn->connect_error) {
     die(json_encode(['error' => "Conexión fallida: " . $conn->connect_error]));
 }
 
-// Leer los datos enviados en el cuerpo de la solicitud POST
+// Leer los datos recibidos
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Extraer los datos del array recibido
 $name = $data['name'] ?? '';
+$parentCategories = $data['parentCategories'] ?? [];
 
-// Verificar si todos los campos requeridos están presentes
+// Validar los campos
 if (empty($name)) {
-    echo json_encode(['error' => 'Falta el campo obligatorio nombre']);
+    echo json_encode(['error' => 'El campo nombre es obligatorio']);
     exit();
 }
 
-// Preparar la consulta SQL para insertar la nueva categoría
+// Insertar la categoría
 $sql = "INSERT INTO Category (name) VALUES (?)";
-
 $stmt = $conn->prepare($sql);
 
-// Verificar si la preparación de la consulta falló
 if (!$stmt) {
-    echo json_encode(['error' => "Error en la preparación de la consulta: " . $conn->error]);
-    $conn->close();
+    echo json_encode(['error' => "Error preparando la consulta: " . $conn->error]);
     exit();
 }
 
-// Asignar el valor al parámetro de la consulta
 $stmt->bind_param("s", $name);
 
-// Ejecutar la consulta y verificar si fue exitosa
 if ($stmt->execute()) {
+    $id_category = $stmt->insert_id;
+
+    // Insertar las categorías padre en la tabla intermedia
+    foreach ($parentCategories as $id_parent) {
+        $sqlParent = "INSERT INTO CategoryParent (id_category, id_parent) VALUES (?, ?)";
+        $stmtParent = $conn->prepare($sqlParent);
+        $stmtParent->bind_param("ii", $id_category, $id_parent);
+        $stmtParent->execute();
+    }
+
     echo json_encode(['message' => 'Categoría agregada exitosamente']);
 } else {
-    echo json_encode(['error' => 'Error al agregar la categoría', 'details' => $stmt->error]);
+    echo json_encode(['error' => 'Error al agregar la categoría']);
 }
 
-// Cerrar la declaración y la conexión
 $stmt->close();
 $conn->close();
 ?>
+
