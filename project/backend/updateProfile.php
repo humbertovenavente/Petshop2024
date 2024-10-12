@@ -45,7 +45,7 @@ $telephone = $data['telephone'];
 $credit_card_name = $data['credit_card_name'];
 $credit_card_number = $data['credit_card_number'];
 $credit_card_exp = $data['credit_card_exp'];
-$cvv = (int)$data['cvv'];  // Convertimos CVV a entero
+$cvv = (int)$data['cvv']; 
 
 // Actualizar el perfil en la base de datos
 $sql = "UPDATE User SET name = ?, lastname = ?, password = ?, address = ?, city = ?, country = ?, zipcode = ?, telephone = ?, credit_card_name = ?, credit_card_number = ?, credit_card_exp = ?, cvv = ? WHERE email = ?";

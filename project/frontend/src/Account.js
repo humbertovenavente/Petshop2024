@@ -80,7 +80,7 @@ function Account() {
 
     // Save changes to backend
     const handleSaveChanges = async () => {
-        console.log('Datos enviados:', editedProfile);  // Esto imprimirá los datos que se envían al backend
+        console.log('Datos enviados:', editedProfile);  
 
         try {
             await axios.post('http://172.16.71.178/updateProfile.php', editedProfile); 
@@ -102,7 +102,7 @@ function Account() {
 
     if (!email || !password) {
         return (
-            <div>
+            <div id="root">
                 <Header />
                 <main className="main">
                     <h1>Guest Access</h1>

@@ -170,8 +170,9 @@ function ProductAdmin() {
   }, []);
 
   return (
-    <div>
+    <div id="root">
       <Header />
+      <main>
       <div>
         <h1>Product Management</h1>
 
@@ -276,6 +277,7 @@ function ProductAdmin() {
           </Button>
         </Modal.Footer>
       </Modal>
+      </main>
 
       <Footer />
     </div>

@@ -77,7 +77,7 @@ function CategoryAdmin() {
   }, []);
 
   return (
-    <div>
+    <div id="root">
       <Header />
       <div>
         <h1>Administración de Categorías</h1>

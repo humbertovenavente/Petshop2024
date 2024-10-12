@@ -132,7 +132,7 @@ function CategoryAdmin() {
   }, []);
 
   return (
-    <div>
+    <div id="root">
       <Header />
       <div>
         <h1>Category Management</h1>

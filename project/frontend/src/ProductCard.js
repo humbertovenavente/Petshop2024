@@ -1,15 +1,18 @@
 import React from 'react';
-import { Card, Button } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 
 function ProductCard({ product }) {
+  // Valida que las propiedades estén definidas antes de usarlas
+  const { name, price, image, categories = [] } = product;
+
   return (
-    <Card className="product-card">
-      <Card.Img variant="top" src={`data:image/jpeg;base64,${product.image}`} />
+    <Card style={{ width: '18rem' }}>
+      <Card.Img variant="top" src={image || 'placeholder-image-url'} alt={name} />
       <Card.Body>
-        <Card.Title>{product.name}</Card.Title>
-        <Card.Text>Precio: {product.price}</Card.Text>
-        <Card.Text>Categorías: {product.categories.join(', ')}</Card.Text>
-        <Button variant="primary">Ver Artículo</Button>
+        <Card.Title>{name}</Card.Title>
+        <Card.Text>Precio: {price}</Card.Text>
+        {/* Solo intenta usar .join() si categories es un array */}
+        <Card.Text>Categorías: {categories.length > 0 ? categories.join(', ') : 'Sin categorías'}</Card.Text>
       </Card.Body>
     </Card>
   );

@@ -6,9 +6,13 @@ import { Modal, Button } from 'react-bootstrap';
 
 function UserAdmin() {
 
+  // State to store the list of users
   const [user, setUser] = useState([]);
-  const [showModal, setShowModal] = useState(false); // Control del modal
-  const [isEditing, setIsEditing] = useState(false); // Si estamos editando o agregando
+  // State to control whether the modal is visible or not
+  const [showModal, setShowModal] = useState(false); 
+  // State to control whether we are in edit mode (true) or adding mode (false)
+  const [isEditing, setIsEditing] = useState(false); 
+  // State to store the new user details or the user being edited
   const [newUser, setNewUser] = useState({
     name: '',
     lastname: '',
@@ -23,26 +27,27 @@ function UserAdmin() {
     credit_card_number: '',
     credit_card_exp: '',
     cvv: '',
-    id_rol: '1', // Rol por defecto
-    status: '1'  // Status por defecto (Activo)
+    id_rol: '1', // Default role
+    status: '1'  // Default status (Active)
   });
 
-  // Función para obtener los usuarios desde el backend
+  // Function to fetch users from the backend
   const fetchUsers = async () => {
     try {
       const response = await axios.get('http://172.16.71.178/user.php');
-      console.log("Respuesta de la API:", response.data);
+      console.log("API Response:", response.data);
+      // Check if the response data is an array before setting the state
       if (Array.isArray(response.data)) {
         setUser(response.data);
       } else {
-        console.error("La respuesta no es un array:", response.data);
+        console.error("Response is not an array:", response.data);
       }
     } catch (error) {
-      console.error("Error al obtener los usuarios:", error);
+      console.error("Error fetching users:", error);
     }
   };
 
-  // Función para manejar los cambios en el formulario
+  // Function to handle changes in the form inputs for newUser
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewUser(prevState => ({
@@ -51,9 +56,9 @@ function UserAdmin() {
     }));
   };
 
-
-  // Función para abrir el modal para agregar
+  // Function to open the modal for adding a new user
   const handleShowModal = () => {
+    // Reset newUser to empty fields before opening the modal for adding
     setNewUser({
       name: '',
       lastname: '',
@@ -68,85 +73,85 @@ function UserAdmin() {
       credit_card_number: '',
       credit_card_exp: '',
       cvv: '',
-      id_rol: '1',
-      status: '1'
+      id_rol: '1', // Default role when adding
+      status: '1'  // Default status (Active) when adding
     });
-    setIsEditing(false); // No estamos editando, estamos agregando
-    setShowModal(true);
+    setIsEditing(false); // Set to adding mode
+    setShowModal(true);  // Show the modal
   };
 
- // Función para cerrar el modal
- const handleCloseModal = () => setShowModal(false);
-  // Función para abrir el modal para editar
+  // Function to close the modal
+  const handleCloseModal = () => setShowModal(false);
+  // Function to open the modal for editing a user
   const handleEditUser = (user) => {
-    setNewUser(user); // Cargar los datos del usuario seleccionado
-    setIsEditing(true); // Estamos en modo edición
-    setShowModal(true); // Mostrar el modal
+    setNewUser(user);  // Load the selected user's data into the form
+    setIsEditing(true);  // Set to editing mode
+    setShowModal(true);  // Show the modal
   };
 
-  // Función para agregar un nuevo usuario
+  // Function to add a new user
   const handleAddUser = async () => {
     try {
-      console.log("Datos que se envían:", newUser);
+      console.log("Sending data:", newUser);
       const response = await axios.post('http://172.16.71.178/addProfile.php', newUser);
-      console.log("Usuario agregado:", response.data);
-      fetchUsers(); // Refrescar la lista de usuarios después de agregar
-      setShowModal(false); // Cerrar el modal
+      console.log("User added:", response.data);
+      fetchUsers();  // Refresh the user list after adding
+      setShowModal(false);  // Close the modal
     } catch (error) {
-      console.error("Error al agregar el usuario:", error);
+      console.error("Error adding user:", error);
     }
   };
 
-  // Función para actualizar un usuario
+  // Function to update an existing user
   const handleUpdateUser = async () => {
     try {
-      console.log("Datos que se envían para actualizar:", newUser);
-      const response = await axios.post('http://172.16.71.178/updateProfile2.php', newUser); // Asegúrate de tener un endpoint de actualización
-      console.log("Usuario actualizado:", response.data);
-      fetchUsers(); // Refrescar la lista de usuarios después de actualizar
-      setShowModal(false); // Cerrar el modal
+      console.log("Sending data for update:", newUser);
+      const response = await axios.post('http://172.16.71.178/updateProfile2.php', newUser);  // Update endpoint
+      console.log("User updated:", response.data);
+      fetchUsers();  // Refresh the user list after updating
+      setShowModal(false);  // Close the modal
     } catch (error) {
-      console.error("Error al actualizar el usuario:", error);
+      console.error("Error updating user:", error);
     }
   };
 
-  // Función que decide si agregar o actualizar en el modal
+  // Function to decide whether to add or update a user when saving changes
   const handleSaveChanges = () => {
     if (isEditing) {
-      handleUpdateUser();
+      handleUpdateUser();  // If editing, update the user
     } else {
-      handleAddUser();
+      handleAddUser();  // If adding, add a new user
     }
   };
 
-  // Función para eliminar un usuario
-const handleDeleteUser = async (id_user) => {
-  if (window.confirm("Are you sure you want to delete this profile?")) { // Confirmación antes de eliminar
-    try {
-      const response = await axios.post('http://172.16.71.178/deleteProfile.php', { id_user });
-      console.log("Usuario eliminado:", response.data);
-      fetchUsers(); // Refrescar la lista de usuarios después de eliminar
-    } catch (error) {
-      console.error("Error al eliminar el usuario:", error);
+  // Function to delete a user
+  const handleDeleteUser = async (id_user) => {
+    if (window.confirm("Are you sure you want to delete this profile?")) {  // Confirmation before deletion
+      try {
+        const response = await axios.post('http://172.16.71.178/deleteProfile.php', { id_user });
+        console.log("User deleted:", response.data);
+        fetchUsers();  // Refresh the user list after deletion
+      } catch (error) {
+        console.error("Error deleting user:", error);
+      }
     }
-  }
-};
+  };
 
-
+  // UseEffect to fetch the user list when the component is mounted
   useEffect(() => {
-    fetchUsers(); // Llamar a la función al cargar el componente
-  }, []);
+    fetchUsers();  // Fetch users when the component loads
+  }, []);  // Empty dependency array ensures it only runs once when the component mounts
 
   return (
-    <div>
-      <Header />
+    <div id="root">
+      <Header /> 
+      <main>
       <div>
         <h1>List of Clients</h1>
-
+    
         <div className="account-profile">
           <button className="edit-profile-btn" onClick={handleShowModal}>Add New Profile</button>
         </div>
-
         <table className="table table-striped">
           <thead>
             <tr>
@@ -159,12 +164,12 @@ const handleDeleteUser = async (id_user) => {
               <th>Address</th>
               <th>City</th>
               <th>Country</th>
-              <th>zipcode</th>
-              <th>credit_card_name</th>
-              <th>credit_card_number</th>
-              <th>credit_card_exp</th>
+              <th>Zip Code</th>
+              <th>Credit Card Name</th>
+              <th>Credit Card Number</th>
+              <th>Credit Card Expiration</th>
               <th>CVV</th>
-              <th>Rol</th>
+              <th>Role</th>
               <th>Status</th>
               <th>Last Login</th>
               <th>Options</th>
@@ -206,10 +211,9 @@ const handleDeleteUser = async (id_user) => {
         </table>
       </div>
 
-      {/* Modal para agregar o editar usuario */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>{isEditing ? 'Edit User' : 'Add New User'}</Modal.Title>
+          <Modal.Title>{isEditing ? 'Edit User' : 'Add New User'}</Modal.Title>  {/* Change modal title based on mode */}
         </Modal.Header>
         <Modal.Body>
           <form>
@@ -266,7 +270,7 @@ const handleDeleteUser = async (id_user) => {
               <input type="text" name="cvv" value={newUser.cvv} onChange={handleInputChange} className="form-control" />
             </div>
             <div className="form-group">
-              <label>Rol</label>
+              <label>Role</label>
               <select className="form-control" name="id_rol" onChange={handleInputChange} value={newUser.id_rol}>
                 <option value="1">User</option>
                 <option value="2">Employee</option>
@@ -291,10 +295,11 @@ const handleDeleteUser = async (id_user) => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      <Footer />
+      <Footer /> 
+      </main> 
     </div>
   );
 }
 
 export default UserAdmin;
+

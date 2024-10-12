@@ -32,7 +32,7 @@ function Header() {
 
       <nav className="nav-bar">
         <Link to="/Home" className="nav-link">Home</Link>
-        <Link to="/Category" className="nav-link">Category</Link>
+        <Link to="/Category" className="nav-link">All Products</Link>
 
         {/* Funcionalidades adicionales solo para empleados y administradores */}
         {userRole >= 2 && (

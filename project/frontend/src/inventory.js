@@ -32,7 +32,7 @@ const fetchProducts = async () => {
   }, []);
 
   return (
-    <div>
+    <div id="root">
       <Header />
       <div>
         <h1>Inventario de Productos</h1>

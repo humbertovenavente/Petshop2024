@@ -1,8 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
 
 function Admin() {
+
+  const navigate = useNavigate();  // Hook de react-router-dom para redireccionar
+
+  // useEffect para redirigir automáticamente
+  useEffect(() => {
+    navigate('/Home');  // Redirige a la ruta /Home
+  }, [navigate]);
+  
   const userName = localStorage.getItem('userName'); // Obtén el nombre del usuario desde localStorage
   const userRole = localStorage.getItem('userRole');
   

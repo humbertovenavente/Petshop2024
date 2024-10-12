@@ -61,16 +61,17 @@ body, html {
   width: 40px;
 }
 
-/* Barra de navegación */
+/* Barra de navegación fija debajo del header */
 .nav-bar {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 15px 0;
   background-color: lightgray;
-  position: relative;
-  top: 60px;
+  position: fixed;
+  top: 60px; /* Colocada justo debajo del header */
   width: 100%;
+  z-index: 999; /* Asegura que esté sobre el contenido */
   font-size: 22px;
 }
 
@@ -113,7 +114,7 @@ body, html {
 /* Para asegurar que el contenido no quede tapado por el footer */
 main {
   flex: 1;  /* El contenido principal ocupará todo el espacio disponible */
-  padding-top: 70px; /* Espacio para el header */
+  padding-top: 120px; /* Espacio para el header y la barra de navegación */
   padding-bottom: 80px; /* Espacio para el footer */
 }
 
