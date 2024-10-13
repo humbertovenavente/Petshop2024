@@ -11,7 +11,7 @@ function Emp() {
   useEffect(() => {
     navigate('/Home');  // Redirige a la ruta /Home
   }, [navigate]);
-  const userName = localStorage.getItem('userName'); // Obtén el nombre del usuario desde localStorage
+  
   const userRole = localStorage.getItem('userRole');
   
     if (userRole !== '2') {
@@ -22,7 +22,7 @@ function Emp() {
     <div> 
       <Header />
         <main className="main">Welcome back
-        <p>{userName}</p> {/* Si userName existe, lo muestra */}
+       
         </main>
     <Footer /> </div>
   );

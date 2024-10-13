@@ -14,7 +14,7 @@ function Home() {
     { name: 'Producto B', price: '$140', image: image1, categories: ['Cat1', 'Cat3'] },
     { name: 'Producto C', price: '$160', image: image1, categories: [] },
     { name: 'Producto D', price: '$180', image: image1, categories: ['Cat2'] },
-    { name: 'Producto E', price: '$200', image: image1 },  // Sin categorías
+    { name: 'Producto E', price: '$200', image: image1 },  
     { name: 'Producto F', price: '$220', image: image1, categories: ['Cat4'] },
     { name: 'Producto G', price: '$240', image: image1 },
     { name: 'Producto H', price: '$260', image: image1, categories: ['Cat1'] },

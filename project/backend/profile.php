@@ -5,16 +5,16 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Habilitar CORS para permitir las solicitudes desde el frontend
-header("Access-Control-Allow-Origin: *");  // Esto permite que cualquier dominio acceda
+header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");  // Asegúrate de permitir los métodos que necesitas
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
-$host = '172.16.71.178'; // En la máquina virtual, MySQL y PHP están en la misma máquina
-$db = 'project';  // Nombre de la base de datos
-$user = 'humbe';  // Usuario de la base de datos
-$pass = 'tu_contraseña';  // Contraseña de la base de datos
+$host = '192.168.0.131'; 
+$db = 'project';  
+$user = 'humbe';  
+$pass = 'tu_contraseña';
 
 // Conexión a la base de datos
 $conn = new mysqli($host, $user, $pass, $db);
@@ -30,7 +30,8 @@ $data = json_decode(file_get_contents("php://input"), true);
 $email = $data['email'];
 $password = $data['password'];
 
-$sql = "SELECT name, lastname, email, password, address, country, city, zipcode, telephone, credit_card_name, credit_card_number, credit_card_exp, cvv, status, last_login, id_rol FROM User WHERE email = ? AND password = ?";
+// Consultar la información del perfil del usuario
+$sql = "SELECT name, lastname, email, telephone, address, country, city, zipcode, credit_card_name, credit_card_number, credit_card_exp, cvv, status, last_login, id_rol FROM User WHERE email = ? AND password = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $email, $password);
 $stmt->execute();
@@ -47,4 +48,3 @@ if ($result->num_rows > 0) {
 $stmt->close();
 $conn->close();
 ?>
-

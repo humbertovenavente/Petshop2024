@@ -26,7 +26,7 @@ function ProductAdmin() {
   // Function to fetch products from the backend
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://172.16.71.178/product.php');
+      const response = await axios.get('http://192.168.0.131/product.php');
       if (Array.isArray(response.data)) {
         setProducts(response.data);
       } else {
@@ -40,7 +40,7 @@ function ProductAdmin() {
   // Function to fetch categories (tags) from the backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://172.16.71.178/category.php');
+      const response = await axios.get('http://192.168.0.131/category.php');
       if (Array.isArray(response.data)) {
         setCategories(response.data.map(cat => ({ value: cat.id_category, label: cat.name }))); // Format categories for react-select
       } else {
@@ -116,7 +116,7 @@ function ProductAdmin() {
   // Function to add a new product
   const handleAddProduct = async () => {
     try {
-      await axios.post('http://172.16.71.178/addProduct.php', { 
+      await axios.post('http://192.168.0.131/addProduct.php', { 
         ...newProduct, 
         categories: selectedCategories 
       });
@@ -130,7 +130,7 @@ function ProductAdmin() {
   // Function to update a product
   const handleUpdateProduct = async () => {
     try {
-      await axios.post('http://172.16.71.178/updateProduct.php', { 
+      await axios.post('http://192.168.0.131/updateProduct.php', { 
         id_product: currentProductId, 
         ...newProduct,
         categories: selectedCategories
@@ -155,7 +155,7 @@ function ProductAdmin() {
   const handleDeleteProduct = async (id_product) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.post('http://172.16.71.178/deleteProduct.php', { id_product });
+        await axios.post('http://192.168.0.131/deleteProduct.php', { id_product });
         fetchProducts(); // Refresh the product list after deletion
       } catch (error) {
         console.error("Error deleting product:", error);

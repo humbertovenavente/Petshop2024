@@ -3,41 +3,45 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Login() {
-
   const navigate = useNavigate(); 
-
-  // acceso como invitado
-  const handleGuestAccess = () => {
-    localStorage.setItem('userRole', 'guest'); 
-    navigate('/guest'); 
-  };
 
   const [values, setValues] = useState({
     email: '',
     password: '',
   });
 
+  const [loading, setLoading] = useState(false); // Estado para el "loading"
+  const [error, setError] = useState(null); // Estado para manejar errores
+
+  // Maneja el inicio de sesión como invitado
+  const handleGuestAccess = () => {
+    localStorage.setItem('userRole', 'guest'); 
+    navigate('/'); 
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+    setLoading(true); // Mostrar el loading cuando comienza la solicitud
+    setError(null); // Resetear el estado de error antes de la nueva solicitud
+
     try {
       // Enviar los datos al backend para autenticación
-      const response = await axios.post('http://172.16.71.178/login.php', values);
+      const response = await axios.post('http://192.168.0.131/login.php', values);
       
       // Supongamos que el backend devuelve el rol del usuario
       const { data } = response;
 
-      if (data.error){
-        alert(data.error);
-      }
-  
-      else if (data.rol) {
-        // Guardamos el rol y otros detalles en localStorage
-        localStorage.setItem('email', values.email);  // Guardar el email
-        localStorage.setItem('password', values.password);  // Guardar la contraseña (no recomendable en proyectos reales)
-        localStorage.setItem('userRole', data.rol);  // Guardar el rol
-        localStorage.setItem('userName', data.name);  // Guardar el nombre
-      
+      setLoading(false); // Ocultar el loading después de recibir la respuesta
+
+      if (data.error) {
+        setError(data.error); // Mostrar el error recibido del backend
+      } else if (data.rol) {
+        // Guardamos el rol, email, nombre y otros detalles en localStorage
+        localStorage.setItem('email', values.email);
+        localStorage.setItem('password', values.password); // Also store the password
+        localStorage.setItem('userRole', data.rol); 
+        localStorage.setItem('userName', data.name); 
+
         // Redirigir al dashboard o página correspondiente según el rol
         if (data.rol === 3) {
           navigate('/admin');
@@ -47,17 +51,18 @@ function Login() {
           navigate('/user');
         }
       } else {
-        alert('Credenciales incorrectas');
+        setError('Credenciales incorrectas');
       }
 
     } catch (error) {
+      setLoading(false); // Ocultar el loading en caso de error
       console.log("Error:", error);
-      alert('Error al iniciar sesión. Verifica tus credenciales.');
+      setError('Error al iniciar sesión. Verifica tus credenciales.');
     }
   };
 
   const handleInput = (event) => {
-    setValues(prev => ({...prev, [event.target.name]: event.target.value}));
+    setValues(prev => ({ ...prev, [event.target.name]: event.target.value }));
   };
 
   return (
@@ -65,15 +70,34 @@ function Login() {
       <div className='bg-white p-3 rounded w-25'>
         <form onSubmit={handleSubmit}>
           <p>Log In</p>
+
+          {/* Mostrar mensajes de error si ocurren */}
+          {error && <p className="text-danger">{error}</p>}
        
           <div className='mb-3'> 
             <label htmlFor='email'>Email</label>
-            <input type="email" placeholder='Enter email' name='email' onChange={handleInput} className='form-control rounded-0'></input>
+            <input 
+              type="email" 
+              placeholder='Enter email' 
+              name='email' 
+              onChange={handleInput} 
+              className='form-control rounded-0'
+              required
+              disabled={loading} // Desactivar el campo si está en estado "loading"
+            />
           </div>
 
           <div className='mb-3'>
             <label htmlFor='password'>Password</label>
-            <input type="password" placeholder='Enter password' name='password' onChange={handleInput} className='form-control rounded-0'></input>
+            <input 
+              type="password" 
+              placeholder='Enter password' 
+              name='password' 
+              onChange={handleInput} 
+              className='form-control rounded-0'
+              required
+              disabled={loading} // Desactivar el campo si está en estado "loading"
+            />
           </div>
 
           <div className="text-end mb-3">
@@ -81,7 +105,13 @@ function Login() {
           </div>
 
           <div className='d-grid gap-2'>
-            <button type= 'submit' className='btn btn-success'>Log in</button>
+            {loading ? (
+              <button className='btn btn-success' type="button" disabled>
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+              </button>
+            ) : (
+              <button type='submit' className='btn btn-success'>Log in</button>
+            )}
 
             <Link to="/signup" className='btn btn-default border bg-light rounded-0 text-decoration-none'>Create an Account</Link>
             <p></p>
@@ -89,8 +119,9 @@ function Login() {
               type="button" 
               className='btn btn-secondary'
               onClick={handleGuestAccess}
+              disabled={loading} // Desactivar el botón si está en estado "loading"
             >
-              Access as Guest
+              Go back
             </button>
           </div>
         </form>
@@ -100,5 +131,3 @@ function Login() {
 }
 
 export default Login;
-
-

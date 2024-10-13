@@ -18,7 +18,7 @@ function CategoryAdmin() {
   // Función para obtener categorías del backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://172.16.71.178/category.php');
+      const response = await axios.get('http://192.168.0.131/category.php');
       if (Array.isArray(response.data)) {
         setCategories(response.data);
       } else {
@@ -79,7 +79,7 @@ function CategoryAdmin() {
   // Agregar una nueva categoría
   const handleAddCategory = async () => {
     try {
-      await axios.post('http://172.16.71.178/addCategory.php', { 
+      await axios.post('http://192.168.0.131/addCategory.php', { 
         ...newCategory, 
         parentCategories: selectedParentCategories 
       });
@@ -93,7 +93,7 @@ function CategoryAdmin() {
   // Actualizar una categoría existente
   const handleUpdateCategory = async () => {
     try {
-      await axios.post('http://172.16.71.178/updateCategory.php', { 
+      await axios.post('http://192.168.0.131/updateCategory.php', { 
         id_category: currentCategoryId, 
         name: newCategory.name,
         parentCategories: selectedParentCategories
@@ -118,7 +118,7 @@ function CategoryAdmin() {
   const handleDeleteCategory = async (id_category) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
-        await axios.post('http://172.16.71.178/deleteCategory.php', { id_category });
+        await axios.post('http://192.168.0.131/deleteCategory.php', { id_category });
         fetchCategories(); // Refrescamos la lista de categorías después de eliminar
       } catch (error) {
         console.error("Error deleting category:", error);
@@ -134,6 +134,7 @@ function CategoryAdmin() {
   return (
     <div id="root">
       <Header />
+      <main> 
       <div>
         <h1>Category Management</h1>
 
@@ -208,7 +209,9 @@ function CategoryAdmin() {
         </Modal.Footer>
       </Modal>
 
+      </main>
       <Footer />
+
     </div>
   );
 }

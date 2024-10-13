@@ -11,7 +11,7 @@ function Footer() {
     try {
       if (email) {
         // Actualizar el last_login antes de hacer el logout
-        await axios.post('http://172.16.71.178/lastlogin.php', { email });
+        await axios.post('http://192.168.0.131/lastlogin.php', { email });
       }
 
       // Limpiar el localStorage y redirigir
@@ -28,6 +28,7 @@ function Footer() {
         <Link to="/about">About Us</Link>
         <Link to="/social">Social</Link>
         <Link to="/contact">Contact Us</Link>
+        
         {userRole !== 'guest' && (
           <button onClick={handleLogout} className="btn btn-link">Log Out</button>
         )}

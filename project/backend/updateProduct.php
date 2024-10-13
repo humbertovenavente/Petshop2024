@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 // Database connection
-$host = '172.16.71.178';
+$host = '192.168.0.131';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';

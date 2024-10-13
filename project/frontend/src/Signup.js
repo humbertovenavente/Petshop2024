@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 function Signup() {
-
   const [values, setValues] = useState({
     name: '',
     lastname: '',
     email: '',
     password: '',
-    id_rol: '1' // I would like to put a default, since I can only use 1-2-3, it must starts as a default 1, id_role from role is 
+    confirmPassword: '',
+    id_rol: '1'  // Rol por defecto
   });
 
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Maneja la entrada del formulario y actualiza el estado
@@ -23,23 +24,47 @@ function Signup() {
     });
   };
 
+  // Validar campos antes de enviar el formulario
+  const validate = () => {
+    let errors = {};
+    if (!values.name) errors.name = "Name is required";
+    if (!values.lastname) errors.lastname = "Lastname is required";
+    if (!values.email) errors.email = "Email is required";
+    if (!values.password) errors.password = "Password is required";
+    if (!values.confirmPassword) errors.confirmPassword = "Confirm your password";
+    if (values.password !== values.confirmPassword) errors.confirmPassword = "Passwords do not match";
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   // Maneja el envío del formulario
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    
-    axios.post('http://172.16.71.178/signup.php', values)   
-      .then(res => {
-        console.log("Account created:", res.data);
-        if (res.data.message) {
-          alert('The user was created successfully');
-        }
+    if (!validate()) return; // Si no pasa la validación, no continúa
+
+    setLoading(true);  // Mostrar loading mientras se envía la solicitud
+
+    axios.post('http://192.168.0.131/signup.php', values, {
+      withCredentials: true,  // Esto es necesario si envías cookies o credenciales
+    })
+    .then(res => {
+      setLoading(false);
+      const { data } = res;
+
+      if (data.error) {
+        setErrors({ email: data.error });  // Mostrar mensaje de error si el correo ya existe
+      } else {
+        alert('The user was created successfully. Check your email to verify your account.');
         navigate('/');
-      })
-      .catch(err => {
-        console.log("Error:", err);
-        alert('Error ocurred when try to create the user');
-      });
+      }
+    })
+    .catch(err => {
+      setLoading(false);
+      console.log("Error:", err);
+      alert('Error occurred while trying to create the user');
+    });
   };
 
   return (
@@ -57,7 +82,9 @@ function Signup() {
               onChange={handleInput} 
               value={values.name} 
               className='form-control rounded-0'
+              required
             />
+            {errors.name && <p className="text-danger">{errors.name}</p>}
           </div>
 
           <div className='mb-3'>
@@ -69,7 +96,9 @@ function Signup() {
               onChange={handleInput} 
               value={values.lastname} 
               className='form-control rounded-0'
+              required
             />
+            {errors.lastname && <p className="text-danger">{errors.lastname}</p>}
           </div>
 
           <div className='mb-3'>
@@ -81,7 +110,9 @@ function Signup() {
               onChange={handleInput} 
               value={values.email} 
               className='form-control rounded-0'
+              required
             />
+            {errors.email && <p className="text-danger">{errors.email}</p>}  
           </div>
 
           <div className='mb-3'>
@@ -93,27 +124,41 @@ function Signup() {
               onChange={handleInput} 
               value={values.password} 
               className='form-control rounded-0'
+              required
             />
+            {errors.password && <p className="text-danger">{errors.password}</p>}
           </div>
 
-          <div>
-            <label className = 'mb-3'>Role</label>
-            <select className = 'form-control rounded-0' name='id_rol' onChange={handleInput} value={values.id_rol}>
-              <option value='1'>User</option>
-              <option value='2'>Employee</option>
-              <option value='3'> Administrator </option>
-            </select>
-      
+          <div className='mb-3'>
+            <label htmlFor='confirmPassword'> Confirm Password </label>
+            <input 
+              type="password" 
+              name='confirmPassword' 
+              placeholder='Confirm password' 
+              onChange={handleInput} 
+              value={values.confirmPassword} 
+              className='form-control rounded-0'
+              required
+            />
+            {errors.confirmPassword && <p className="text-danger">{errors.confirmPassword}</p>}
           </div>
+
+          {loading ? (
+            <div className="text-center">
+              <p>Loading...</p>
+            </div>
+          ) : (
+            <button type='submit' className='btn btn-success w-100'>
+              Create an account
+            </button>
+          )}
+
           <p></p>
-          <button type='submit' className='btn btn-success w-100'>Create an account</button>
-          <p></p>
-          <Link to="/" className='btn btn-default border w-100 gb-light rounded-0 text-decoration-none'>Back</Link>
+          <Link to="/" className='btn btn-default border w-100 bg-light rounded-0 text-decoration-none'>Back</Link>
         </form>
       </div>
     </div>
   );
 }
 
-export default Signup
-
+export default Signup;

@@ -10,7 +10,7 @@ function InventoryAdmin() {
   // En el fetchProducts, añade una validación para manejar correctamente respuestas vacías o incorrectas
 const fetchProducts = async () => {
   try {
-    const response = await axios.get('http://172.16.71.178/inventory.php');
+    const response = await axios.get('http://192.168.0.131/inventory.php');
     console.log("Respuesta de la API:", response.data);
     
     // Verificar si la respuesta es un array antes de establecer los productos
