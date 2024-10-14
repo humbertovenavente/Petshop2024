@@ -4,6 +4,7 @@ import Login from './Login';
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import Signup from './Signup';
 import Forgotpassword from './Forgotpassword';
+import ResetPassword from './ResetPassword';
 import Admin from './admin';
 import Emp from './emp';
 import User from './user';
@@ -37,6 +38,7 @@ function App() {
     <Route path='/' element={ <Home/>}></Route>
     <Route path='/signup' element={ <Signup/>}></Route>
     <Route path='/forgotpassword' element={ <Forgotpassword/>}></Route>
+    <Route path='/ResetPassword' element={ <ResetPassword/>}></Route>
     <Route path="/admin" element={<ProtectedRoute allowedRoles={[1, 2, 3]}><Admin /></ProtectedRoute>} />
     <Route path="/emp" element={<ProtectedRoute allowedRoles={[2]}><Emp /></ProtectedRoute>} />
     <Route path="/user" element={<ProtectedRoute allowedRoles={[1]}><User /></ProtectedRoute>} />

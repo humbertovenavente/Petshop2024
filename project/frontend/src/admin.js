@@ -6,30 +6,33 @@ import Footer from './footer';
 function Admin() {
 
   const navigate = useNavigate();  // Hook de react-router-dom para redireccionar
-
-  // useEffect para redirigir automáticamente
-  useEffect(() => {
-    navigate('/Home');  // Redirige a la ruta /Home
-  }, [navigate]);
- 
   const userRole = localStorage.getItem('userRole');
-  
-  if (userRole !== '3') {
+
+  // useEffect para verificar si el usuario es admin
+  useEffect(() => {
+    // Si el rol no es admin o empleado, redirigir a home
+    if (userRole !== '3' && userRole !== '2') {
+      navigate('/');  // Redirigir a la página principal
+    }
+  }, [userRole, navigate]);
+ 
+  // Si el usuario no es administrador ni empleado, no permitir el acceso
+  if (userRole !== '3' && userRole !== '2') {
     return <div>No tienes acceso a esta página.</div>;
   }
  
   return (
     <div> 
       <Header />
-        <main className="main">Welcome back
-
+        <main className="main">
+          <h1>Bienvenido al panel de administración</h1>
+          {/* Aquí va el contenido del administrador */}
         </main>
-    <Footer /> </div>
+      <Footer /> 
+    </div>
   );
 }
 
- 
-  
+export default Admin;
 
-export default Admin
 

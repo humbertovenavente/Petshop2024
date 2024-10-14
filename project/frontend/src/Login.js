@@ -16,49 +16,47 @@ function Login() {
   // Maneja el inicio de sesión como invitado
   const handleGuestAccess = () => {
     localStorage.setItem('userRole', 'guest'); 
-    navigate('/'); 
+    navigate('/Account'); 
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     setLoading(true); // Mostrar el loading cuando comienza la solicitud
     setError(null); // Resetear el estado de error antes de la nueva solicitud
 
-    try {
-      // Enviar los datos al backend para autenticación
-      const response = await axios.post('http://192.168.0.131/login.php', values);
-      
-      // Supongamos que el backend devuelve el rol del usuario
-      const { data } = response;
+    // Enviar los datos al backend para autenticación
+    axios.post('http://192.168.0.131/login.php', values)
+      .then(response => {
+        const { data } = response;
 
-      setLoading(false); // Ocultar el loading después de recibir la respuesta
+        setLoading(false); // Ocultar el loading después de recibir la respuesta
 
-      if (data.error) {
-        setError(data.error); // Mostrar el error recibido del backend
-      } else if (data.rol) {
-        // Guardamos el rol, email, nombre y otros detalles en localStorage
-        localStorage.setItem('email', values.email);
-        localStorage.setItem('password', values.password); // Also store the password
-        localStorage.setItem('userRole', data.rol); 
-        localStorage.setItem('userName', data.name); 
+        if (data.error) {
+          alert(data.error); // Mostrar el error recibido del backend en una ventana emergente
+        } else if (data.rol) {
+          // Guardamos el rol, email, nombre y otros detalles en localStorage
+          localStorage.setItem('email', values.email);
+          localStorage.setItem('password', values.password); // También guardamos la contraseña
+          localStorage.setItem('userRole', data.rol); 
+          localStorage.setItem('userName', data.name); 
 
-        // Redirigir al dashboard o página correspondiente según el rol
-        if (data.rol === 3) {
-          navigate('/admin');
-        } else if (data.rol === 2) {
-          navigate('/emp');
-        } else if (data.rol === 1) {
-          navigate('/user');
+          // Redirigir al dashboard o página correspondiente según el rol
+          if (data.rol === 3) {
+            navigate('/admin');
+          } else if (data.rol === 2) {
+            navigate('/emp');
+          } else if (data.rol === 1) {
+            navigate('/user');
+          }
+        } else {
+          alert('Credenciales incorrectas');
         }
-      } else {
-        setError('Credenciales incorrectas');
-      }
-
-    } catch (error) {
-      setLoading(false); // Ocultar el loading en caso de error
-      console.log("Error:", error);
-      setError('Error al iniciar sesión. Verifica tus credenciales.');
-    }
+      })
+      .catch(error => {
+        setLoading(false); // Ocultar el loading en caso de error
+        console.error("Error:", error);
+        alert('Error al iniciar sesión. Verifica tus credenciales.');
+      });
   };
 
   const handleInput = (event) => {
@@ -69,12 +67,12 @@ function Login() {
     <div className='d-flex justify-content-center align-items-center vh-100' style={{ backgroundColor: 'darkorange' }}> 
       <div className='bg-white p-3 rounded w-25'>
         <form onSubmit={handleSubmit}>
-          <p>Log In</p>
+          <h1 className="login-title">Log In</h1>
 
           {/* Mostrar mensajes de error si ocurren */}
-          {error && <p className="text-danger">{error}</p>}
+          {error && <p className="text-danger text-center">{error}</p>} {/* Centrar mensaje de error */}
        
-          <div className='mb-3'> 
+          <div className='mb-3'>
             <label htmlFor='email'>Email</label>
             <input 
               type="email" 

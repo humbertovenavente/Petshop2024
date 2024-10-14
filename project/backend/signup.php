@@ -4,8 +4,21 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Habilitar CORS para permitir las solicitudes desde el frontend
-header("Access-Control-Allow-Origin: http://localhost:3000");  // Específica la URL de tu frontend
+// Obtener el origen de la solicitud
+$origin = $_SERVER['HTTP_ORIGIN'];
+
+// Lista de orígenes permitidos
+$allowed_origins = [
+    'http://192.168.0.12:3000',
+    'http://localhost:3000'
+];
+
+// Verificar si el origen está en la lista de permitidos
+if (in_array($origin, $allowed_origins)) {
+    header("Access-Control-Allow-Origin: $origin");
+}
+
+// El resto de los encabezados CORS
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Credentials: true");  // Permitir cookies o credenciales
@@ -83,7 +96,7 @@ if ($stmt->execute()) {
     $email_sendgrid->setFrom("humberto107_@hotmail.com", "Jose");
     $email_sendgrid->setSubject("Verifica tu cuenta");
     $email_sendgrid->addTo($email, $name . " " . $lastname);
-    $verification_link = "http://192.168.56.1:3000/verify?token=$verification_token";
+    $verification_link = "http://192.168.0.12:3000/verify?token=$verification_token";
         $email_sendgrid->addContent(
         "text/html", 
         "Gracias por registrarte. Haz clic en este enlace para verificar tu cuenta: <a href='$verification_link'>Verificar cuenta</a>"

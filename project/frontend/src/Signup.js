@@ -57,7 +57,7 @@ function Signup() {
         setErrors({ email: data.error });  // Mostrar mensaje de error si el correo ya existe
       } else {
         alert('The user was created successfully. Check your email to verify your account.');
-        navigate('/');
+        navigate('/login');
       }
     })
     .catch(err => {
@@ -71,7 +71,7 @@ function Signup() {
     <div className='d-flex justify-content-center align-items-center vh-100' style={{ backgroundColor: 'darkorange' }}>
       <div className='bg-white p-3 rounded w-25'>
         <form onSubmit={handleSubmit}>
-          <p>Sign up</p>
+          <h1>Sign up</h1>
 
           <div className='mb-3'>
             <label htmlFor='name'> Name </label>
@@ -154,7 +154,7 @@ function Signup() {
           )}
 
           <p></p>
-          <Link to="/" className='btn btn-default border w-100 bg-light rounded-0 text-decoration-none'>Back</Link>
+          <Link to="/Login" className='btn btn-default border w-100 bg-light rounded-0 text-decoration-none'>Back</Link>
         </form>
       </div>
     </div>
