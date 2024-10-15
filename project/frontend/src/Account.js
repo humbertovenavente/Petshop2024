@@ -3,36 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
 import axios from 'axios';
-import { Modal, Button, Spinner } from 'react-bootstrap'; // Import Bootstrap components, including Spinner for loading
+import { Modal, Button, Spinner } from 'react-bootstrap';
 
 function Account() {
-    // State to store user profile data
     const [profile, setProfile] = useState(null);
-    // State to control modal visibility
     const [showModal, setShowModal] = useState(false);
-    // State to store the profile being edited
     const [editedProfile, setEditedProfile] = useState(null);
-    // State to track loading status for the modal and save actions
     const [loading, setLoading] = useState(false); 
-    // Navigation hook to redirect users if necessary
+    const [selectedFile, setSelectedFile] = useState(null);  // Estado para la imagen seleccionada
+    const [fileType, setFileType] = useState('');  // Estado para el tipo de archivo (MIME type)
+    const [showImageModal, setShowImageModal] = useState(false);  // Estado para controlar el modal de la imagen
     const navigate = useNavigate();
-    // Retrieve user email and password from localStorage
     const email = localStorage.getItem('email');
     const password = localStorage.getItem('password');
 
-    // Fetch profile data when the component loads or email/password changes
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                // Fetch the profile from the server using the email and password
                 const response = await axios.post('http://192.168.0.131/profile.php', { email, password });
                 const data = response.data;
-                // Handle error if there is a problem fetching the profile
                 if (data.error) {
                     console.log('Error fetching profile:', data.error);
                     setProfile(null);
                 } else {
-                    // Set both profile and editable profile states with the fetched data
                     setProfile(data);
                     setEditedProfile(data); 
                 }
@@ -42,7 +35,6 @@ function Account() {
             }
         };
 
-        // Only fetch profile if email and password exist
         if (email && password) {
             fetchProfile();
         } else {
@@ -50,7 +42,6 @@ function Account() {
         }
     }, [email, password]);
 
-    // If the user is not logged in, show a message and login button
     if (!email || !password || !profile) {
         return (
             <div id="root">
@@ -65,48 +56,37 @@ function Account() {
         );
     }
 
-    // Function to handle when "Edit Profile" button is clicked, showing the modal
     const handleEditClick = () => {
         setShowModal(true);
-        setLoading(false); // Reset loading state when opening modal
+        setLoading(false);
     };
 
-    // Function to close the modal
     const handleClose = () => setShowModal(false);
 
-    // Function to handle saving changes to the backend
     const handleSaveChanges = async () => {
-        setLoading(true); // Set loading to true while saving
-
+        setLoading(true);
         try {
-            // Send the updated profile data to the backend
             const response = await axios.post('http://192.168.0.131/updateProfile.php', editedProfile);
-
-            // Handle errors if the update fails
             if (response.data.error) {
                 alert('Error updating profile: ' + response.data.error);
             } else {
-                // If the update is successful, update the profile in the state
                 alert('Profile updated successfully.');
                 setProfile(editedProfile); 
-                setShowModal(false); // Close the modal after saving
+                setShowModal(false);
             }
         } catch (error) {
             console.error('Error updating profile:', error);
         } finally {
-            setLoading(false); // Stop the loading spinner after the request is completed
+            setLoading(false);
         }
     };
 
-    // Handle changes to the input fields in the modal
     const handleInputChange = (event) => {
         const { name, value } = event.target;
-
-        // Check if the input is for the expiration date and format it accordingly
         if (name === 'credit_card_exp') {
-            let formattedValue = value.replace(/\D/g, ''); // Remove any non-numeric characters
+            let formattedValue = value.replace(/\D/g, '');
             if (formattedValue.length > 2) {
-                formattedValue = `${formattedValue.slice(0, 2)}-${formattedValue.slice(2, 6)}`; // Add hyphen between MM and YYYY
+                formattedValue = `${formattedValue.slice(0, 2)}-${formattedValue.slice(2, 6)}`;
             }
             setEditedProfile(prevState => ({
                 ...prevState,
@@ -120,6 +100,47 @@ function Account() {
         }
     };
 
+    // Función para manejar la selección de la imagen
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setFileType(file.type);  // Guardar el tipo de archivo (MIME type)
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setSelectedFile(reader.result);  // Guardar la imagen como Base64
+            };
+            reader.readAsDataURL(file);  // Convertir la imagen a Base64
+        }
+    };
+
+    // Función para guardar la imagen en el backend
+    const handleSavePhoto = async () => {
+        setLoading(true);
+        try {
+            const updatedProfile = { ...profile, profile_pic: selectedFile, file_type: fileType };  // Incluir la imagen y tipo en el perfil
+            const response = await axios.post('http://192.168.0.131/updateProfile.php', updatedProfile);
+
+            if (response.data.error) {
+                alert('Error uploading photo: ' + response.data.error);
+            } else {
+                alert('Photo uploaded successfully.');
+                setProfile(updatedProfile);
+            }
+        } catch (error) {
+            console.error('Error uploading photo:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleShowImage = () => {
+        setShowImageModal(true);  // Mostrar el modal con la imagen
+    };
+
+    const handleCloseImageModal = () => {
+        setShowImageModal(false);  // Cerrar el modal de la imagen
+    };
+
     return (
         <div>
             <Header />
@@ -129,13 +150,40 @@ function Account() {
                     <h2>My Account</h2>
                     <div className="account-profile">
                         <div className="profile-pic">
-                            <img src="https://img.icons8.com/ios-filled/50/000000/user-male-circle.png" alt="Profile" />
+                            <img src={`data:${profile.file_type};base64,${profile.profile_pic}`} alt="Profile" style={{ width: '150px', height: '150px' }} />
                         </div>
-                        {/* Button to open the edit profile modal */}
                         <button className="edit-profile-btn" onClick={handleEditClick} disabled={loading}>
                             {loading ? <Spinner animation="border" size="sm" /> : 'Edit Profile'}
                         </button>
+                        
+                        <input type="file" onChange={handleFileChange} style={{ marginLeft: '20px' }} />
+                        <button onClick={handleSavePhoto} disabled={loading || !selectedFile} style={{ marginLeft: '10px' }}>
+                            {loading ? <Spinner animation="border" size="sm" /> : 'Save Photo'}
+                        </button>
+
+                        <button onClick={handleShowImage} style={{ marginLeft: '10px' }}>
+                            View Photo
+                        </button>
                     </div>
+
+                    {/* Modal para mostrar la imagen */}
+                    <Modal show={showImageModal} onHide={handleCloseImageModal}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Your Profile Picture</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <img 
+                                src={`data:${profile.file_type};base64,${profile.profile_pic}`} 
+                                alt="Profile"
+                                style={{ width: '100%', height: '100%' }}
+                            />
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleCloseImageModal}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
 
                     <div className="account-details">
                         <div className="details-section">
@@ -164,16 +212,10 @@ function Account() {
                             <p>Expiration Date: {profile.credit_card_exp}</p>
                             <p>CVV: {profile.cvv}</p>
                         </div>
-
-                        <div className="details-section">
-                            <p>Role: {profile.id_rol === '1' ? 'User' : profile.id_rol === '2' ? 'Employee' : 'Admin'}</p>
-                            <p>Status: {profile.status === '1' ? 'Active' : 'Inactive'}</p>
-                            <p>Last Login: {profile.last_login}</p>
-                        </div>
                     </div>
                 </div>
 
-                {/* Modal for editing profile */}
+                {/* Modal para editar perfil */}
                 <Modal show={showModal} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Edit Profile</Modal.Title>
@@ -289,7 +331,7 @@ function Account() {
                                     value={editedProfile.credit_card_exp || ''}
                                     onChange={handleInputChange}
                                     className="form-control"
-                                    maxLength={7} // Limit to "MM-YYYY" format
+                                    maxLength={7} // Formato "MM-YYYY"
                                 />
                             </div>
                             <div className="form-group">
@@ -300,13 +342,12 @@ function Account() {
                                     value={editedProfile.cvv || ''}
                                     onChange={handleInputChange}
                                     className="form-control"
-                                    maxLength={4} // Limit CVV to 4 digits
+                                    maxLength={4} // Límite de 4 dígitos para CVV
                                 />
                             </div>
                         </form>
                     </Modal.Body>
                     <Modal.Footer>
-                        {/* Show loading spinner during save operation */}
                         <Button variant="secondary" onClick={handleClose} disabled={loading}>   
                             Cancel
                         </Button>

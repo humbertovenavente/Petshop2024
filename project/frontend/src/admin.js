@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from './header';
-import Footer from './footer';
+import Home from './Home';
 
 function Admin() {
 
@@ -23,12 +22,7 @@ function Admin() {
  
   return (
     <div> 
-      <Header />
-        <main className="main">
-          <h1>Bienvenido al panel de administración</h1>
-          {/* Aquí va el contenido del administrador */}
-        </main>
-      <Footer /> 
+     <Home /> 
     </div>
   );
 }

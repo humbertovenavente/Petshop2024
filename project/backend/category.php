@@ -23,7 +23,7 @@ if ($conn->connect_error) {
     die(json_encode(['error' => "Conexión fallida: " . $conn->connect_error]));
 }
 
-// Consulta SQL simplificada para obtener categorías sin relaciones padre-hijo
+// Consulta SQL simplificada para obtener categorías
 $sql = "SELECT id_category, name FROM Category";
 $result = $conn->query($sql);
 
