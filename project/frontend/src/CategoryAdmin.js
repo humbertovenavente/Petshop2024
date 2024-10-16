@@ -1,35 +1,22 @@
 import Header from './header';
 import Footer from './footer';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Table } from 'react-bootstrap';
+import { useCategory } from './CategoryContext'; // Importar el hook del contexto
 
 function CategoryAdmin() {
-  const [categories, setCategories] = useState([]);
+  const { categories, fetchCategories } = useCategory(); // Obtener y establecer categorías desde el contexto
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
   const [newCategory, setNewCategory] = useState({ name: '' });
 
-  // Función para obtener categorías del backend
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get('http://192.168.0.131/category.php');
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewCategory((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -50,8 +37,8 @@ function CategoryAdmin() {
 
   const handleAddCategory = async () => {
     try {
-      await axios.post('http://192.168.0.131/addCategory.php', newCategory);
-      fetchCategories();
+      await axios.post('http://172.16.72.69/addCategory.php', newCategory);
+      fetchCategories(); // Actualizar las categorías después de agregar
       setShowModal(false);
     } catch (error) {
       console.error("Error adding category:", error);
@@ -60,11 +47,11 @@ function CategoryAdmin() {
 
   const handleUpdateCategory = async () => {
     try {
-      await axios.post('http://192.168.0.131/updateCategory.php', { 
-        id_category: currentCategoryId, 
-        name: newCategory.name
+      await axios.post('http://172.16.72.69/updateCategory.php', {
+        id_category: currentCategoryId,
+        name: newCategory.name,
       });
-      fetchCategories();
+      fetchCategories(); // Actualizar las categorías después de editar
       setShowModal(false);
     } catch (error) {
       console.error("Error updating category:", error);
@@ -80,12 +67,12 @@ function CategoryAdmin() {
   };
 
   const handleDeleteCategory = async (id_category) => {
-    if (window.confirm("Are you sure you want to delete this category?")) {
+    if (window.confirm('Are you sure you want to delete this category?')) {
       try {
-        await axios.post('http://192.168.0.131/deleteCategory.php', { id_category });
-        fetchCategories();
+        await axios.post('http://172.16.72.69/deleteCategory.php', { id_category });
+        fetchCategories(); // Actualizar las categorías después de eliminar
       } catch (error) {
-        console.error("Error deleting category:", error);
+        console.error('Error deleting category:', error);
       }
     }
   };
@@ -93,40 +80,49 @@ function CategoryAdmin() {
   return (
     <div id="root">
       <Header />
-      <main> 
-        <div>
-          <h1>Category Management</h1>
-          <div className="account-profile">
-            <button className="edit-profile-btn" onClick={handleShowModal}>Add New Category</button>
-          </div>
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Options</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories.length > 0 ? (
-                categories.map(category => (
-                  <tr key={category.id_category}>
-                    <td>{category.id_category}</td>
-                    <td>{category.name}</td>
-                    <td>
-                      <button className="edit-profile-btn" onClick={() => handleEditCategory(category)}>Edit</button>
-                      <button className="delete-profile-btn" onClick={() => handleDeleteCategory(category.id_category)}>Delete</button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3">No categories found</td>
+      <main className="container my-5">
+        <h1>Category Management</h1>
+        <Button variant="primary" onClick={handleShowModal}>
+          Add New Category
+        </Button>
+        <Table striped bordered hover className="mt-4">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.length > 0 ? (
+              categories.map((category) => (
+                <tr key={category.id_category}>
+                  <td>{category.id_category}</td>
+                  <td>{category.name}</td>
+                  <td>
+                    <Button
+                      variant="warning"
+                      className="me-2"
+                      onClick={() => handleEditCategory(category)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDeleteCategory(category.id_category)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3">No categories found</td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
 
         <Modal show={showModal} onHide={handleCloseModal}>
           <Modal.Header closeButton>
@@ -136,12 +132,20 @@ function CategoryAdmin() {
             <form>
               <div className="form-group">
                 <label>Category Name</label>
-                <input type="text" name="name" value={newCategory.name} onChange={handleInputChange} className="form-control" />
+                <input
+                  type="text"
+                  name="name"
+                  value={newCategory.name}
+                  onChange={handleInputChange}
+                  className="form-control"
+                />
               </div>
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Cancel
+            </Button>
             <Button variant="primary" onClick={handleSaveChanges}>
               {isEditing ? 'Save Changes' : 'Add'}
             </Button>

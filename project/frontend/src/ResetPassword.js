@@ -29,7 +29,7 @@ function ResetPassword() {
         setLoading(true);
 
         // Enviar la solicitud de restablecimiento al backend
-        axios.post('http://192.168.0.131/resetPassword.php', {
+        axios.post('http://172.16.72.69/resetPassword.php', {
             token,
             newPassword
         })

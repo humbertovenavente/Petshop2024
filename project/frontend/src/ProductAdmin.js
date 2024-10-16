@@ -2,7 +2,7 @@ import Header from './header';
 import Footer from './footer';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
 import Select from 'react-select';  // Import react-select
 
 function ProductAdmin() {
@@ -21,12 +21,17 @@ function ProductAdmin() {
     comment: '',
     color: '',
     size: '',
+    image: '', // Add this to store the current image
+    file_type: '',
   });
+  const [selectedFile, setSelectedFile] = useState(null); // To store the selected image
+  const [fileType, setFileType] = useState(''); // To store the file type (MIME type)
+  const [loading, setLoading] = useState(false); // To track loading state
 
-  // Function to fetch products from the backend
+  // Fetch products from backend
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://192.168.0.131/product.php');
+      const response = await axios.get('http://172.16.72.69/product.php');
       if (Array.isArray(response.data)) {
         setProducts(response.data);
       } else {
@@ -37,10 +42,10 @@ function ProductAdmin() {
     }
   };
 
-  // Function to fetch categories (tags) from the backend
+  // Fetch categories (tags) from backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://192.168.0.131/category.php');
+      const response = await axios.get('http://172.16.72.69/category.php');
       if (Array.isArray(response.data)) {
         setCategories(response.data.map(cat => ({ value: cat.id_category, label: cat.name }))); // Format categories for react-select
       } else {
@@ -51,7 +56,7 @@ function ProductAdmin() {
     }
   };
 
-  // Function to handle form input changes
+  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
@@ -70,12 +75,12 @@ function ProductAdmin() {
     });
   };
 
-  // Function to handle category selection (using react-select)
+  // Handle category selection (using react-select)
   const handleCategoryChange = (selected) => {
     setSelectedCategories(selected.map(item => item.value));
   };
 
-  // Function to open the modal to add a new product
+  // Open modal to add a new product
   const handleShowModal = () => {
     setNewProduct({
       name: '',
@@ -86,10 +91,51 @@ function ProductAdmin() {
       comment: '',
       color: '',
       size: '',
+      image: '', // Clear image when adding a new product
+      file_type: '',
     });
     setSelectedCategories([]); // Clear the selected categories
+    setSelectedFile(null); // Clear selected file
     setIsEditing(false); // We're adding, not editing
     setShowModal(true);
+  };
+
+  // Close modal
+  const handleCloseModal = () => setShowModal(false);
+
+  // Add a new product
+  const handleAddProduct = async () => {
+    // Validación básica
+    if (!newProduct.name || !newProduct.price || !newProduct.inventory) {
+      alert("Por favor, completa todos los campos obligatorios.");
+      return;
+    }
+
+    try {
+      setLoading(true);  // Iniciar el estado de carga
+
+      // Agregar la imagen y el tipo de archivo si se selecciona
+      const productData = {
+        ...newProduct,
+        categories: selectedCategories,  // Enviar las categorías seleccionadas
+        image: selectedFile,  // Aquí se envía la imagen en Base64
+        file_type: fileType  // El tipo de archivo de la imagen
+      };
+
+      const response = await axios.post('http://172.16.72.69/addProduct.php', productData);
+
+      if (response.data.error) {
+        alert(`Error: ${response.data.error}`);
+      } else {
+        alert('Producto agregado exitosamente');
+        fetchProducts(); // Refrescar la lista de productos después de agregar
+        setShowModal(false); // Cerrar el modal
+      }
+    } catch (error) {
+      console.error("Error al agregar el producto:", error);
+    } finally {
+      setLoading(false);  // Finalizar el estado de carga
+    }
   };
 
   // Function to open the modal to edit a product
@@ -103,62 +149,78 @@ function ProductAdmin() {
       comment: product.comment,
       color: product.color,
       size: product.size,
+      image: product.image, // Cargar la imagen actual
+      file_type: product.file_type, // Cargar el tipo de archivo actual
     });
-    setCurrentProductId(product.id_product); // Set the current product ID being edited
-    setSelectedCategories(product.categories || []); // Set the selected categories for this product
-    setIsEditing(true); // We're editing
-    setShowModal(true); // Open the modal
+    setSelectedCategories(product.categories || []); // Establecemos las categorías seleccionadas
+    setCurrentProductId(product.id_product); // Establecer el ID del producto que estamos editando
+    setIsEditing(true); // Cambiamos el estado a "editando"
+    setShowModal(true); // Mostramos el modal
   };
 
-  // Function to close the modal
-  const handleCloseModal = () => setShowModal(false);
-
-  // Function to add a new product
-  const handleAddProduct = async () => {
-    try {
-      await axios.post('http://192.168.0.131/addProduct.php', { 
-        ...newProduct, 
-        categories: selectedCategories 
-      });
-      fetchProducts(); // Refresh the product list after adding
-      setShowModal(false); // Close the modal
-    } catch (error) {
-      console.error("Error adding product:", error);
-    }
-  };
-
-  // Function to update a product
+  // Function to update a product (Save Changes)
   const handleUpdateProduct = async () => {
     try {
-      await axios.post('http://192.168.0.131/updateProduct.php', { 
-        id_product: currentProductId, 
+      setLoading(true);  // Empezar loading
+      const productData = {
         ...newProduct,
-        categories: selectedCategories
+        categories: selectedCategories,
+        image: selectedFile || newProduct.image, // Use the existing image if no new one is selected
+        file_type: selectedFile ? fileType : newProduct.file_type // Use the existing file type if no new image
+      };
+
+      const response = await axios.post('http://172.16.72.69/updateProduct.php', { 
+        id_product: currentProductId,  // Pasar el ID del producto que se está editando
+        ...productData
       });
-      fetchProducts(); // Refresh the product list after updating
-      setShowModal(false); // Close the modal
+
+      if (response.data.error) {
+        console.error('Error al actualizar el producto:', response.data.error);
+      } else {
+        alert('Producto actualizado exitosamente');
+        fetchProducts(); // Actualizar la lista de productos
+        setShowModal(false); // Cerrar el modal
+      }
     } catch (error) {
-      console.error("Error updating product:", error);
+      console.error('Error al actualizar el producto:', error);
+    } finally {
+      setLoading(false);  // Finalizar loading
     }
   };
 
   // Function to save changes (either add or edit)
   const handleSaveChanges = () => {
     if (isEditing) {
-      handleUpdateProduct();
+      handleUpdateProduct();  // Llamar a la función de actualizar producto
     } else {
-      handleAddProduct();
+      handleAddProduct();  // Llamar a la función de agregar nuevo producto
     }
   };
 
-  // Function to delete a product
+  // Handle file change (upload image)
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setFileType(file.type); // Set the file type (MIME type)
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedFile(reader.result); // Convertir la imagen a Base64
+      };
+      reader.readAsDataURL(file); // Convertir la imagen a Base64
+    }
+  };
+
+  // Delete a product
   const handleDeleteProduct = async (id_product) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.post('http://192.168.0.131/deleteProduct.php', { id_product });
+        setLoading(true);  // Start loading
+        await axios.post('http://172.16.72.69/deleteProduct.php', { id_product });
         fetchProducts(); // Refresh the product list after deletion
       } catch (error) {
         console.error("Error deleting product:", error);
+      } finally {
+        setLoading(false);  // Stop loading
       }
     }
   };
@@ -173,110 +235,130 @@ function ProductAdmin() {
     <div id="root">
       <Header />
       <main>
-      <div>
-        <h1>Product Management</h1>
+        <div>
+          <h1>Product Management</h1>
 
-        <div className="account-profile">
-          <button className="edit-profile-btn" onClick={handleShowModal}>Add New Product</button>
+          <div className="account-profile">
+            <button className="edit-profile-btn" onClick={handleShowModal}>Add New Product</button>
+          </div>
+
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Inventory</th>
+                <th>Categories</th>
+                <th>Image</th>
+                <th>Options</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(products) && products.length > 0 ? (
+                products.map(product => (
+                  <tr key={product.id_product}>
+                    <td>{product.id_product}</td>
+                    <td>{product.name}</td>
+                    <td>{product.description}</td>
+                    <td>{product.price}</td>
+                    <td>{product.inventory}</td>
+                    <td>{Array.isArray(product.categories) ? product.categories.join(', ') : 'No categories'}</td>
+                    <td>
+                      {product.image ? (
+                        <img src={`data:${product.file_type};base64,${product.image}`} alt="Product" style={{ width: '50px', height: '50px' }} />
+                      ) : 'No Image'}
+                    </td>
+                    <td>
+                      <button className="edit-profile-btn" onClick={() => handleEditProduct(product)}>Edit</button>
+                      <button className="delete-profile-btn" onClick={() => handleDeleteProduct(product.id_product)}>Delete</button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8">No products found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
 
-        <table className="table table-striped">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Price</th>
-              <th>Inventory</th>
-              <th>Categories</th>
-              <th>Options</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(products) && products.length > 0 ? (
-              products.map(product => (
-                <tr key={product.id_product}>
-                  <td>{product.id_product}</td>
-                  <td>{product.name}</td>
-                  <td>{product.description}</td>
-                  <td>{product.price}</td>
-                  <td>{product.inventory}</td>
-                  <td>{Array.isArray(product.categories) ? product.categories.join(', ') : 'No categories'}</td>
-                  <td>
-                    <button className="edit-profile-btn" onClick={() => handleEditProduct(product)}>Edit</button>
-                    <button className="delete-profile-btn" onClick={() => handleDeleteProduct(product.id_product)}>Delete</button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7">No products found</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+        {/* Modal for adding or editing a product */}
+        <Modal show={showModal} onHide={handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>{isEditing ? 'Edit Product' : 'Add New Product'}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <form>
+              <div className="form-group">
+                <label>Product Name</label>
+                <input type="text" name="name" value={newProduct.name} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Description</label>
+                <input type="text" name="description" value={newProduct.description} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Price</label>
+                <input type="number" name="price" value={newProduct.price} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Inventory</label>
+                <input type="number" name="inventory" value={newProduct.inventory} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Stock</label>
+                <select className="form-control" name="stock" onChange={handleInputChange} value={newProduct.stock} disabled={parseInt(newProduct.inventory) === 0}>
+                  <option value="1">In Stock</option>
+                  <option value="0">Out of Stock</option>
+                </select>
+              </div>
 
-      {/* Modal for adding or editing a product */}
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>{isEditing ? 'Edit Product' : 'Add New Product'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <form>
-            <div className="form-group">
-              <label>Product Name</label>
-              <input type="text" name="name" value={newProduct.name} onChange={handleInputChange} className="form-control" />
-            </div>
-            <div className="form-group">
-              <label>Description</label>
-              <input type="text" name="description" value={newProduct.description} onChange={handleInputChange} className="form-control" />
-            </div>
-            <div className="form-group">
-              <label>Price</label>
-              <input type="number" name="price" value={newProduct.price} onChange={handleInputChange} className="form-control" />
-            </div>
-            <div className="form-group">
-              <label>Inventory</label>
-              <input type="number" name="inventory" value={newProduct.inventory} onChange={handleInputChange} className="form-control" />
-            </div>
-            <div className="form-group">
-              <label>Stock</label>
-              <select className="form-control" name="stock" onChange={handleInputChange} value={newProduct.stock} disabled={parseInt(newProduct.inventory) === 0}>
-                <option value="1">In Stock</option>
-                <option value="0">Out of Stock</option>
-              </select>
-            </div>
+              <div className="form-group">
+                <label>Categories (Tags)</label>
+                <Select
+                  options={categories} // Categories for the dropdown
+                  isMulti
+                  value={categories.filter(category => selectedCategories.includes(category.value))}
+                  onChange={handleCategoryChange}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                />
+              </div>
 
-            <div className="form-group">
-              <label>Categories (Tags)</label>
-              <Select
-                options={categories} // Categories for the dropdown
-                isMulti
-                value={categories.filter(category => selectedCategories.includes(category.value))}
-                onChange={handleCategoryChange}
-                className="basic-multi-select"
-                classNamePrefix="select"
-              />
-            </div>
+              <div className="form-group">
+                <label>Color</label>
+                <input type="text" name="color" value={newProduct.color} onChange={handleInputChange} className="form-control" />
+              </div>
+              <div className="form-group">
+                <label>Size</label>
+                <input type="text" name="size" value={newProduct.size} onChange={handleInputChange} className="form-control" />
+              </div>
 
-            <div className="form-group">
-              <label>Color</label>
-              <input type="text" name="color" value={newProduct.color} onChange={handleInputChange} className="form-control" />
-            </div>
-            <div className="form-group">
-              <label>Size</label>
-              <input type="text" name="size" value={newProduct.size} onChange={handleInputChange} className="form-control" />
-            </div>
-          </form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
-          <Button variant="primary" onClick={handleSaveChanges}>
-            {isEditing ? 'Save Changes' : 'Add'}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+              {/* Mostrar imagen actual si existe */}
+              {newProduct.image && (
+                <div className="form-group">
+                  <label>Current Image</label>
+                  <img src={`data:${newProduct.file_type};base64,${newProduct.image}`} alt="Current Product" style={{ width: '100px', height: '100px' }} />
+                </div>
+              )}
+
+              {/* Campo para subir nueva imagen */}
+              <div className="form-group">
+                <label>Upload New Image</label>
+                <input type="file" onChange={handleFileChange} className="form-control" />
+              </div>
+            </form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+            <Button variant="primary" onClick={handleSaveChanges}>
+              {loading ? <Spinner animation="border" size="sm" /> : (isEditing ? 'Save Changes' : 'Add')}
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </main>
 
       <Footer />
@@ -285,5 +367,4 @@ function ProductAdmin() {
 }
 
 export default ProductAdmin;
-
 

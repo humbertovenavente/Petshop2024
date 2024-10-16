@@ -16,16 +16,20 @@ function Category() {
         {/* Listado de categorías */}
         <h2>Categories</h2>
         <Row>
-          {categories.map(category => (
-            <Col key={category.id_category} md={4} className="mb-4">
-              <Card>
-                <Card.Body>
-                  <Card.Title>{category.name}</Card.Title>
-                  <Button variant="primary">View Category</Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
+          {categories.length > 0 ? (
+            categories.map(category => (
+              <Col key={category.id_category} md={4} className="mb-4">
+                <Card>
+                  <Card.Body>
+                    <Card.Title>{category.name}</Card.Title>
+                    <Button variant="primary">View Category</Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))
+          ) : (
+            <p>No categories available</p>
+          )}
         </Row>
       </main>
       <Footer />

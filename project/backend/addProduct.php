@@ -1,29 +1,32 @@
 <?php
-// Enable error reporting
+// Habilitar la visualización de errores para depuración
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Enable CORS
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
-// Database connection
-$host = '192.168.0.131';
-$db = 'project';
-$user = 'humbe';
-$pass = 'tu_contraseña';
+// Configuración de la base de datos
+$host = '172.16.72.69'; 
+$db = 'project';  
+$user = 'humbe';  
+$pass = 'tu_contraseña';  
+
+// Conexión a la base de datos
 $conn = new mysqli($host, $user, $pass, $db);
 
+// Verificar conexión
 if ($conn->connect_error) {
-    die(json_encode(['error' => "Connection failed: " . $conn->connect_error]));
+    die(json_encode(['error' => "Conexión fallida: " . $conn->connect_error]));
 }
 
+// Leer los datos enviados
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Extract product data
+// Extraer datos del producto
 $name = $data['name'];
 $description = $data['description'];
 $price = $data['price'];
@@ -32,28 +35,37 @@ $stock = $data['stock'];
 $comment = $data['comment'];
 $color = $data['color'];
 $size = $data['size'];
-$rate = $data['rate'];
-$categories = $data['categories']; // Array of selected category IDs
+$image = $data['image'] ?? null;  // Imagen opcional
+$file_type = $data['file_type'] ?? null;  // Tipo de archivo opcional
+$categories = $data['categories'] ?? [];  // Array de IDs de categorías
 
-// Insert product into the Product table
-$sql = "INSERT INTO Product (name, description, price, inventory, stock, comment, color, size, rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+// Verificar que se recibieron los datos necesarios
+if (empty($name) || empty($price) || empty($inventory)) {
+    echo json_encode(['error' => 'Faltan campos obligatorios']);
+    exit();
+}
+
+// Insertar el nuevo producto en la tabla de productos
+$sql = "INSERT INTO Product (name, description, price, inventory, stock, comment, color, size, image, file_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ssdiisssi", $name, $description, $price, $inventory, $stock, $comment, $color, $size, $rate);
+$stmt->bind_param('ssdiisssss', $name, $description, $price, $inventory, $stock, $comment, $color, $size, $image, $file_type);
 
 if ($stmt->execute()) {
-    $id_product = $stmt->insert_id; // Get the inserted product ID
+    $id_product = $stmt->insert_id;  // Obtener el ID del producto insertado
 
-    // Insert the product-category relationships into the ProductCategory table
-    foreach ($categories as $id_category) {
-        $sql = "INSERT INTO ProductCategory (id_product, id_category) VALUES (?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ii", $id_product, $id_category);
-        $stmt->execute();
+    // Asociar categorías al producto en la tabla intermedia
+    if (!empty($categories)) {
+        $sql_category = "INSERT INTO ProductCategory (id_product, id_category) VALUES (?, ?)";
+        $stmt_category = $conn->prepare($sql_category);
+        foreach ($categories as $id_category) {
+            $stmt_category->bind_param('ii', $id_product, $id_category);
+            $stmt_category->execute();
+        }
     }
 
-    echo json_encode(['message' => 'Product added successfully']);
+    echo json_encode(['message' => 'Producto agregado exitosamente']);
 } else {
-    echo json_encode(['error' => 'Error adding product']);
+    echo json_encode(['error' => 'Error al agregar el producto', 'details' => $stmt->error]);
 }
 
 $stmt->close();

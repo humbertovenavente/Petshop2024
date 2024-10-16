@@ -1,28 +1,30 @@
 <?php
-// Enable error reporting for debugging
+// Habilitar la visualización de errores para depuración
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Enable CORS for frontend requests
+// Habilitar CORS para permitir solicitudes desde el frontend
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
-// Database connection
-$host = '192.168.0.131';
-$db = 'project';
-$user = 'humbe';
-$pass = 'tu_contraseña';
+// Configuración de la base de datos
+$host = '172.16.72.69'; 
+$db = 'project';  
+$user = 'humbe';  
+$pass = 'tu_contraseña';  
+
+// Conexión a la base de datos
 $conn = new mysqli($host, $user, $pass, $db);
 
-// Check the connection
+// Verificar la conexión
 if ($conn->connect_error) {
-    die(json_encode(['error' => "Connection failed: " . $conn->connect_error]));
+    die(json_encode(['error' => "Conexión fallida: " . $conn->connect_error]));
 }
 
-// SQL query to fetch products and their associated categories
+// Consulta SQL para obtener productos y categorías
 $sql = "
     SELECT 
         p.id_product, 
@@ -30,10 +32,12 @@ $sql = "
         p.description, 
         p.price, 
         p.inventory, 
-        IF(p.inventory < 1, 'Out of Stock', 'In Stock') AS stock,  /* Mostrar 'Out of Stock' o 'In Stock' según el inventario */
+        IF(p.inventory < 1, 'Out of Stock', 'In Stock') AS stock,
         p.comment, 
         p.color, 
         p.size, 
+        p.image, 
+        p.file_type,
         c.id_category,
         c.name AS category_name
     FROM 
@@ -46,14 +50,14 @@ $sql = "
 
 $result = $conn->query($sql);
 
-// Check if the query was successful
+// Verificar si la consulta fue exitosa
 if (!$result) {
-    echo json_encode(['error' => 'Error in SQL query: ' . $conn->error]);
+    echo json_encode(['error' => 'Error en la consulta SQL: ' . $conn->error]);
     $conn->close();
     exit();
 }
 
-// Organize products and their categories
+// Organizar productos y categorías
 $products = [];
 while ($row = $result->fetch_assoc()) {
     $productId = $row['id_product'];
@@ -67,6 +71,8 @@ while ($row = $result->fetch_assoc()) {
             'comment' => $row['comment'],
             'color' => $row['color'],
             'size' => $row['size'],
+            'image' => base64_encode($row['image']),  // Codificar la imagen en Base64
+            'file_type' => $row['file_type'],
             'categories' => []
         ];
     }
@@ -75,10 +81,10 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 
-// Convert associative array to indexed array
+// Convertir el array asociativo en un array indexado
 $products = array_values($products);
 
-// Return the data in JSON format
+// Devolver los datos en formato JSON
 echo json_encode($products);
 
 $conn->close();

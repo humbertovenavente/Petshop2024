@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 
 // Configuración de la base de datos
-$host = '192.168.0.131';
+$host = '172.16.72.69';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
@@ -96,14 +96,14 @@ if ($stmt->execute()) {
     $email_sendgrid->setFrom("humberto107_@hotmail.com", "Jose");
     $email_sendgrid->setSubject("Verifica tu cuenta");
     $email_sendgrid->addTo($email, $name . " " . $lastname);
-    $verification_link = "http://192.168.0.12:3000/verify?token=$verification_token";
+    $verification_link = "http://172.16.72.67:3000/verify?token=$verification_token";
         $email_sendgrid->addContent(
         "text/html", 
         "Gracias por registrarte. Haz clic en este enlace para verificar tu cuenta: <a href='$verification_link'>Verificar cuenta</a>"
     );
 
     // Enviar el correo de verificación usando la clave API de SendGrid
-    $sendgrid = new \SendGrid('');
+  
 
     try {
         $response = $sendgrid->send($email_sendgrid);

@@ -17,10 +17,24 @@ function Account() {
     const email = localStorage.getItem('email');
     const password = localStorage.getItem('password');
 
+    // Funciones para mostrar el rol y los estados en texto
+    const getRoleName = (id_rol) => {
+        switch(id_rol) {
+            case 1: return 'User';
+            case 2: return 'Employee';
+            case 3: return 'Admin';
+            default: return 'Guest';
+        }
+    };
+
+    const getStatusName = (status) => {
+        return status === 1 ? 'Active' : 'Inactive';
+    };
+
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.post('http://192.168.0.131/profile.php', { email, password });
+                const response = await axios.post('http://172.16.72.69/profile.php', { email, password });
                 const data = response.data;
                 if (data.error) {
                     console.log('Error fetching profile:', data.error);
@@ -66,7 +80,7 @@ function Account() {
     const handleSaveChanges = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.131/updateProfile.php', editedProfile);
+            const response = await axios.post('http://172.16.72.69/updateProfile.php', editedProfile);
             if (response.data.error) {
                 alert('Error updating profile: ' + response.data.error);
             } else {
@@ -118,7 +132,7 @@ function Account() {
         setLoading(true);
         try {
             const updatedProfile = { ...profile, profile_pic: selectedFile, file_type: fileType };  // Incluir la imagen y tipo en el perfil
-            const response = await axios.post('http://192.168.0.131/updateProfile.php', updatedProfile);
+            const response = await axios.post('http://172.16.72.69/updateProfile.php', updatedProfile);
 
             if (response.data.error) {
                 alert('Error uploading photo: ' + response.data.error);
@@ -195,6 +209,15 @@ function Account() {
                             <p>{profile.email}</p>
                             <h4>Telephone</h4>
                             <p>{profile.telephone}</p>
+                        </div>
+
+                        <div className="details-section">
+                            <h4>Role</h4>
+                            <p>{getRoleName(profile.id_rol)}</p>  {/* Mostrar rol como texto */}
+                            <h4>Status</h4>
+                            <p>{getStatusName(profile.status)}</p>  {/* Mostrar estado como texto */}
+                            <h4>Last Status</h4>
+                            <p>{getStatusName(profile.last_status)}</p>  {/* Mostrar último estado como texto */}
                         </div>
 
                         <div className="details-section">
