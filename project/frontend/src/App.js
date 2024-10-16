@@ -15,6 +15,9 @@ import Account from './Account';
 import UserAdmin from './UserAdmin';
 import CategoryAdmin from './CategoryAdmin';
 import Category from './Category';
+import CategoryProducts from './CategoryProducts';
+
+
 import ProductAdmin from './ProductAdmin';
 import InventoryAdmin from './inventory';
 import Home from './Home';
@@ -50,6 +53,8 @@ function App() {
     <Route path='/CategoryAdmin' element={ <CategoryAdmin/>}></Route>
     <Route path='/ProductAdmin' element={ <ProductAdmin/>}></Route>
     <Route path='/Category' element={ <Category/>}></Route>
+    <Route path="/category/:categoryId/:categoryName" element={<CategoryProducts />} />
+    
     <Route path='/inventory' element={ <InventoryAdmin/>}></Route>
     <Route path='/Login' element={ <Login/>}></Route>
     <Route path='/CarouselC' element={ <CarouselComponent/>}></Route>
