@@ -4,7 +4,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
-$host = '172.16.72.69';
+$host = '192.168.0.131';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';

@@ -24,7 +24,7 @@ function Header() {
           {/* Mostrar "My Order" solo si el usuario no es un guest */}
           {userRole !== 'guest' && 
           
-          <Link to="/order" className="order-link">My Order</Link>}
+          <Link to="/MyOrders" className="order-link">My Orders</Link>}
 
 <Link to="/cart">
   <img src="https://img.icons8.com/ios-filled/50/000000/shopping-cart.png" alt="Shopping Cart" className="cart-icon" />
@@ -39,7 +39,8 @@ function Header() {
         {/* Funcionalidades adicionales solo para empleados y administradores */}
         {userRole >= 2 && (
           <>
-            <Link to="/manage-orders" className="nav-link">Manage Orders</Link>
+            <Link to="/ManageOrder" className="nav-link">Manage Orders</Link>
+
             <Link to="/inventory" className="nav-link">Inventory</Link>
           </>
         )}

@@ -1,4 +1,3 @@
-
 import './App.css';
 import Login from './Login';
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
@@ -19,7 +18,6 @@ import CategoryAdmin from './CategoryAdmin';
 import Category from './Category';
 import CategoryProducts from './CategoryProducts';
 
-
 import ProductAdmin from './ProductAdmin';
 import InventoryAdmin from './inventory';
 import Home from './Home';
@@ -29,15 +27,41 @@ import VideoComponent from './VideoC';
 import VerifyAccount from './VerifyAccount';
 import Cart from './Cart';
 import Checkout from './Checkout';
+import MyOrders from './MyOrders';
+import Tracking from './Tracking';
+import ManageOrder from './ManageOrder';
+import { useEffect } from 'react';  
 
 function App() {
-
   const userRole = localStorage.getItem('userRole');
+
+  // Efecto para limpiar el localStorage al cerrar el navegador o pestaña
+  useEffect(() => {
+    // Función para limpiar el localStorage y establecer el rol como guest al cerrar la pestaña
+    const handleBeforeUnload = () => {
+      localStorage.clear();  // Limpiar todo el localStorage
+      localStorage.setItem('userRole', 'guest');  // Asignar el rol de guest para la próxima vez
+    };
+
+    // Listener para detectar el evento de cerrar la pestaña o ventana
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Establecer el rol de "guest" si no existe ya un rol en el localStorage
+    if (!userRole) {
+      localStorage.setItem('userRole', 'guest');
+    }
+
+    // Limpiar el listener cuando el componente se desmonta
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [userRole]);
 
   // Función para proteger rutas según el rol
   const ProtectedRoute = ({ children, allowedRoles }) => {
     return allowedRoles.includes(parseInt(userRole)) ? children : <Navigate to="/" />;
   };
+
   return (
    <BrowserRouter>
     <Routes>
@@ -58,8 +82,11 @@ function App() {
     <Route path='/Category' element={ <Category/>}></Route>
     <Route path="/category/:categoryId/:categoryName" element={<CategoryProducts />} />
     <Route path="/ProductDetails/:productId" element={<ProductDetails userRole={userRole} />} />
+    <Route path="/ManageOrder" element={<ManageOrder />} />
+
 
     <Route path='/inventory' element={ <InventoryAdmin/>}></Route>
+    <Route path='/MyOrders' element={ <MyOrders/>}></Route>
     <Route path='/Login' element={ <Login/>}></Route>
     <Route path='/CarouselC' element={ <CarouselComponent/>}></Route>
     <Route path='/ProductC' element={ <ProductCard/>}></Route>
@@ -68,12 +95,8 @@ function App() {
     <Route path='/Home' element={ <Home/>}></Route>
     <Route path="/cart" element={<Cart />} />
     <Route path="/checkout" element={<Checkout />} />
-
-
-
-
-
-
+    <Route path='/Tracking' element={ <Tracking/>}></Route>
+    <Route path="/orderDetails/:orderId" element={<Tracking />} />
 
 
     </Routes>

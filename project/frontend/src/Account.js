@@ -34,7 +34,7 @@ function Account() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.post('http://172.16.72.69/profile.php', { email, password });
+                const response = await axios.post('http://192.168.0.131/profile.php', { email, password });
                 const data = response.data;
                 if (data.error) {
                     console.log('Error fetching profile:', data.error);
@@ -81,7 +81,7 @@ function Account() {
         setLoading(true);
         try {
             // Aquí estamos asegurando que los datos editados se envíen correctamente
-            const response = await axios.post('http://172.16.72.69/updateProfile.php', JSON.stringify(editedProfile), {
+            const response = await axios.post('http://192.168.0.131/updateProfile.php', JSON.stringify(editedProfile), {
                 headers: { 'Content-Type': 'application/json' }
             });
             if (response.data.error) {
@@ -136,7 +136,7 @@ function Account() {
         setLoading(true);
         try {
             const updatedProfile = { ...profile, profile_pic: selectedFile, file_type: fileType };  // Incluir la imagen y tipo en el perfil
-            const response = await axios.post('http://172.16.72.69/updateProfile.php', updatedProfile);
+            const response = await axios.post('http://192.168.0.131/updateProfile.php', updatedProfile);
 
             if (response.data.error) {
                 alert('Error uploading photo: ' + response.data.error);

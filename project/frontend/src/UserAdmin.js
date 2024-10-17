@@ -34,7 +34,7 @@ function UserAdmin() {
   // Function to fetch users from the backend
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://172.16.72.69/user.php');
+      const response = await axios.get('http://192.168.0.131/user.php');
       console.log("API Response:", response.data);
       // Check if the response data is an array before setting the state
       if (Array.isArray(response.data)) {
@@ -93,7 +93,7 @@ function UserAdmin() {
   const handleAddUser = async () => {
     try {
       console.log("Sending data:", newUser);
-      const response = await axios.post('http://172.16.72.69/addProfile.php', newUser);
+      const response = await axios.post('http://192.168.0.131/addProfile.php', newUser);
       console.log("User added:", response.data);
       fetchUsers();  // Refresh the user list after adding
       setShowModal(false);  // Close the modal
@@ -106,7 +106,7 @@ function UserAdmin() {
   const handleUpdateUser = async () => {
     try {
       console.log("Sending data for update:", newUser);
-      const response = await axios.post('http://172.16.72.69/updateProfile2.php', newUser);  // Update endpoint
+      const response = await axios.post('http://192.168.0.131/updateProfile2.php', newUser);  // Update endpoint
       console.log("User updated:", response.data);
       fetchUsers();  // Refresh the user list after updating
       setShowModal(false);  // Close the modal
@@ -128,7 +128,7 @@ function UserAdmin() {
   const handleDeleteUser = async (id_user) => {
     if (window.confirm("Are you sure you want to delete this profile?")) {  // Confirmation before deletion
       try {
-        const response = await axios.post('http://172.16.72.69/deleteProfile.php', { id_user });
+        const response = await axios.post('http://192.168.0.131/deleteProfile.php', { id_user });
         console.log("User deleted:", response.data);
         fetchUsers();  // Refresh the user list after deletion
       } catch (error) {

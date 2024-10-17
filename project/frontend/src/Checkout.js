@@ -9,6 +9,8 @@ function Checkout() {
   const [cartItems, setCartItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [shipping, setShipping] = useState(0);
+  const [orderConfirmation, setOrderConfirmation] = useState(false);
+  const [orderId, setOrderId] = useState(null); // Para manejar el número de orden
   const [shippingAddress, setShippingAddress] = useState({
     address: '',
     city: '',
@@ -33,7 +35,7 @@ function Checkout() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.post('http://172.16.72.69/profile.php', {
+        const response = await axios.post('http://192.168.0.131/profile.php', {
           email,
           password,
         });
@@ -70,8 +72,26 @@ function Checkout() {
     setShipping(totalAmount >= 500 ? 0 : 35);
   }, [email, password]);
 
-  const handlePlaceOrder = () => {
-    alert("Orden realizada correctamente");
+  const handlePlaceOrder = async () => {
+    try {
+      // Realizar la petición para crear el pedido
+      const orderResponse = await axios.post('http://192.168.0.131/placeOrder.php', {
+        email,
+        total: total + shipping,
+        items: cartItems,
+      });
+
+      if (orderResponse.data.id_order) {
+        // Si la orden fue creada correctamente
+        setOrderId(orderResponse.data.id_order); // Obtener el número de orden (id_order)
+        setOrderConfirmation(true); // Mostrar la confirmación de orden
+      } else {
+        alert("Hubo un error al realizar tu orden. Intenta de nuevo.");
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert("Hubo un error al realizar tu orden. Intenta de nuevo.");
+    }
   };
 
   const handleEditShipping = () => {
@@ -218,6 +238,20 @@ function Checkout() {
             <Button variant="primary" onClick={() => navigate('/Account')}>
               Yes, go to Account
             </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Modal de confirmación de pedido */}
+        <Modal show={orderConfirmation} onHide={() => setOrderConfirmation(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Order Confirmation</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Tu orden fue confirmada. Número de orden: {orderId}. ¿Qué deseas hacer?
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => navigate('/')}>Regresar a Home</Button>
+            <Button variant="primary" onClick={() => navigate('/MyOrders')}>Ver mis órdenes</Button>
           </Modal.Footer>
         </Modal>
       </main>

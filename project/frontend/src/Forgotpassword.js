@@ -12,7 +12,7 @@ function Forgotpassword() {
     setLoading(true);
     
     // Enviar email al backend para restablecer la contraseña
-    axios.post('http://172.16.72.69/forgotpassword.php', { email })
+    axios.post('http://192.168.0.131/forgotpassword.php', { email })
       .then(response => {
         setLoading(false);
         if (response.data.success) {

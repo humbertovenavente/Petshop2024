@@ -13,7 +13,7 @@ function CategoryProducts() {
   // Función para obtener los productos de la categoría seleccionada
   const fetchProductsByCategory = useCallback(async () => {
     try {
-      const response = await axios.get(`http://172.16.72.69/CategoryProduct.php?categoryId=${categoryId}`);
+      const response = await axios.get(`http://192.168.0.131/CategoryProduct.php?categoryId=${categoryId}`);
       
       // Asegurarse de que la respuesta sea un array antes de llamarlo en setProducts
       if (Array.isArray(response.data)) {

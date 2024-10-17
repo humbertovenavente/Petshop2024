@@ -63,7 +63,7 @@ function CategoryAdmin() {
   const handleDeleteCategory = async (id_category) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar esta categoría?")) {
       try {
-        const response = await axios.post('http://172.16.72.69/deleteCategory.php', { id_category });
+        const response = await axios.post('http://192.168.0.131/deleteCategory.php', { id_category });
         console.log("Categoría eliminada:", response.data);
         fetchCategories(); // Refrescar la lista de categorías después de eliminar
       } catch (error) {
