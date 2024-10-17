@@ -80,7 +80,10 @@ function Account() {
     const handleSaveChanges = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.72.69/updateProfile.php', editedProfile);
+            // Aquí estamos asegurando que los datos editados se envíen correctamente
+            const response = await axios.post('http://172.16.72.69/updateProfile.php', JSON.stringify(editedProfile), {
+                headers: { 'Content-Type': 'application/json' }
+            });
             if (response.data.error) {
                 alert('Error updating profile: ' + response.data.error);
             } else {
@@ -94,6 +97,7 @@ function Account() {
             setLoading(false);
         }
     };
+    
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;

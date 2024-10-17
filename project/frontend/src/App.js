@@ -11,6 +11,8 @@ import User from './user';
 import Footer from './footer';
 import Header from './header';
 
+import ProductDetails from './ProductDetails';
+
 import Account from './Account';
 import UserAdmin from './UserAdmin';
 import CategoryAdmin from './CategoryAdmin';
@@ -25,7 +27,8 @@ import CarouselComponent from './CarouselC';
 import ProductCard from './ProductCard';
 import VideoComponent from './VideoC';
 import VerifyAccount from './VerifyAccount';
-
+import Cart from './Cart';
+import Checkout from './Checkout';
 
 function App() {
 
@@ -54,7 +57,8 @@ function App() {
     <Route path='/ProductAdmin' element={ <ProductAdmin/>}></Route>
     <Route path='/Category' element={ <Category/>}></Route>
     <Route path="/category/:categoryId/:categoryName" element={<CategoryProducts />} />
-    
+    <Route path="/ProductDetails/:productId" element={<ProductDetails userRole={userRole} />} />
+
     <Route path='/inventory' element={ <InventoryAdmin/>}></Route>
     <Route path='/Login' element={ <Login/>}></Route>
     <Route path='/CarouselC' element={ <CarouselComponent/>}></Route>
@@ -62,6 +66,10 @@ function App() {
     <Route path='/VideoC' element={ <VideoComponent/>}></Route>
     <Route path='/verify' element={ <VerifyAccount/>}></Route>
     <Route path='/Home' element={ <Home/>}></Route>
+    <Route path="/cart" element={<Cart />} />
+    <Route path="/checkout" element={<Checkout />} />
+
+
 
 
 

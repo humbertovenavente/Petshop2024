@@ -26,7 +26,9 @@ function Header() {
           
           <Link to="/order" className="order-link">My Order</Link>}
 
-          <img src="https://img.icons8.com/ios-filled/50/000000/shopping-cart.png" alt="Shopping Cart" className="cart-icon" />
+<Link to="/cart">
+  <img src="https://img.icons8.com/ios-filled/50/000000/shopping-cart.png" alt="Shopping Cart" className="cart-icon" />
+</Link>
         </div>
       </header>
 

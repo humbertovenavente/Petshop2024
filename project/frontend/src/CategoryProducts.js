@@ -51,7 +51,13 @@ function CategoryProducts() {
                   <Card.Body>
                     <Card.Title>{product.name}</Card.Title>
                     <Card.Text>Precio: ${product.price}</Card.Text>
-                    <Button variant="primary">Ver Artículo</Button>
+                    <Button
+  variant="primary"
+  onClick={() => navigate(`/ProductDetails/${product.id_product}`)}
+>
+  Ver Artículo
+</Button>
+
                   </Card.Body>
                 </Card>
               </Col>
