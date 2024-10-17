@@ -35,7 +35,7 @@ function Tracking() {
     <div id="root">
       <Header />
       <main className="container my-5">
-        <h1>Tracking of your order: {orderId}</h1>
+        <h1>Order Number: {orderId}</h1>
 
         {/* Mostrar el estado de la orden */}
         <p>The status of your order is: <strong>{orderDetails.status}</strong></p>

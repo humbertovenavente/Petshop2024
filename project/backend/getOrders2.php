@@ -60,7 +60,7 @@ if (count($products) === 0) {
 }
 
 $orderDetails = [
-    'status' => $status, // Incluir el estado de la orden
+    'status' => $status, 
     'products' => $products,
     'total_items' => $total_items,
     'total_price' => $total_price,

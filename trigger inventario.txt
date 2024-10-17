@@ -1,0 +1,53 @@
+DROP TRIGGER IF EXISTS actualizar_inventario;
+DROP TRIGGER IF EXISTS actualizar_inventoryNow;
+
+-- Eliminar cualquier trigger previo que esté causando conflictos
+DROP TRIGGER IF EXISTS actualizar_inventario;
+
+-- Eliminar campos innecesarios como 'inventoryNow' si existen
+ALTER TABLE Product DROP COLUMN IF EXISTS inventoryNow;
+
+-- Asegurarse de que el campo 'ventas' existe en la tabla 'Product'
+ALTER TABLE Product ADD COLUMN IF NOT EXISTS ventas INT DEFAULT 0;
+
+-- Reiniciar los valores del inventario y las ventas (opcional)
+UPDATE Product 
+SET inventory = 100,  -- Ajusta el inventario inicial según lo que necesites
+    ventas = 0;  -- Reiniciar el contador de ventas a 0
+
+-- Crear el trigger para manejar la actualización del inventario y las ventas
+DELIMITER $$
+
+CREATE TRIGGER actualizar_inventario
+AFTER INSERT ON OrderProduct
+FOR EACH ROW
+BEGIN
+    -- Actualizar el inventario restando la cantidad comprada
+    -- y aumentar el campo de ventas con la cantidad vendida
+    UPDATE Product
+    SET inventory = GREATEST(inventory - NEW.quantity, 0),  -- Evitar que el inventario sea negativo
+        ventas = ventas + NEW.quantity  -- Aumentar el número total de ventas
+    WHERE id_product = NEW.id_product;
+END$$
+
+DELIMITER ;
+
+-- Prueba insertando una venta en OrderProduct
+INSERT INTO OrderProduct (id_order, id_product, price, quantity) 
+VALUES (2, 1, 5.00, 1);  -- Compra 1 unidad del producto con id_product = 1
+
+-- Verificar el inventario y las ventas después de la inserción
+SELECT name, inventory AS inventario_inicial, ventas 
+FROM Product 
+WHERE id_product = 1;
+
+-- Modificar manualmente el inventario de un producto
+UPDATE Product 
+SET inventory = 150  -- Ajusta este valor según lo que desees
+WHERE id_product = 1;  -- Ajusta el ID del producto que deseas modificar
+
+-- Verificar el inventario después de modificarlo manualmente
+SELECT name, inventory, ventas 
+FROM Product 
+WHERE id_product = 1;
+
