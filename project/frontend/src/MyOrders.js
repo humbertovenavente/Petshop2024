@@ -6,7 +6,7 @@ import Footer from './footer';
 import { Button } from 'react-bootstrap';
 
 function MyOrders() {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState([]); // Aseguramos que orders sea siempre un arreglo
   const email = localStorage.getItem('email');
   const navigate = useNavigate();
 
@@ -14,13 +14,16 @@ function MyOrders() {
     const fetchOrders = async () => {
       try {
         const response = await axios.post('http://192.168.0.131/getOrders.php', { email });
-        setOrders(response.data.orders);
+        setOrders(response.data.orders || []);  // Aseguramos que siempre haya un arreglo
       } catch (error) {
         console.error('Error fetching orders:', error);
+        setOrders([]);  // Si ocurre un error, orders será un arreglo vacío
       }
     };
 
-    fetchOrders();
+    if (email) {  // Aseguramos que email esté presente
+      fetchOrders();
+    }
   }, [email]);
 
   const handleViewOrder = (orderId) => {
