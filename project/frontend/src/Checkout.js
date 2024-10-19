@@ -77,14 +77,18 @@ function Checkout() {
       // Realizar la petición para crear el pedido
       const orderResponse = await axios.post('http://192.168.0.131/placeOrder.php', {
         email,
-        total: total + shipping,
+        total: total + shipping,  // Aquí se envía el total correcto
         items: cartItems,
       });
-
+  
       if (orderResponse.data.id_order) {
         // Si la orden fue creada correctamente
         setOrderId(orderResponse.data.id_order); // Obtener el número de orden (id_order)
         setOrderConfirmation(true); // Mostrar la confirmación de orden
+  
+        // Limpiar el carrito una vez se completa la orden
+        localStorage.removeItem('cart');  // Aquí limpiamos el carrito
+        setCartItems([]);  // Actualizamos el estado para reflejar el carrito vacío
       } else {
         alert("Hubo un error al realizar tu orden. Intenta de nuevo.");
       }
@@ -93,6 +97,8 @@ function Checkout() {
       alert("Hubo un error al realizar tu orden. Intenta de nuevo.");
     }
   };
+  
+  
 
   const handleEditShipping = () => {
     setShowAddressConfirmation(true); // Mostrar modal de confirmación

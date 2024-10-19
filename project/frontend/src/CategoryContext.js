@@ -33,4 +33,4 @@ export const CategoryProvider = ({ children }) => {
 // Hook para usar el contexto
 export const useCategory = () => {
   return useContext(CategoryContext);
-};
+}; 

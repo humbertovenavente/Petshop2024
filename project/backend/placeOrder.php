@@ -17,8 +17,8 @@ if ($conn->connect_error) {
 $data = json_decode(file_get_contents("php://input"), true);
 
 $email = $data['email'];
-$cartItems = $data['items'];  // Asegúrate que este campo corresponda a los items del carrito
-$total = $data['total'];
+$cartItems = $data['items'];  // Los items del carrito
+$total = $data['total'];  // El total de la orden, incluido el envío
 
 if (!$email || !$cartItems || !$total) {
     echo json_encode(['success' => false, 'message' => 'Faltan datos']);
@@ -26,19 +26,21 @@ if (!$email || !$cartItems || !$total) {
 }
 
 // Estado inicial de la orden
-$status = 'Accepted';  // Usando uno de los valores permitidos en ENUM
+$status = 'Accepted';
 
-// Insertar la orden
-$sql = "INSERT INTO `Order` (id_user, order_date, status) VALUES ((SELECT id_user FROM User WHERE email = ?), NOW(), ?)";
+// Insertar la orden con el total_amount
+$sql = "INSERT INTO `Order` (id_user, order_date, status, total_amount) 
+        VALUES ((SELECT id_user FROM User WHERE email = ?), NOW(), ?, ?)";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param('ss', $email, $status);
+$stmt->bind_param('ssd', $email, $status, $total);  // d: double para total_amount
 
 if ($stmt->execute()) {
     $orderId = $stmt->insert_id;
 
     // Insertar los productos de la orden en la tabla `OrderProduct`
     foreach ($cartItems as $item) {
-        $sqlOrderProduct = "INSERT INTO OrderProduct (id_order, id_product, price, quantity) VALUES (?, ?, ?, ?)";
+        $sqlOrderProduct = "INSERT INTO OrderProduct (id_order, id_product, price, quantity) 
+                            VALUES (?, ?, ?, ?)";
         $stmtProduct = $conn->prepare($sqlOrderProduct);
         $stmtProduct->bind_param('iidi', $orderId, $item['id_product'], $item['price'], $item['quantity']);
         $stmtProduct->execute();

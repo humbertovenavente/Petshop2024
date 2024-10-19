@@ -59,3 +59,4 @@ if ($stmt->execute()) {
 // Cerrar la declaración y la conexión
 $stmt->close();
 $conn->close();
+?>

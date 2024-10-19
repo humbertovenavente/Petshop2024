@@ -49,7 +49,7 @@ function ProductDetails({ userRole }) {
   };
 
   if (!product) {
-    return <p>Cargando detalles del producto...</p>;
+    return <p></p>;
   }
 
   return (

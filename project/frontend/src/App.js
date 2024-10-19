@@ -37,26 +37,23 @@ function App() {
 
   // Efecto para limpiar el localStorage al cerrar el navegador o pestaña
   useEffect(() => {
-    // Función para limpiar el localStorage y establecer el rol como guest al cerrar la pestaña
     const handleBeforeUnload = () => {
-      localStorage.clear();  // Limpiar todo el localStorage
-      localStorage.setItem('userRole', 'guest');  // Asignar el rol de guest para la próxima vez
+      // No limpiar el localStorage al cerrar la pestaña
+      // localStorage.clear();  // Elimina esta línea para que no se borre el localStorage
     };
-
+  
     // Listener para detectar el evento de cerrar la pestaña o ventana
     window.addEventListener('beforeunload', handleBeforeUnload);
-
-    // Establecer el rol de "guest" si no existe ya un rol en el localStorage
+  
+    // Si no hay un userRole definido, establecerlo como 'guest'
     if (!userRole) {
       localStorage.setItem('userRole', 'guest');
     }
-
-    // Limpiar el listener cuando el componente se desmonta
+  
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [userRole]);
-
   // Función para proteger rutas según el rol
   const ProtectedRoute = ({ children, allowedRoles }) => {
     return allowedRoles.includes(parseInt(userRole)) ? children : <Navigate to="/" />;

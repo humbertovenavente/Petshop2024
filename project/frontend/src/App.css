@@ -148,6 +148,13 @@ main {
   margin-top: 40px;
 }
 
+
+.product-card .product-image {
+  object-fit: cover;
+  height: 400px;
+  width: 100%;
+  display: block;
+}
 /* Estilos responsivos */
 @media (max-width: 768px) {
   .header {
@@ -201,7 +208,12 @@ main {
     font-size: 14px;
   }
 }
-
+.product-card .product-image {
+  object-fit: cover;
+  height: 400px;
+  width: 100%;
+  display: block;
+}
 @media (max-width: 480px) {
   .header {
     height: 45px;
@@ -252,4 +264,12 @@ main {
   .footer a {
     font-size: 12px;
   }
+.product-card .product-image {
+  object-fit: cover;
+  height: 400px;
+  width: 100%;
+  display: block;
+}
+
+
 }

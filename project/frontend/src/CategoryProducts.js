@@ -5,6 +5,8 @@ import axios from 'axios';
 import Header from './header';
 import Footer from './footer';
 
+// Importa los estilos CSS personalizados
+
 function CategoryProducts() {
   const { categoryId, categoryName } = useParams(); // Obtener el id y nombre de la categoría desde la URL
   const [products, setProducts] = useState([]);
@@ -46,19 +48,22 @@ function CategoryProducts() {
           {Array.isArray(products) && products.length > 0 ? (
             products.map((product) => (
               <Col key={product.id_product} md={4} className="mb-4 product-card">
-                <Card>
-                  <Card.Img variant="top" src={product.image} className="product-image" />
-                  <Card.Body>
-                    <Card.Title>{product.name}</Card.Title>
-                    <Card.Text>Precio: ${product.price}</Card.Text>
-                    <Button
-  variant="primary"
-  onClick={() => navigate(`/ProductDetails/${product.id_product}`)}
->
-  Ver Artículo
-</Button>
-
-                  </Card.Body>
+                <Card className="product-card">  {/* Asegúrate de usar la clase product-card */}
+  <Card.Img 
+    variant="top" 
+    src={product.image} 
+    className="product-image" 
+  />
+  <Card.Body>
+    <Card.Title>{product.name}</Card.Title>
+    <Card.Text>Precio: ${product.price}</Card.Text>
+    <Button
+      variant="primary"
+      onClick={() => navigate(`/ProductDetails/${product.id_product}`)}
+    >
+      Ver Artículo
+    </Button>
+  </Card.Body>
                 </Card>
               </Col>
             ))
