@@ -33,11 +33,29 @@ function Category() {
     };
 
     const searchProducts = () => {
+           // Validar que los precios sean mayores o iguales a 1
+        const minPrice = parseFloat(filters.min_price);
+        const maxPrice = parseFloat(filters.max_price);
+
+        if (minPrice < 1 || (maxPrice !== '' && maxPrice < 1)) {
+            alert('Both Minimum Price and Maximum Price must be at least 1.');
+            return;
+        }
+        if (maxPrice <= minPrice) {
+            alert('Maximum Price must be greater than Minimum Price.');
+            return;
+        }
+
+        if (filters.category_id === '' || filters.min_price === '' || filters.max_price === '') {
+            alert('It must have a value.');
+            return;
+        }
+
         console.log("Filtros enviados:", filters);
         axios.post('http://192.168.0.131/searchCategory.php', {
             category_id: filters.category_id, 
-            min_price: filters.min_price,
-            max_price: filters.max_price
+            min_price: filters.min_price ? filters.min_price : 0, 
+            max_price: filters.max_price ? filters.max_price : Infinity
         })
         .then(response => {
             console.log('Respuesta del backend:', response.data);
@@ -78,12 +96,12 @@ function Category() {
                         </Col>
                         <Col md={4}>
                             <Form.Group>
-                                <Form.Label>Min Price</Form.Label>
+                                <Form.Label>Minimun Price</Form.Label>
                                 <Form.Control
                                     type="number"
                                     name="min_price"
                                     onChange={handleInputChange}
-                                    placeholder="Min Price"
+                                    placeholder="Minimun Price"
                                 />
                             </Form.Group>
                         </Col>

@@ -1,23 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 function ResetPassword() {
+    const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [loading, setLoading] = useState(false); // Estado de "loading"
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Extraer el token de los parámetros de la URL
+    // Extraer el token y el correo electrónico de los parámetros de la URL
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get('token');
+    const emailFromUrl = queryParams.get('email');
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        setError(''); // Limpiar errores previos
+    useEffect(() => {
+        if (emailFromUrl) {
+            setEmail(emailFromUrl); // Completar el campo de correo electrónico
+        }
+    }, [emailFromUrl]);
+
+    const handleSubmit = async (event) => {
+        event.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
+        setError(''); // Limpiar cualquier mensaje de error previo
+
+        console.log("Email:", email);
+        console.log("New Password:", newPassword);
+        console.log("Confirm Password:", confirmPassword);
+        console.log("Token:", token);
 
         // Verificar si las contraseñas coinciden
         if (newPassword !== confirmPassword) {
@@ -28,35 +41,38 @@ function ResetPassword() {
         // Empezar a cargar
         setLoading(true);
 
-        // Enviar la solicitud de restablecimiento al backend
-        axios.post('http://192.168.0.131/resetPassword.php', {
-            token,
-            newPassword
-        })
-        .then((response) => {
-            setLoading(false); // Terminar de cargar
+        try {
+            // Enviar la solicitud de restablecimiento al backend
+            const response = await axios.post('http://192.168.0.131/resetPassword.php', {
+                email,
+                token,
+                newPassword
+            });
+
+            setLoading(false);
+            console.log("Response:", response.data); // Mostrar la respuesta en la consola
             if (response.data.success) {
-                alert('Password reset successfully'); // Mensaje de éxito
-                navigate('/login'); // Redirigir a la página de login
+                alert('Password reset successfully'); // Mensaje de confirmación
+                navigate('/Login'); // Redirigir a la página de login
             } else if (response.data.error) {
-                alert(response.data.error); // Mostrar error como alerta
+                alert(response.data.error); // Mostrar error
             }
-        })
-        .catch((error) => {
-            setLoading(false); // Terminar de cargar
+        } catch (error) {
+            setLoading(false);
             console.error('Error resetting password:', error);
-            alert('Failed to reset password. Please try again.'); // Mostrar error
-        });
+            alert('Failed to reset password. Please try again.');
+        }
     };
 
     return (
         <div className='d-flex justify-content-center align-items-center vh-100' style={{ backgroundColor: 'darkorange' }}>
             <div className='bg-white p-3 rounded w-25'>
+                <h2>Reset Password</h2>
+                <p>Your email is: {email}</p> {/* Mostrar el correo electrónico */}
+
+                {error && <p className="text-danger">{error}</p>}
+
                 <form onSubmit={handleSubmit}>
-                    <h2>Reset Password</h2>
-
-                    {error && <p className="text-danger">{error}</p>}
-
                     <div className='mb-3'>
                         <label htmlFor='newPassword'>New Password</label>
                         <input

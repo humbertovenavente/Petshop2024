@@ -9,7 +9,7 @@ $origin = $_SERVER['HTTP_ORIGIN'];
 
 // Lista de orígenes permitidos
 $allowed_origins = [
-    'http://192.168.0.3:3000',
+    'http://192.168.0.4:3000',
     'http://localhost:3000'
 ];
 
@@ -93,25 +93,25 @@ if ($stmt->execute()) {
     require 'vendor/autoload.php';
     $email_sendgrid = new \SendGrid\Mail\Mail();
     
-    $email_sendgrid->setFrom("humberto107_@hotmail.com", "Jose");
-    $email_sendgrid->setSubject("Verifica tu cuenta");
+    $email_sendgrid->setFrom("humberto107_@hotmail.com", "Michigan");
+    $email_sendgrid->setSubject("Verify your account");
     $email_sendgrid->addTo($email, $name . " " . $lastname);
-    $verification_link = "http://192.168.0.3:3000/verify?token=$verification_token";
+    $verification_link = "http://192.168.0.4:3000/verify?token=$verification_token";
         $email_sendgrid->addContent(
         "text/html", 
-        "Gracias por registrarte. Haz clic en este enlace para verificar tu cuenta: <a href='$verification_link'>Verificar cuenta</a>"
+        "Thank you for your regristration. Please click the following link to verify your account: <a href='$verification_link'>Verificar cuenta</a>"
     );
-
-    //aca
+    
+// aca
 
     try {
         $response = $sendgrid->send($email_sendgrid);
-        echo json_encode(['message' => 'Usuario creado con éxito. Revisa tu correo para verificar tu cuenta.']);
+        echo json_encode(['message' => 'User created successfully. Kindly check your email to verify your account.']);
     } catch (Exception $e) {
-        echo json_encode(['error' => "El correo de verificación no pudo ser enviado. Error: {$e->getMessage()}"]);
+        echo json_encode(['error' => "Email was not sent through. Error: {$e->getMessage()}"]);
     }
 } else {
-    echo json_encode(['error' => 'Error al insertar los datos: ' . $conn->error]);
+    echo json_encode(['error' => 'Erro to insert data: ' . $conn->error]);
 }
 
 // Cerrar la consulta y la conexión a la base de datos

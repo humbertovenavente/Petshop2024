@@ -25,19 +25,19 @@ function ProductDetails({ userRole }) {
     fetchProductDetails();
   }, [productId]);
 
-  // Función para agregar el producto al carrito
+  // Agregar el producto al carrito
   const handleAddToCart = () => {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     const newProduct = { ...product, quantity };
     const updatedCart = [...cart, newProduct];
     localStorage.setItem('cart', JSON.stringify(updatedCart));
-    alert(`Agregaste ${quantity} artículo(s) al carrito`);
+    alert(`You added ${quantity} article(s) in the cart`);
   };
 
   const handleQuantityChange = (e) => {
     const selectedQuantity = parseInt(e.target.value);
     if (selectedQuantity > product.inventory) {
-      setError(`Insuficientes artículos, solo quedan ${product.inventory}.`);
+      setError(`Almost out of stock, there is only ${product.inventory} products available.`);
     } else {
       setError('');
       setQuantity(selectedQuantity);
@@ -57,7 +57,7 @@ function ProductDetails({ userRole }) {
       <Header />
       <main className="container my-5">
         <Button variant="secondary" onClick={handleGoBack} className="mb-3">
-          Regresar
+          Back
         </Button>
 
         <h1>{product.name}</h1>
@@ -71,14 +71,14 @@ function ProductDetails({ userRole }) {
         ) : (
           <p>No image available</p>
         )}
-        <p><strong>Name:</strong> {product.name || 'No disponible'}</p>
-        <p><strong>Descripción:</strong> {product.description || 'No disponible'}</p>
-        <p><strong>Precio:</strong> ${product.price || 'No disponible'}</p>
-        <p><strong>Color:</strong> {product.color || 'No aplica'}</p>
-        <p><strong>Tamaño:</strong> {product.size || 'No aplica'}</p>
+        <p><strong>Name:</strong> {product.name || 'No available'}</p>
+        <p><strong>Description:</strong> {product.description || 'No available'}</p>
+        <p><strong>Price:</strong> ${product.price || 'No available'}</p>
+        <p><strong>Color:</strong> {product.color || 'No available'}</p>
+        <p><strong>Size:</strong> {product.size || 'No available'}</p>
 
         <Form.Group>
-          <Form.Label>Cantidad</Form.Label>
+          <Form.Label>Quantity</Form.Label>
           <Form.Control as="select" value={quantity} onChange={handleQuantityChange} disabled={product.stock === 0}>
             {[...Array(10).keys()].map(i => (
               <option key={i + 1} value={i + 1}>{i + 1}</option>

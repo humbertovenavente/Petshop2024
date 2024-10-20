@@ -61,9 +61,9 @@ function Cart() {
         <Header />
         <main className="container my-5">
           <Button variant="secondary" onClick={handleGoBack} className="mb-3">
-            Regresar
+            Back
           </Button>
-          <p>El carrito está vacío.</p>
+          <p>Your cart is empty! Please add products.</p>
         </main>
         <Footer />
       </div>
@@ -81,10 +81,10 @@ function Cart() {
       <main className="container my-5">
         {/* Botón para regresar a la página anterior */}
         <Button variant="secondary" onClick={handleGoBack} className="mb-3">
-          Regresar
+          Back
         </Button>
 
-        <h1>Tu Carrito</h1>
+        <h1>Your cart information</h1>
         {cartItems.map((item) => (
           <div key={item.id_product} className="card mb-3">
             <div className="row no-gutters">
@@ -102,10 +102,10 @@ function Cart() {
               <div className="col-md-8">
                 <div className="card-body">
                   <h5 className="card-title">{item.name}</h5>
-                  <p className="card-text">Precio: ${item.price}</p>
+                  <p className="card-text">Price: ${item.price}</p>
                   <p className="card-text">{item.stock > 0 ? 'In Stock' : 'Out of Stock'}</p>
                   <Form.Group controlId={`quantity-${item.id_product}`}>
-                    <Form.Label>Cantidad</Form.Label>
+                    <Form.Label>Quantity</Form.Label>
                     <Form.Control
                       as="select"
                       value={item.stock > 0 ? item.quantity : 0}
@@ -122,7 +122,7 @@ function Cart() {
                     className="mt-3"
                     onClick={() => handleRemoveItem(item.id_product)}
                   >
-                    Eliminar
+                    Delete
                   </Button>
                 </div>
               </div>
@@ -131,7 +131,7 @@ function Cart() {
         ))}
 
         <div className="card p-3">
-          <p><strong>Cantidad de productos:</strong> {totalQuantity}</p>
+          <p><strong>Quantity of products:</strong> {totalQuantity}</p>
           <p><strong>Total:</strong> ${total.toFixed(2)}</p>
           <Button variant="success" onClick={handleProceedToCheckout}>Proceed to checkout</Button>
         </div>

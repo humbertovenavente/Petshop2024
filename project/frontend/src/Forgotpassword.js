@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Forgotpassword() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // Usar useNavigate para redirección
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
     setLoading(true);
     
     // Enviar email al backend para restablecer la contraseña
@@ -18,6 +18,7 @@ function Forgotpassword() {
         if (response.data.success) {
           // Mostrar mensaje de éxito usando `alert()`
           alert('Reset password email was sent to you, please check your email');
+          navigate('/login'); // Redirigir al login después de que el usuario haga clic en OK
         } else if (response.data.error) {
           // Mostrar mensaje de error usando `alert()`
           alert(response.data.error);

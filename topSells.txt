@@ -1,0 +1,27 @@
+DROP PROCEDURE IF EXISTS topSells;
+
+
+CREATE OR REPLACE VIEW topSells AS
+SELECT 
+    p.id_product,
+    p.image,
+    p.name,
+    p.price,
+    p.inventory,
+    SUM(op.quantity) AS total_sales
+FROM 
+    Product p
+JOIN 
+    OrderProduct op ON p.id_product = op.id_product
+JOIN 
+    `Order` o ON op.id_order = o.id_order  -- Aquí uso comillas invertidas para la tabla `Order`
+WHERE 
+    o.order_date >= NOW() - INTERVAL 1 WEEK
+GROUP BY 
+    p.id_product, p.image, p.name, p.price, p.inventory
+ORDER BY 
+    total_sales DESC
+LIMIT 10;
+
+
+SELECT * FROM topSells;

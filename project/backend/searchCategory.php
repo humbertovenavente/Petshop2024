@@ -29,8 +29,8 @@ $data = json_decode($input, true);
 
 // Validar que los datos existen
 $category_id = isset($data['category_id']) ? $data['category_id'] : null;
-$min_price = isset($data['min_price']) ? $data['min_price'] : null;
-$max_price = isset($data['max_price']) ? $data['max_price'] : null;
+$min_price = isset($data['min_price']) ? $data['min_price'] : 0;
+$max_price = isset($data['max_price']) ? $data['max_price'] : PHP_INT_MAX;
 
 if (!$category_id || !$min_price || !$max_price) {
     echo json_encode([

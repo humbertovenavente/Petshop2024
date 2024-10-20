@@ -1,0 +1,43 @@
+DROP PROCEDURE IF EXISTS searchCategory;
+
+DELIMITER $$
+
+CREATE PROCEDURE searchCategory(
+    IN category_id INT, 
+    IN min_price DECIMAL(10,2), 
+    IN max_price DECIMAL(10,2)
+)
+BEGIN
+    -- Construir la consulta base
+    SET @query = 'SELECT p.id_product, p.name, p.price, p.image, c.name as category_name
+                  FROM Product p
+                  JOIN ProductCategory pc ON p.id_product = pc.id_product
+                  JOIN Category c ON pc.id_category = c.id_category
+                  WHERE 1=1';
+
+    --  condiciones dinámicas 
+    IF category_id IS NOT NULL THEN
+        SET @query = CONCAT(@query, ' AND pc.id_category = ', category_id);
+    END IF;
+
+    IF min_price IS NOT NULL THEN
+        SET @query = CONCAT(@query, ' AND p.price >= ', min_price);
+    END IF;
+
+    IF max_price IS NOT NULL THEN
+        SET @query = CONCAT(@query, ' AND p.price <= ', max_price);
+    END IF;
+
+    -- Ejecutar 
+    PREPARE stmt FROM @query;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+END$$
+
+DELIMITER ;
+
+
+
+
+CALL searchCategory(3, 5, 100);
+-- Filtra por categoría 1, precio entre 10 y 100, y productos en stock

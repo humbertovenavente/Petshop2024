@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const VerifyAccount = () => {
-  const [message, setMessage] = useState('Verificando tu cuenta...');
+  const [message, setMessage] = useState('Verifying your account...');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -11,7 +11,7 @@ const VerifyAccount = () => {
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
   
-    console.log("Token capturado desde URL:", token); // Verificar si el token se captura correctamente
+    console.log("Token:", token); // Verificar si el token se captura correctamente
   
     if (token) {
       axios.post('http://192.168.0.131/verify.php', { token })
@@ -22,14 +22,14 @@ const VerifyAccount = () => {
             setMessage(response.data.message);
             setTimeout(() => {
               navigate('/Login');
-            }, 3000);  // Redirige después de 3 segundos
+            }, 3000);  // Redirige 
           } else {
-            setMessage(response.data.error || 'Error al verificar la cuenta.');
+            setMessage(response.data.error || 'Error occurred to verify.');
           }
         })
         .catch(error => {
-          console.error("Error en la verificación:", error);  // Captura cualquier error
-          setMessage('Hubo un problema al verificar tu cuenta.');
+          console.error("Error in verification:", error);  // Captura cualquier error
+          setMessage('There was an error when try to verified your account.');
         });
     } else {
       setMessage('Token no válido.');

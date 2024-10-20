@@ -90,11 +90,11 @@ function Checkout() {
         localStorage.removeItem('cart');  // Aquí limpiamos el carrito
         setCartItems([]);  // Actualizamos el estado para reflejar el carrito vacío
       } else {
-        alert("Hubo un error al realizar tu orden. Intenta de nuevo.");
+        alert("An error occured. Try again.");
       }
     } catch (error) {
       console.error("Error placing order:", error);
-      alert("Hubo un error al realizar tu orden. Intenta de nuevo.");
+      alert("An error occured. Try again.");
     }
   };
   
@@ -138,7 +138,7 @@ function Checkout() {
       <main className="container my-5">
         <h1>Checkout</h1>
 
-        {/* Sección de Dirección de Envío */}
+        {/* shipping address */}
         <h2>Shipping Address</h2>
         <p>Address: {shippingAddress.address || 'No disponible'}</p>
         <p>City: {shippingAddress.city || 'No disponible'}</p>
@@ -146,7 +146,7 @@ function Checkout() {
         <p>Zip Code: {shippingAddress.zip || 'No disponible'}</p>
         <Button onClick={handleEditShipping}>Edit Shipping Address</Button>
 
-        {/* Sección de Información de Tarjeta */}
+        {/* CC*/}
         <h2>Credit Card Information</h2>
         <p>Name on Card: {creditCard.name || 'No disponible'}</p>
         <p>Card Number: {creditCard.cardNumber || 'No disponible'}</p>
@@ -154,7 +154,7 @@ function Checkout() {
         <p>CVV: {creditCard.cvv || 'No disponible'}</p>
         <Button onClick={handleEditCreditCard}>Edit Credit Card</Button>
 
-        {/* Sección de Productos */}
+        {/* Products */}
         <h2>Review Item and Shipping</h2>
         {cartItems.map((item) => (
           <div key={item.id_product} className="card mb-3">
@@ -173,9 +173,9 @@ function Checkout() {
               <div className="col-md-8">
                 <div className="card-body">
                   <h5 className="card-title">{item.name}</h5>
-                  <p className="card-text">Precio: ${item.price}</p>
+                  <p className="card-text">Price: ${item.price}</p>
                   <Form.Group controlId={`quantity-${item.id_product}`}>
-                    <Form.Label>Cantidad</Form.Label>
+                    <Form.Label>Quantity</Form.Label>
                     <Form.Control
                       as="select"
                       value={item.quantity}
@@ -191,18 +191,18 @@ function Checkout() {
                     className="mt-3"
                     onClick={() => handleRemoveItem(item.id_product)}
                   >
-                    Eliminar
+                    Delete
                   </Button>
                 </div>
               </div>
             </div>
           </div>
         ))}
-
+          {/* Condition regarding shipping */}
         <p>Shipping: {total >= 500 ? 'Free Shipping' : `$${shipping}`}</p>
 
         <div className="card p-3">
-          <p><strong>Cantidad de productos:</strong> {cartItems.length}</p>
+          <p><strong>Quantity of products:</strong> {cartItems.length}</p>
           <p><strong>Total:</strong> ${(total + shipping).toFixed(2)}</p>
           <Button variant="success" onClick={handlePlaceOrder}>Place your order</Button>
         </div>
@@ -217,14 +217,14 @@ function Checkout() {
             <Modal.Title>Edit Shipping Address</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Los cambios en la dirección de envío se hacen en tu cuenta. ¿Deseas continuar para editar tu perfil?
+          Please go to your account to edit this information. Would you like to edit it?
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowAddressConfirmation(false)}>
               Cancel
             </Button>
             <Button variant="primary" onClick={() => navigate('/Account')}>
-              Yes, go to Account
+              Yes
             </Button>
           </Modal.Footer>
         </Modal>
@@ -235,14 +235,14 @@ function Checkout() {
             <Modal.Title>Edit Credit Card</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Los cambios en la información de la tarjeta de crédito se hacen en tu cuenta. ¿Deseas continuar para editar tu perfil?
+            Please go to your account to edit this information. Would you like to edit it?
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowCreditConfirmation(false)}>
               Cancel
             </Button>
             <Button variant="primary" onClick={() => navigate('/Account')}>
-              Yes, go to Account
+              Yes
             </Button>
           </Modal.Footer>
         </Modal>
@@ -253,11 +253,11 @@ function Checkout() {
             <Modal.Title>Order Confirmation</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Tu orden fue confirmada. Número de orden: {orderId}. ¿Qué deseas hacer?
+            Order confirmed. Your order number is: {orderId}. What would you like to do?
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => navigate('/')}>Regresar a Home</Button>
-            <Button variant="primary" onClick={() => navigate('/MyOrders')}>Ver mis órdenes</Button>
+            <Button variant="secondary" onClick={() => navigate('/')}>Go back to  Home</Button>
+            <Button variant="primary" onClick={() => navigate('/MyOrders')}>View my Order</Button>
           </Modal.Footer>
         </Modal>
       </main>

@@ -3,6 +3,7 @@ import Footer from './footer';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 function CategoryAdmin() { 
 
@@ -11,6 +12,19 @@ function CategoryAdmin() {
   const [newCategory, setNewCategory] = useState({
     name: '' // Solo necesitamos el nombre de la categoría
   });
+
+  const navigate = useNavigate(); 
+
+  useEffect(() => {
+    const userRole = localStorage.getItem('userRole');  // Obtener el rol del usuario
+    if (userRole !== '2' && userRole !== '3') { // Cambia estos valores según tus roles
+        setError('No tienes acceso a esta página.');
+        navigate('/');  // Redirigir al home si no es empleado ni administrador
+    } else {
+        fetchCategories(); // Llamar a la función solo si el usuario tiene acceso
+    }
+}, [navigate, fetchCategories]); // Agregar fetchCategories aquí
+
 
   // Función para obtener las categorías desde el backend
   const fetchCategories = async () => {

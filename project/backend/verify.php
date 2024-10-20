@@ -19,7 +19,7 @@ $conn = new mysqli($host, $user, $pass, $db);
 
 // Verificar conexión
 if ($conn->connect_error) {
-    die(json_encode(['error' => "Conexión fallida: " . $conn->connect_error]));
+    die(json_encode(['error' => "Conexión failed: " . $conn->connect_error]));
 }
 
 // Leer los datos enviados
@@ -28,12 +28,12 @@ $token = $data['token'] ?? '';
 
 // Verificar si el token es válido
 if (!$token) {
-    echo json_encode(['error' => 'Token no proporcionado']);
+    echo json_encode(['error' => 'Token was not provided']);
     exit();
 }
 
 // Agregar log para verificar el token
-error_log("Token recibido: " . $token);
+error_log("Token: " . $token);
 
 $sql = "SELECT * FROM User WHERE verification_token = ? AND status = 0";
 $stmt = $conn->prepare($sql);
@@ -48,13 +48,13 @@ if ($result->num_rows > 0) {
     $stmt->bind_param("s", $token);
     $stmt->execute();
 
-    echo json_encode(['message' => 'Cuenta verificada exitosamente.']);
+    echo json_encode(['message' => 'The account was verified successfully.']);
 } else {
-    echo json_encode(['error' => 'Token no válido o cuenta ya verificada.']);
+    echo json_encode(['error' => 'Token no longer valid or account already verified.']);
 }
 
 // Agregar log para confirmar si la actualización se realizó correctamente
-error_log("Proceso de verificación finalizado.");
+error_log("Verification ended.");
 
 $stmt->close();
 $conn->close();

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import Select from 'react-select';  // Import react-select
+import { useNavigate } from 'react-router-dom';
 
 function ProductAdmin() {
   const [products, setProducts] = useState([]); // Array to store products
@@ -27,6 +28,19 @@ function ProductAdmin() {
   const [selectedFile, setSelectedFile] = useState(null); // To store the selected image
   const [fileType, setFileType] = useState(''); // To store the file type (MIME type)
   const [loading, setLoading] = useState(false); // To track loading state
+  const [error, setError] = useState(''); // Agregar estado para manejar errores
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const userRole = localStorage.getItem('userRole');  // Obtener el rol del usuario
+    if (userRole !== '2' && userRole !== '3') { // Cambia estos valores según tus roles
+        setError('No tienes acceso a esta página.'); // Establecer mensaje de error
+        navigate('/');  // Redirigir al home si no es empleado ni administrador
+    } else {
+        fetchProducts(); // Llamar a la función solo si el usuario tiene acceso
+        fetchCategories(); // Fetch available categories (tags)
+    }
+  }, [navigate]); // Aquí no es necesario incluir fetchProducts o fetchCategories, ya que no cambian
 
   // Fetch products from backend
   const fetchProducts = async () => {
@@ -133,6 +147,7 @@ function ProductAdmin() {
       }
     } catch (error) {
       console.error("Error al agregar el producto:", error);
+      setError('Error al agregar el producto.'); // Establecer mensaje de error
     } finally {
       setLoading(false);  // Finalizar el estado de carga
     }
@@ -183,6 +198,7 @@ function ProductAdmin() {
       }
     } catch (error) {
       console.error('Error al actualizar el producto:', error);
+      setError('Error al actualizar el producto.'); // Establecer mensaje de error
     } finally {
       setLoading(false);  // Finalizar loading
     }
@@ -219,17 +235,12 @@ function ProductAdmin() {
         fetchProducts(); // Refresh the product list after deletion
       } catch (error) {
         console.error("Error deleting product:", error);
+        setError('Error al eliminar el producto.'); // Establecer mensaje de error
       } finally {
         setLoading(false);  // Stop loading
       }
     }
   };
-
-  // Fetch products and categories when component loads
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories(); // Fetch available categories (tags)
-  }, []);
 
   return (
     <div id="root">
@@ -237,7 +248,7 @@ function ProductAdmin() {
       <main>
         <div>
           <h1>Product Management</h1>
-
+          {error && <p className="text-danger">{error}</p>} {/* Mostrar mensaje de error si existe */}
           <div className="account-profile">
             <button className="edit-profile-btn" onClick={handleShowModal}>Add New Product</button>
           </div>
@@ -367,4 +378,3 @@ function ProductAdmin() {
 }
 
 export default ProductAdmin;
-
