@@ -2,36 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 function CombinedCategory() {
-  const { mainCategoryId, relatedCategoryId } = useParams(); // Obtener las categorías desde los parámetros de la URL
-  const [products, setProducts] = useState([]);
+    const { id1, id2 } = useParams();
+    const [products, setProducts] = useState([]);
+    
+    useEffect(() => {
+        fetch(`http://192.168.0.131/CombinedCategory.php?id1=${id1}&id2=${id2}`)
+            .then(response => response.json())
+            .then(data => {
+                setProducts(data);
+            })
+            .catch(error => console.error('Error fetching products:', error));
+    }, [id1, id2]);
 
-  useEffect(() => {
-    // Hacer una petición para obtener los productos que tienen ambas categorías
-    fetch(`http://192.168.0.131/CombinedCategory.php?mainCategoryId=${mainCategoryId}&relatedCategoryId=${relatedCategoryId}`)
-      .then(response => response.json())
-      .then(data => setProducts(data))
-      .catch(error => console.error('Error fetching products:', error));
-  }, [mainCategoryId, relatedCategoryId]);
-
-  return (
-    <div>
-      <h1>Productos para las categorías seleccionadas</h1>
-      <div className="product-grid">
-        {products.length > 0 ? (
-          products.map(product => (
-            <div key={product.id} className="product-card">
-              {/* Mostrar la imagen del producto usando base64 */}
-              <img src={`data:${product.file_type};base64,${product.image}`} alt={product.name} />
-              <h2>{product.name}</h2>
-              <p>Precio: ${product.price}</p>
-            </div>
-          ))
-        ) : (
-          <p>No se encontraron productos para esta combinación de categorías.</p>
-        )}
-      </div>
-    </div>
-  );
+    return (
+        <div>
+            <h1>Products in Both Categories</h1>
+            {products.length === 0 ? (
+                <p>No products found for these categories</p>
+            ) : (
+                <div className="products-grid">
+                    {products.map(product => (
+                        <div key={product.id_product} className="product-card">
+                            <img src={`data:image/jpeg;base64,${product.image}`} alt={product.name} />
+                            <h3>{product.name}</h3>
+                            <p>{product.price}</p>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 }
 
 export default CombinedCategory;

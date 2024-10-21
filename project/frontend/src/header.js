@@ -5,21 +5,36 @@ function Header() {
   const userRole = parseInt(localStorage.getItem('userRole')) || 'guest';
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [activeCategory, setActiveCategory] = useState(null); // Para submenús
 
   const handleDropdownToggle = () => {
     setDropdownOpen(!isDropdownOpen);
   };
 
-  // Obtener categorías de category2.php
+  // Obtener categorías desde category2.php
   useEffect(() => {
-    fetch('http://192.168.0.131/category.php')  // Cambia esta URL si es necesario
+    fetch('http://192.168.0.131/category2.php')  // Cambia esta URL si es necesario
       .then(response => response.json())
       .then(data => {
-        console.log('Categorías obtenidas:', data); // Verificar que las categorías tienen id_category
+        console.log('Categorías obtenidas:', data);
         setCategories(data);
       })
       .catch(error => console.error('Error fetching categories:', error));
   }, []);
+
+  const handleCategoryHover = (category) => {
+    setActiveCategory(category);
+  };
+
+  // Función para eliminar categorías duplicadas
+  const uniqueCategories = (relatedCategories) => {
+    return relatedCategories.reduce((unique, category) => {
+      if (!unique.some(item => item.name === category.name)) {
+        unique.push(category);
+      }
+      return unique;
+    }, []);
+  };
 
   return (
     <>
@@ -51,13 +66,25 @@ function Header() {
               {/* Opción "All Categories" */}
               <li><Link to="/Category">All Categories</Link></li>
 
-              {/* Renderizado dinámico de categorías */}
-              {categories.map(category => (
-                <li key={category.id_category}>
-                  {/* Verificar que el id_category esté definido correctamente */}
-                  <Link to={`/category/${category.id_category}/${category.name}`}>
-                    {category.name}
+              {/* Renderizado dinámico de categorías con submenús */}
+              {categories.length > 0 && categories.map(category => (
+                <li key={category.id_category || category.main_category_id} onMouseEnter={() => handleCategoryHover(category)}>
+                  <Link to={`/category/${category.id_category || category.main_category_id}/${category.name}`}>
+                    {category.name || 'Unnamed Category'}
                   </Link>
+
+                  {/* Submenú si la categoría tiene categorías relacionadas */}
+                  {activeCategory === category && category.related_categories && (
+                    <ul className="submenu">
+                      {uniqueCategories(category.related_categories).map(relatedCategory => (
+                        <li key={relatedCategory.id}>
+                          <Link to={`/category/${relatedCategory.id}/${relatedCategory.name}`}>
+                            {relatedCategory.name || 'Unnamed Related Category'}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               ))}
             </ul>
