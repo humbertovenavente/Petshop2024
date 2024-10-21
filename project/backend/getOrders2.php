@@ -23,8 +23,8 @@ if (!$id_order) {
     exit();
 }
 
-// Consulta de los detalles de la orden
-$sql = "SELECT o.id_order, o.status, op.id_product, p.name, p.price, op.quantity, p.image 
+// Consulta de los detalles de la orden, incluyendo el comentario
+$sql = "SELECT o.id_order, o.status, o.comment, op.id_product, p.name, p.price, op.quantity, p.image 
         FROM `Order` o 
         JOIN OrderProduct op ON o.id_order = op.id_order
         JOIN Product p ON op.id_product = p.id_product
@@ -39,9 +39,11 @@ $products = [];
 $total_items = 0;
 $total_price = 0;
 $status = '';
+$comment = '';
 
 while ($row = $result->fetch_assoc()) {
     $status = $row['status']; // Obtener el estado de la orden
+    $comment = $row['comment']; // Obtener el comentario de la orden
     $imageData = base64_encode($row['image']); // Convertir la imagen a Base64
     $products[] = [
         'name' => $row['name'],
@@ -61,6 +63,7 @@ if (count($products) === 0) {
 
 $orderDetails = [
     'status' => $status, 
+    'comment' => $comment, // Agregar el comentario a los detalles de la orden
     'products' => $products,
     'total_items' => $total_items,
     'total_price' => $total_price,

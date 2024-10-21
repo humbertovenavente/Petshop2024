@@ -12,6 +12,8 @@ import Header from './header';
 
 import ProductDetails from './ProductDetails';
 
+import CombinedCategory from './CombinedCategory'; 
+
 import Account from './Account';
 import UserAdmin from './UserAdmin';
 import CategoryAdmin from './CategoryAdmin';
@@ -30,6 +32,9 @@ import Checkout from './Checkout';
 import MyOrders from './MyOrders';
 import Tracking from './Tracking';
 import ManageOrder from './ManageOrder';
+import EditOrder from './editOrder';
+
+
 import { useEffect } from 'react';  
 
 function App() {
@@ -80,6 +85,7 @@ function App() {
     <Route path="/category/:categoryId/:categoryName" element={<CategoryProducts />} />
     <Route path="/ProductDetails/:productId" element={<ProductDetails userRole={userRole} />} />
     <Route path="/ManageOrder" element={<ManageOrder />} />
+    <Route path="/Category/:mainCategoryId/Related/:relatedCategoryId" element={<CombinedCategory />} />
 
 
     <Route path='/inventory' element={ <InventoryAdmin/>}></Route>
@@ -94,6 +100,8 @@ function App() {
     <Route path="/checkout" element={<Checkout />} />
     <Route path='/Tracking' element={ <Tracking/>}></Route>
     <Route path="/orderDetails/:orderId" element={<Tracking />} />
+    <Route path="/editOrder/:id_order" element={<EditOrder />} />
+
 
 
     </Routes>
