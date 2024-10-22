@@ -9,6 +9,7 @@ import Emp from './emp';
 import User from './user';
 import Footer from './footer';
 import Header from './header';
+import HomeAdmin from './HomeAdmin';
 
 import ProductDetails from './ProductDetails';
 
@@ -76,7 +77,9 @@ function App() {
     <Route path="/user" element={<ProtectedRoute allowedRoles={[1]}><User /></ProtectedRoute>} />
     
     <Route path='/footer' element={ <Footer/>}></Route>
+    
     <Route path='/header' element={ <Header/>}></Route>
+    <Route path='/HomeAdmin' element={ <HomeAdmin/>}></Route>
     <Route path='/Account' element={ <Account/>}></Route>
     <Route path='/UserAdmin' element={ <UserAdmin/>}></Route>
     <Route path='/CategoryAdmin' element={ <CategoryAdmin/>}></Route>

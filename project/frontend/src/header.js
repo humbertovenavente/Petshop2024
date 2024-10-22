@@ -103,6 +103,7 @@ function Header() {
             <Link to="/UserAdmin" className="nav-link">Manage Users</Link>
             <Link to="/CategoryAdmin" className="nav-link">Manage Category</Link>
             <Link to="/ProductAdmin" className="nav-link">Manage Product</Link>
+            <Link to="/HomeAdmin" className="nav-link">Manage Home</Link>
           </>
         )}
       </nav>

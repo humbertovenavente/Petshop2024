@@ -35,11 +35,11 @@ $stock = $data['stock'];
 $comment = $data['comment'];
 $color = $data['color'];
 $size = $data['size'];
-$image = $data['image'] ?? null;  // Imagen opcional
-$file_type = $data['file_type'] ?? null;  // Tipo de archivo opcional
+$image = $data['image'] ?? null;  
+$file_type = $data['file_type'] ?? null;  
 $categories = $data['categories'] ?? [];  // Array de IDs de categorías
 
-// Verificar que se recibieron los datos necesarios
+// Verificar que se recibieron los datos necesarios que son nombre, precio e inventario tiene que escribir
 if (empty($name) || empty($price) || empty($inventory)) {
     echo json_encode(['error' => 'Faltan campos obligatorios']);
     exit();

@@ -258,6 +258,53 @@ main {
   background-color: lightgray;
 }
 
+/* ahomedmin */
+
+.admin-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.slider-section {
+  flex: 1;
+  margin: 0 10px;
+  text-align: center;
+}
+
+.preview-image {
+  width: 200px; /* Ajusta este tamaño como prefieras */
+  height: 200px; /* Ajusta este tamaño como prefieras */
+  object-fit: cover; /* Mantiene la proporción pero ajusta a un tamaño uniforme */
+  margin-top: 10px;
+}
+
+.text-section {
+  margin-top: 20px;
+}
+
+.text-section input {
+  display: block;
+  width: 80%;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
 
 
 /* Estilos responsivos */

@@ -15,7 +15,7 @@ function User() {
     navigate('/Home');  // Redirige a la ruta /Home
   }, [navigate]);
   
-  const userName = localStorage.getItem('userName'); // Obtén el nombre del usuario desde localStorage
+  const userName = localStorage.getItem('userName'); 
   const userRole = localStorage.getItem('userRole');
   
     if (userRole !== '1') {

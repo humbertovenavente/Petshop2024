@@ -1,20 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Carousel, Button, Accordion } from 'react-bootstrap';
+import { Card, Carousel, Button, Accordion } from 'react-bootstrap'; // Importa los componentes que faltaban
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import VideoComponent from './VideoC';
-import Header from './header';
-import Footer from './footer';
+import VideoComponent from './VideoC'; // Asegúrate de tener este componente definido en tu proyecto
+import Header from './header'; // Asegúrate de tener este componente definido
+import Footer from './footer'; // Asegúrate de tener este componente definido
 import './App.css';
 
-// Importa las imágenes locales
-import image1 from './assets/image1.jpeg';  // Asumiendo que tu imagen se llama 'image1.jpeg'
+// Función auxiliar para dividir los productos en grupos
+const chunkArray = (array, size) => {
+  const result = [];
+  for (let i = 0; i < array.length; i += size) {
+    result.push(array.slice(i, i + size));
+  }
+  return result;
+};
 
 function Home() {
   const [topProducts, setTopProducts] = useState([]);
+  const [sliderData, setSliderData] = useState({
+    slider1: '',
+    slider2: '',
+    slider3: '',
+    title1: '',
+    description1: '',
+    title2: '',
+    description2: '',
+    title3: '',
+    description3: '',
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Obtener los productos más vendidos
     async function fetchTopProducts() {
       try {
         const response = await axios.get('http://192.168.0.131/topSells.php');
@@ -24,6 +42,17 @@ function Home() {
       }
     }
     fetchTopProducts();
+
+    // Obtener los datos del slider
+    async function fetchSliderData() {
+      try {
+        const response = await axios.get('http://192.168.0.131/getHome.php');
+        setSliderData(response.data);
+      } catch (error) {
+        console.error('Error al obtener los datos del slider', error);
+      }
+    }
+    fetchSliderData();
   }, []);
 
   const handleViewProduct = (productId) => {
@@ -32,22 +61,10 @@ function Home() {
 
   // Datos estáticos para 12 productos destacados (featured) en carrusel
   const featuredProducts = [
-    { name: 'Producto Destacado A', price: '$120', image: image1 },
-    { name: 'Producto Destacado B', price: '$150', image: image1 },
-    { name: 'Producto Destacado C', price: '$200', image: image1 },
-    { name: 'Producto Destacado D', price: '$250', image: image1 },
-    { name: 'Producto Destacado E', price: '$120', image: image1 },
-    { name: 'Producto Destacado F', price: '$150', image: image1 },
-    { name: 'Producto Destacado G', price: '$200', image: image1 },
-    { name: 'Producto Destacado H', price: '$250', image: image1 },
-    { name: 'Producto Destacado I', price: '$120', image: image1 },
-    { name: 'Producto Destacado J', price: '$150', image: image1 },
-    { name: 'Producto Destacado K', price: '$200', image: image1 },
-    { name: 'Producto Destacado L', price: '$250', image: image1 }
+    { name: 'Producto Destacado A', price: '$120', image: sliderData.slider1 },
+    { name: 'Producto Destacado B', price: '$150', image: sliderData.slider2 },
+    { name: 'Producto Destacado C', price: '$200', image: sliderData.slider3 },
   ];
-
-  // URL estática para el video de presentación
-  const videoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4';
 
   // Datos estáticos para categorías destacadas
   const categories = [
@@ -58,14 +75,8 @@ function Home() {
     { name: 'Bird' }
   ];
 
-  // Función para dividir los productos en grupos
-  const chunkArray = (array, size) => {
-    const result = [];
-    for (let i = 0; i < array.length; i += size) {
-      result.push(array.slice(i, i + size));
-    }
-    return result;
-  };
+  // URL estática para el video de presentación
+  const videoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4';
 
   return (
     <div id="root">
@@ -76,37 +87,37 @@ function Home() {
           <Carousel.Item>
             <img
               className="d-block w-100"
-              src={image1}
+              src={`data:image/jpeg;base64,${sliderData.slider1}`}
               alt="First slide"
               style={{ height: '300px', objectFit: 'cover' }}
             />
             <Carousel.Caption>
-              <h3>First Slide</h3>
-              <p>Some description for the first slide.</p>
+              <h3>{sliderData.title1}</h3>
+              <p>{sliderData.description1}</p>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
             <img
               className="d-block w-100"
-              src={image1}
+              src={`data:image/jpeg;base64,${sliderData.slider2}`}
               alt="Second slide"
               style={{ height: '300px', objectFit: 'cover' }}
             />
             <Carousel.Caption>
-              <h3>Second Slide</h3>
-              <p>Some description for the second slide.</p>
+              <h3>{sliderData.title2}</h3>
+              <p>{sliderData.description2}</p>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
             <img
               className="d-block w-100"
-              src={image1}
+              src={`data:image/jpeg;base64,${sliderData.slider3}`}
               alt="Third slide"
               style={{ height: '300px', objectFit: 'cover' }}
             />
             <Carousel.Caption>
-              <h3>Third Slide</h3>
-              <p>Some description for the third slide.</p>
+              <h3>{sliderData.title3}</h3>
+              <p>{sliderData.description3}</p>
             </Carousel.Caption>
           </Carousel.Item>
         </Carousel>
