@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Button, Spinner } from 'react-bootstrap'; // Importamos Modal
+import { Modal, Button, Spinner } from 'react-bootstrap';
 import Header from './header';
 import Footer from './footer';
 import axios from 'axios';
@@ -15,13 +15,17 @@ function HomeAdmin() {
     const [title3, setTitle3] = useState('');
     const [description3, setDescription3] = useState('');
     const [loading, setLoading] = useState(false);
-    
-    // Nueva parte: manejo de categorías destacadas
+
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
-    const [savedCategories, setSavedCategories] = useState([]); // Inicializa como un arreglo vacío
+    const [savedCategories, setSavedCategories] = useState([]);
+    
+    // FAQ states
+    const [faqData, setFaqData] = useState([]); // Inicializado como array vacío
+    const [currentFaq, setCurrentFaq] = useState({ id: null, question: '', answer: '' });
+    const [showFaqModal, setShowFaqModal] = useState(false);
 
-    // Modal states
+    // Modal for categories
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
@@ -55,17 +59,28 @@ function HomeAdmin() {
         const fetchSavedCategories = async () => {
             try {
                 const response = await axios.get('http://172.16.71.159/getFeaturedCategories.php');
-                const data = response.data || []; // Asegurarse de que sea un arreglo
-                setSavedCategories(data);  // Guardar las categorías que ya están seleccionadas
-                setSelectedCategories(data.map(category => category.id_category));  // Preseleccionar las categorías
+                const data = response.data || [];
+                setSavedCategories(data);
+                setSelectedCategories(data.map(category => category.id_category));
             } catch (error) {
                 console.error('Error fetching saved categories:', error);
             }
         };
 
+        // Fetch FAQs
+        const fetchFaqData = async () => {
+            try {
+                const response = await axios.get('http://172.16.71.159/getFaq.php');
+                setFaqData(response.data || []);  // Asegurarse de que siempre sea un array
+            } catch (error) {
+                console.error('Error fetching FAQ data:', error);
+            }
+        };
+
         fetchHomeData();
         fetchCategories();
-        fetchSavedCategories();  // Cargar las categorías destacadas ya guardadas
+        fetchSavedCategories();
+        fetchFaqData();
     }, []);
 
     const handleFileChange = (e, setSlider) => {
@@ -134,11 +149,60 @@ function HomeAdmin() {
                 alert('Error saving featured categories: ' + response.data.error);
             } else {
                 alert('Featured categories saved successfully!');
-                setSavedCategories(selectedCategories.map(id => categories.find(cat => cat.id_category === id)));  // Actualiza las categorías guardadas
+                setSavedCategories(selectedCategories.map(id => categories.find(cat => cat.id_category === id)));
                 setShowModal(false);  // Cerrar el modal después de guardar
             }
         } catch (error) {
             console.error('Error saving featured categories:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Manejo de FAQs
+    const handleAddFaq = () => {
+        setCurrentFaq({ id: null, question: '', answer: '' });
+        setShowFaqModal(true);
+    };
+
+    const handleSaveFaq = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.post('http://172.16.71.159/updateFaq.php', currentFaq);
+            if (response.data.success) {
+                alert('FAQ updated successfully');
+                setShowFaqModal(false);
+                if (currentFaq.id) {
+                    setFaqData(faqData.map(f => (f.id === currentFaq.id ? currentFaq : f)));
+                } else {
+                    setFaqData([...faqData, response.data.newFaq]);
+                }
+            } else {
+                alert('Error updating FAQ: ' + response.data.error);
+            }
+        } catch (error) {
+            console.error('Error updating FAQ:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Eliminar FAQ
+    const handleDeleteFaq = async (id) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this FAQ?");
+        if (!confirmDelete) return;
+
+        setLoading(true);
+        try {
+            const response = await axios.post('http://172.16.71.159/deleteFaq.php', { id });
+            if (response.data.success) {
+                alert('FAQ deleted successfully');
+                setFaqData(faqData.filter(f => f.id !== id));  // Filtra las FAQs para eliminar la seleccionada
+            } else {
+                alert('Error deleting FAQ: ' + response.data.error);
+            }
+        } catch (error) {
+            console.error('Error deleting FAQ:', error);
         } finally {
             setLoading(false);
         }
@@ -149,33 +213,32 @@ function HomeAdmin() {
             <Header /> 
             <main className="main">
                 <h1>Admin Home Settings</h1>
-                <div className="admin-container">
-                    <div className="slider-section">
-                        <h2>Slider 1</h2>
-                        <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setSlider1)} />
-                        {slider1 && <img src={slider1} alt="Slider 1" className="preview-image" />}
-                        <Button onClick={() => saveImage('slider1', slider1)} disabled={loading || !slider1}>
-                            {loading ? <Spinner animation="border" size="sm" /> : 'Save Image 1'}
-                        </Button>
-                    </div>
 
-                    <div className="slider-section">
-                        <h2>Slider 2</h2>
-                        <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setSlider2)} />
-                        {slider2 && <img src={slider2} alt="Slider 2" className="preview-image" />}
-                        <Button onClick={() => saveImage('slider2', slider2)} disabled={loading || !slider2}>
-                            {loading ? <Spinner animation="border" size="sm" /> : 'Save Image 2'}
-                        </Button>
-                    </div>
+                <div className="slider-section">
+                    <h2>Slider 1</h2>
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setSlider1)} />
+                    {slider1 && <img src={slider1} alt="Slider 1" className="preview-image" />}
+                    <Button onClick={() => saveImage('slider1', slider1)} disabled={loading || !slider1}>
+                        {loading ? <Spinner animation="border" size="sm" /> : 'Save Image 1'}
+                    </Button>
+                </div>
 
-                    <div className="slider-section">
-                        <h2>Slider 3</h2>
-                        <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setSlider3)} />
-                        {slider3 && <img src={slider3} alt="Slider 3" className="preview-image" />}
-                        <Button onClick={() => saveImage('slider3', slider3)} disabled={loading || !slider3}>
-                            {loading ? <Spinner animation="border" size="sm" /> : 'Save Image 3'}
-                        </Button>
-                    </div>
+                <div className="slider-section">
+                    <h2>Slider 2</h2>
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setSlider2)} />
+                    {slider2 && <img src={slider2} alt="Slider 2" className="preview-image" />}
+                    <Button onClick={() => saveImage('slider2', slider2)} disabled={loading || !slider2}>
+                        {loading ? <Spinner animation="border" size="sm" /> : 'Save Image 2'}
+                    </Button>
+                </div>
+
+                <div className="slider-section">
+                    <h2>Slider 3</h2>
+                    <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setSlider3)} />
+                    {slider3 && <img src={slider3} alt="Slider 3" className="preview-image" />}
+                    <Button onClick={() => saveImage('slider3', slider3)} disabled={loading || !slider3}>
+                        {loading ? <Spinner animation="border" size="sm" /> : 'Save Image 3'}
+                    </Button>
                 </div>
 
                 <div className="text-section">
@@ -201,13 +264,11 @@ function HomeAdmin() {
                     </Button>
                 </div>
 
-                {/* Nueva sección para seleccionar las categorías destacadas */}
                 <div className="featured-categories-section">
                     <Button variant="primary" onClick={() => setShowModal(true)}>
                         Select Featured Categories
                     </Button>
 
-                    {/* Modal para seleccionar categorías */}
                     <Modal show={showModal} onHide={() => setShowModal(false)}>
                         <Modal.Header closeButton>
                             <Modal.Title>Select up to 5 Featured Categories</Modal.Title>
@@ -237,7 +298,6 @@ function HomeAdmin() {
                         </Modal.Footer>
                     </Modal>
 
-                    {/* Mostrar las categorías guardadas */}
                     <h3>Your Top Categories Are:</h3>
                     <ul>
                         {Array.isArray(savedCategories) && savedCategories.length > 0 ? (
@@ -249,6 +309,47 @@ function HomeAdmin() {
                         )}
                     </ul>
                 </div>
+
+                <div className="faq-section">
+                    <h2>Manage FAQs</h2>
+                    <Button variant="success" onClick={handleAddFaq}>Add FAQ</Button>
+                    <ul>
+                        {faqData.length > 0 ? faqData.map((faq) => (
+                            faq && faq.question && faq.answer ? (
+                                <li key={faq.id}>
+                                    <strong>{faq.question}</strong> - {faq.answer}
+                                    <Button onClick={() => setCurrentFaq(faq)} style={{ marginLeft: '10px' }}>Edit</Button>
+                                    <Button variant="danger" onClick={() => handleDeleteFaq(faq.id)} style={{ marginLeft: '10px' }}>Delete</Button>
+                                </li>
+                            ) : null
+                        )) : <li>No FAQs available</li>}
+                    </ul>
+                </div>
+
+                <Modal show={showFaqModal} onHide={() => setShowFaqModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>{currentFaq.id ? 'Edit FAQ' : 'Add FAQ'}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <input
+                            type="text"
+                            value={currentFaq.question}
+                            onChange={(e) => setCurrentFaq({ ...currentFaq, question: e.target.value })}
+                            placeholder="Question"
+                        />
+                        <textarea
+                            value={currentFaq.answer}
+                            onChange={(e) => setCurrentFaq({ ...currentFaq, answer: e.target.value })}
+                            placeholder="Answer"
+                        />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowFaqModal(false)}>Close</Button>
+                        <Button variant="primary" onClick={handleSaveFaq} disabled={loading}>
+                            {loading ? <Spinner animation="border" size="sm" /> : 'Save Changes'}
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </main>
             <Footer /> 
         </div>
