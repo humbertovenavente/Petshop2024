@@ -15,7 +15,7 @@ function Category() {
     });
 
     useEffect(() => {
-        axios.get('http://192.168.0.131/category.php')
+        axios.get('http://172.16.71.159/category.php')
         .then(response => {
             console.log('Categorías obtenidas:', response.data);
             setCategories(response.data);
@@ -52,7 +52,7 @@ function Category() {
         }
 
         console.log("Filtros enviados:", filters);
-        axios.post('http://192.168.0.131/searchCategory.php', {
+        axios.post('http://172.16.71.159/searchCategory.php', {
             category_id: filters.category_id, 
             min_price: filters.min_price ? filters.min_price : 0, 
             max_price: filters.max_price ? filters.max_price : Infinity

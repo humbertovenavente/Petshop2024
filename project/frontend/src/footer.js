@@ -11,7 +11,7 @@ function Footer() {
     try {
       if (email) {
         // Actualizar el last_login antes de hacer el logout
-        await axios.post('http://192.168.0.131/lastlogin.php', { email });
+        await axios.post('http://172.16.71.159/lastlogin.php', { email });
       }
   
       // Guardar los artículos del carrito antes de limpiar el localStorage

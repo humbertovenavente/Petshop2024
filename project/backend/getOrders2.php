@@ -4,7 +4,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
 
 // Conexión a la base de datos
-$host = '192.168.0.131';
+$host = '172.16.71.159';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';

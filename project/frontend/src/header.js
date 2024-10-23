@@ -13,7 +13,7 @@ function Header() {
 
   // Obtener categorías desde category2.php
   useEffect(() => {
-    fetch('http://192.168.0.131/category2.php')  // Cambia esta URL si es necesario
+    fetch('http://172.16.71.159/category2.php')  // Cambia esta URL si es necesario
       .then(response => response.json())
       .then(data => {
         console.log('Categorías obtenidas:', data);

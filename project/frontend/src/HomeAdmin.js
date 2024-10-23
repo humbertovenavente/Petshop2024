@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Header from './header';  // Header importado
-import Footer from './footer';  // Footer importado
+import { Modal, Button, Spinner } from 'react-bootstrap'; // Importamos Modal
+import Header from './header';
+import Footer from './footer';
 import axios from 'axios';
-import { Spinner, Button } from 'react-bootstrap';
 
 function HomeAdmin() {
     const [slider1, setSlider1] = useState(null);
@@ -15,12 +15,19 @@ function HomeAdmin() {
     const [title3, setTitle3] = useState('');
     const [description3, setDescription3] = useState('');
     const [loading, setLoading] = useState(false);
+    
+    // Nueva parte: manejo de categorías destacadas
+    const [categories, setCategories] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [savedCategories, setSavedCategories] = useState([]); // Inicializa como un arreglo vacío
 
-    // Cargar los datos al iniciar el componente
+    // Modal states
+    const [showModal, setShowModal] = useState(false);
+
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
-                const response = await axios.get('http://192.168.0.131/getHome.php');
+                const response = await axios.get('http://172.16.71.159/getHome.php');
                 const data = response.data;
                 setSlider1(`data:image/jpeg;base64,${data.slider1}`);
                 setSlider2(`data:image/jpeg;base64,${data.slider2}`);
@@ -36,7 +43,29 @@ function HomeAdmin() {
             }
         };
 
+        const fetchCategories = async () => {
+            try {
+                const response = await axios.get('http://172.16.71.159/category.php');
+                setCategories(response.data);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
+        const fetchSavedCategories = async () => {
+            try {
+                const response = await axios.get('http://172.16.71.159/getFeaturedCategories.php');
+                const data = response.data || []; // Asegurarse de que sea un arreglo
+                setSavedCategories(data);  // Guardar las categorías que ya están seleccionadas
+                setSelectedCategories(data.map(category => category.id_category));  // Preseleccionar las categorías
+            } catch (error) {
+                console.error('Error fetching saved categories:', error);
+            }
+        };
+
         fetchHomeData();
+        fetchCategories();
+        fetchSavedCategories();  // Cargar las categorías destacadas ya guardadas
     }, []);
 
     const handleFileChange = (e, setSlider) => {
@@ -53,7 +82,7 @@ function HomeAdmin() {
     const saveImage = async (field, imageData) => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.131/updateHome.php', {
+            const response = await axios.post('http://172.16.71.159/updateHome.php', {
                 field: field,
                 slider: imageData.split(',')[1], // Solo la parte base64
             });
@@ -72,7 +101,7 @@ function HomeAdmin() {
     const saveText = async (field, value) => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.131/updateHome.php', {
+            const response = await axios.post('http://172.16.71.159/updateHome.php', {
                 field: field,
                 text: value,
             });
@@ -88,8 +117,35 @@ function HomeAdmin() {
         }
     };
 
+    // Función para seleccionar hasta 5 categorías
+    const toggleCategorySelection = (id_category) => {
+        if (selectedCategories.includes(id_category)) {
+            setSelectedCategories(selectedCategories.filter(id => id !== id_category));
+        } else if (selectedCategories.length < 5) {
+            setSelectedCategories([...selectedCategories, id_category]);
+        }
+    };
+
+    const saveFeaturedCategories = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.post('http://172.16.71.159/saveFeaturedCategories.php', { categories: selectedCategories });
+            if (response.data.error) {
+                alert('Error saving featured categories: ' + response.data.error);
+            } else {
+                alert('Featured categories saved successfully!');
+                setSavedCategories(selectedCategories.map(id => categories.find(cat => cat.id_category === id)));  // Actualiza las categorías guardadas
+                setShowModal(false);  // Cerrar el modal después de guardar
+            }
+        } catch (error) {
+            console.error('Error saving featured categories:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <div  id="root">
+        <div id="root">
             <Header /> 
             <main className="main">
                 <h1>Admin Home Settings</h1>
@@ -144,8 +200,57 @@ function HomeAdmin() {
                         {loading ? <Spinner animation="border" size="sm" /> : 'Save Text 3'}
                     </Button>
                 </div>
+
+                {/* Nueva sección para seleccionar las categorías destacadas */}
+                <div className="featured-categories-section">
+                    <Button variant="primary" onClick={() => setShowModal(true)}>
+                        Select Featured Categories
+                    </Button>
+
+                    {/* Modal para seleccionar categorías */}
+                    <Modal show={showModal} onHide={() => setShowModal(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Select up to 5 Featured Categories</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="category-list">
+                                {categories.map((category) => (
+                                    <div key={category.id_category}>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedCategories.includes(category.id_category)}
+                                            onChange={() => toggleCategorySelection(category.id_category)}
+                                            disabled={!selectedCategories.includes(category.id_category) && selectedCategories.length >= 5}
+                                        />
+                                        <label>{category.name}</label>
+                                    </div>
+                                ))}
+                            </div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => setShowModal(false)}>
+                                Close
+                            </Button>
+                            <Button variant="primary" onClick={saveFeaturedCategories} disabled={selectedCategories.length === 0}>
+                                {loading ? 'Saving...' : 'Save Featured Categories'}
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                    {/* Mostrar las categorías guardadas */}
+                    <h3>Your Top Categories Are:</h3>
+                    <ul>
+                        {Array.isArray(savedCategories) && savedCategories.length > 0 ? (
+                            savedCategories.map(category => (
+                                <li key={category.id_category}>{category.name}</li>
+                            ))
+                        ) : (
+                            <li>No categories selected yet</li>
+                        )}
+                    </ul>
+                </div>
             </main>
-            <Footer /> {/* Agregar Footer */}
+            <Footer /> 
         </div>
     );
 }

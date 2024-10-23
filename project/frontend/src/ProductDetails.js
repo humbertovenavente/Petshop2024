@@ -15,7 +15,7 @@ function ProductDetails({ userRole }) {
   useEffect(() => {
     async function fetchProductDetails() {
       try {
-        const response = await axios.get(`http://192.168.0.131/ProductDetails.php?productId=${productId}`);
+        const response = await axios.get(`http://172.16.71.159/ProductDetails.php?productId=${productId}`);
         setProduct(response.data.product);
       } catch (error) {
         console.error("Error fetching product details:", error);

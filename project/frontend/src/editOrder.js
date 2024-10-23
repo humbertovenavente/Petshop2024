@@ -20,7 +20,7 @@ function EditOrder() {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const response = await fetch(`http://192.168.0.131/editOrder.php?id_order=${id_order}`);
+        const response = await fetch(`http://172.16.71.159/editOrder.php?id_order=${id_order}`);
         const data = await response.json();
         if (data.success) {
           setOrder(data.order); // Almacenar los detalles de la orden en el estado
@@ -51,7 +51,7 @@ function EditOrder() {
 
       // Enviar el nuevo estado y comentario al servidor
       try {
-        const response = await fetch(`http://192.168.0.131/updateOrderStatus.php`, {
+        const response = await fetch(`http://172.16.71.159/updateOrderStatus.php`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id_order, status: newStatus, comment }) // Asegúrate de enviar el comentario
@@ -83,7 +83,7 @@ function EditOrder() {
 
     // Enviar el comentario actualizado al servidor
     try {
-      const response = await fetch(`http://192.168.0.131/updateOrderStatus.php`, {
+      const response = await fetch(`http://172.16.71.159/updateOrderStatus.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id_order, status: 'Delivered', comment }) // Solo actualiza el comentario en "Delivered"

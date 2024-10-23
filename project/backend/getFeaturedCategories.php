@@ -1,30 +1,25 @@
 <?php
-// Habilitar la visualización de errores para depuración
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Habilitar CORS para permitir las solicitudes desde el frontend
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Conexión a la base de datos
-$host = '172.16.71.159'; 
-$db = 'project';  
-$user = 'humbe';  
-$pass = 'tu_contraseña';  
+$host = '172.16.71.159';
+$db = 'project';
+$user = 'humbe';
+$pass = 'tu_contraseña';
 
 $conn = new mysqli($host, $user, $pass, $db);
 
-// Verificar la conexión a la base de datos
+// Verificar la conexión
 if ($conn->connect_error) {
     die(json_encode(['error' => "Conexión fallida: " . $conn->connect_error]));
 }
 
-// Consulta SQL simplificada para obtener categorías
-$sql = "SELECT id_category, name FROM Category";
+// Consulta para obtener las categorías destacadas
+$sql = "SELECT Category.id_category, Category.name FROM FeaturedCategories 
+        JOIN Category ON FeaturedCategories.id_category = Category.id_category";
 $result = $conn->query($sql);
 
 $categories = [];
@@ -38,6 +33,5 @@ if ($result->num_rows > 0) {
 }
 
 echo json_encode($categories);
-
 $conn->close();
 ?>

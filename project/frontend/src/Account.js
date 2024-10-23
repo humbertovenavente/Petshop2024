@@ -38,7 +38,7 @@ function Account() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.post('http://192.168.0.131/profile.php', { email, password });
+                const response = await axios.post('http://172.16.71.159/profile.php', { email, password });
                 const data = response.data;
                 if (data.error) {
                     console.log('Error fetching profile:', data.error);
@@ -90,7 +90,7 @@ function Account() {
     const handleSaveChanges = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.131/updateProfile.php', JSON.stringify(editedProfile), {
+            const response = await axios.post('http://172.16.71.159/updateProfile.php', JSON.stringify(editedProfile), {
                 headers: { 'Content-Type': 'application/json' }
             });
             if (response.data.error) {
@@ -125,7 +125,7 @@ function Account() {
         setLoading(true);
         try {
             const updatedProfile = { ...profile, profile_pic: selectedFile.replace(/^data:image\/[a-z]+;base64,/, ''), file_type: fileType };
-            const response = await axios.post('http://192.168.0.131/updateProfile.php', updatedProfile);
+            const response = await axios.post('http://172.16.71.159/updateProfile.php', updatedProfile);
 
             if (response.data.error) {
                 alert('Error uploading photo: ' + response.data.error);
@@ -144,7 +144,7 @@ function Account() {
     const handleDeletePhoto = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.131/deleteProfilePic.php', { email });
+            const response = await axios.post('http://172.16.71.159/deleteProfilePic.php', { email });
 
             if (response.data.error) {
                 alert('Error deleting photo: ' + response.data.error);
@@ -171,7 +171,7 @@ function Account() {
     const handleChangePassword = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.131/verifyPassword.php', { email, currentPassword });
+            const response = await axios.post('http://172.16.71.159/verifyPassword.php', { email, currentPassword });
 
             if (response.data.error) {
                 alert('Password incorrect.');
@@ -189,7 +189,7 @@ function Account() {
     const handleUpdatePassword = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.131/updatePassword.php', { email, newPassword });
+            const response = await axios.post('http://172.16.71.159/updatePassword.php', { email, newPassword });
 
             if (response.data.error) {
                 alert('Error updating password: ' + response.data.error);
