@@ -19,14 +19,23 @@ function HomeAdmin() {
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [savedCategories, setSavedCategories] = useState([]);
-    
+
     // FAQ states
-    const [faqData, setFaqData] = useState([]); // Inicializado como array vacío
+    const [faqData, setFaqData] = useState([]);
     const [currentFaq, setCurrentFaq] = useState({ id: null, question: '', answer: '' });
     const [showFaqModal, setShowFaqModal] = useState(false);
 
     // Modal for categories
-    const [showModal, setShowModal] = useState(false);
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
+
+    // Video states
+    const [videoLink, setVideoLink] = useState('');
+    const [newVideoLink, setNewVideoLink] = useState('');
+    const [videoList, setVideoList] = useState([]);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedVideoName, setSelectedVideoName] = useState('');
+    const [selectedVideoToShow, setSelectedVideoToShow] = useState('');
+    const [showVideoModal, setShowVideoModal] = useState(false);
 
     useEffect(() => {
         const fetchHomeData = async () => {
@@ -67,13 +76,25 @@ function HomeAdmin() {
             }
         };
 
-        // Fetch FAQs
         const fetchFaqData = async () => {
             try {
                 const response = await axios.get('http://172.16.71.159/getFaq.php');
-                setFaqData(response.data || []);  // Asegurarse de que siempre sea un array
+                setFaqData(response.data || []);
             } catch (error) {
                 console.error('Error fetching FAQ data:', error);
+            }
+        };
+
+        const fetchVideos = async () => {
+            try {
+                const response = await axios.get('http://172.16.71.159/getVideo.php');
+                setVideoList(response.data);
+
+                if (response.data.length > 0) {
+                    setVideoLink(response.data[0].video_link);
+                }
+            } catch (error) {
+                console.error('Error fetching videos:', error);
             }
         };
 
@@ -81,6 +102,7 @@ function HomeAdmin() {
         fetchCategories();
         fetchSavedCategories();
         fetchFaqData();
+        fetchVideos();
     }, []);
 
     const handleFileChange = (e, setSlider) => {
@@ -90,7 +112,7 @@ function HomeAdmin() {
             setSlider(reader.result);
         };
         if (file) {
-            reader.readAsDataURL(file);  // Convertir el archivo a base64
+            reader.readAsDataURL(file);
         }
     };
 
@@ -99,7 +121,7 @@ function HomeAdmin() {
         try {
             const response = await axios.post('http://172.16.71.159/updateHome.php', {
                 field: field,
-                slider: imageData.split(',')[1], // Solo la parte base64
+                slider: imageData.split(',')[1],
             });
             if (response.data.error) {
                 alert(`Error guardando ${field}: ${response.data.error}`);
@@ -132,7 +154,6 @@ function HomeAdmin() {
         }
     };
 
-    // Función para seleccionar hasta 5 categorías
     const toggleCategorySelection = (id_category) => {
         if (selectedCategories.includes(id_category)) {
             setSelectedCategories(selectedCategories.filter(id => id !== id_category));
@@ -150,7 +171,7 @@ function HomeAdmin() {
             } else {
                 alert('Featured categories saved successfully!');
                 setSavedCategories(selectedCategories.map(id => categories.find(cat => cat.id_category === id)));
-                setShowModal(false);  // Cerrar el modal después de guardar
+                setShowCategoryModal(false);
             }
         } catch (error) {
             console.error('Error saving featured categories:', error);
@@ -159,9 +180,13 @@ function HomeAdmin() {
         }
     };
 
-    // Manejo de FAQs
     const handleAddFaq = () => {
         setCurrentFaq({ id: null, question: '', answer: '' });
+        setShowFaqModal(true);
+    };
+
+    const handleEditFaq = (faq) => {
+        setCurrentFaq(faq);
         setShowFaqModal(true);
     };
 
@@ -187,7 +212,6 @@ function HomeAdmin() {
         }
     };
 
-    // Eliminar FAQ
     const handleDeleteFaq = async (id) => {
         const confirmDelete = window.confirm("Are you sure you want to delete this FAQ?");
         if (!confirmDelete) return;
@@ -197,7 +221,7 @@ function HomeAdmin() {
             const response = await axios.post('http://172.16.71.159/deleteFaq.php', { id });
             if (response.data.success) {
                 alert('FAQ deleted successfully');
-                setFaqData(faqData.filter(f => f.id !== id));  // Filtra las FAQs para eliminar la seleccionada
+                setFaqData(faqData.filter(f => f.id !== id));
             } else {
                 alert('Error deleting FAQ: ' + response.data.error);
             }
@@ -208,9 +232,81 @@ function HomeAdmin() {
         }
     };
 
+    const extractYouTubeId = (url) => {
+        let videoId = '';
+        if (url.includes('youtube.com/watch?v=')) {
+            videoId = url.split('v=')[1];
+            const ampersandPosition = videoId.indexOf('&');
+            if (ampersandPosition !== -1) {
+                videoId = videoId.substring(0, ampersandPosition);
+            }
+        } else if (url.includes('youtu.be/')) {
+            videoId = url.split('youtu.be/')[1];
+        }
+        return videoId ? videoId : null;
+    };
+
+    const handleUpdateVideo = async () => {
+        setLoading(true);
+        try {
+            if (!newVideoLink || !selectedVideoName) {
+                alert("Por favor selecciona un video y proporciona un nuevo enlace válido");
+                setLoading(false);
+                return;
+            }
+
+            const videoId = extractYouTubeId(newVideoLink);
+            if (!videoId) {
+                alert("Enlace de video inválido");
+                setLoading(false);
+                return;
+            }
+
+            const embedLink = `https://www.youtube.com/embed/${videoId}`;
+
+            const response = await axios.post('http://172.16.71.159/updateVideo.php', {
+                video_link: embedLink,
+                name: selectedVideoName
+            });
+            if (response.data.error) {
+                alert(`Error actualizando el video: ${response.data.error}`);
+            } else {
+                alert('Video actualizado correctamente');
+                setVideoLink(embedLink);
+
+                setVideoList(
+                    videoList.map((video) =>
+                        video.name === selectedVideoName ? { ...video, video_link: embedLink } : video
+                    )
+                );
+            }
+        } catch (error) {
+            console.error('Error actualizando el video:', error);
+        } finally {
+            setLoading(false);
+            setShowEditModal(false);
+        }
+    };
+
+    const handleShowSelectedVideo = async () => {
+        const selectedVideo = videoList.find((video) => video.name === selectedVideoToShow);
+        if (selectedVideo) {
+            setVideoLink(selectedVideo.video_link);
+
+            try {
+                await axios.post('http://172.16.71.159/updateHomeVideo.php', {
+                    video_link: selectedVideo.video_link
+                });
+            } catch (error) {
+                console.error('Error actualizando el video en Home:', error);
+            }
+        }
+        setShowVideoModal(false);
+    };
+
     return (
         <div id="root">
-            <Header /> 
+            <Header />
             <main className="main">
                 <h1>Admin Home Settings</h1>
 
@@ -265,11 +361,11 @@ function HomeAdmin() {
                 </div>
 
                 <div className="featured-categories-section">
-                    <Button variant="primary" onClick={() => setShowModal(true)}>
+                    <Button variant="primary" onClick={() => setShowCategoryModal(true)}>
                         Select Featured Categories
                     </Button>
 
-                    <Modal show={showModal} onHide={() => setShowModal(false)}>
+                    <Modal show={showCategoryModal} onHide={() => setShowCategoryModal(false)}>
                         <Modal.Header closeButton>
                             <Modal.Title>Select up to 5 Featured Categories</Modal.Title>
                         </Modal.Header>
@@ -289,7 +385,7 @@ function HomeAdmin() {
                             </div>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={() => setShowModal(false)}>
+                            <Button variant="secondary" onClick={() => setShowCategoryModal(false)}>
                                 Close
                             </Button>
                             <Button variant="primary" onClick={saveFeaturedCategories} disabled={selectedCategories.length === 0}>
@@ -318,7 +414,7 @@ function HomeAdmin() {
                             faq && faq.question && faq.answer ? (
                                 <li key={faq.id}>
                                     <strong>{faq.question}</strong> - {faq.answer}
-                                    <Button onClick={() => setCurrentFaq(faq)} style={{ marginLeft: '10px' }}>Edit</Button>
+                                    <Button onClick={() => handleEditFaq(faq)} style={{ marginLeft: '10px' }}>Edit</Button>
                                     <Button variant="danger" onClick={() => handleDeleteFaq(faq.id)} style={{ marginLeft: '10px' }}>Delete</Button>
                                 </li>
                             ) : null
@@ -350,8 +446,83 @@ function HomeAdmin() {
                         </Button>
                     </Modal.Footer>
                 </Modal>
+
+                {/* Video Section */}
+                <div className="video-section">
+                    <h2>Video Actual</h2>
+                    {videoLink ? (
+                        <iframe
+                            width="100%"
+                            height="600"
+                            src={videoLink}
+                            title="Video"
+                            frameBorder="0"
+                            allowFullScreen
+                        ></iframe>
+                    ) : (
+                        <p>No hay video disponible.</p>
+                    )}
+                </div>
+
+                <Button onClick={() => setShowEditModal(true)}>Actualizar Video Existente</Button>
+
+                <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Actualizar Video</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <select value={selectedVideoName} onChange={(e) => setSelectedVideoName(e.target.value)}>
+                            <option value="">Selecciona un video</option>
+                            {videoList.map((video) => (
+                                <option key={video.id} value={video.name}>
+                                    {video.name}
+                                </option>
+                            ))}
+                        </select>
+                        <input
+                            type="text"
+                            value={newVideoLink}
+                            onChange={(e) => setNewVideoLink(e.target.value)}
+                            placeholder="Nuevo enlace del video"
+                        />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+                            Cerrar
+                        </Button>
+                        <Button variant="primary" onClick={handleUpdateVideo} disabled={loading || !selectedVideoName}>
+                            {loading ? <Spinner animation="border" size="sm" /> : 'Actualizar Video'}
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <Button onClick={() => setShowVideoModal(true)}>Mostrar Video</Button>
+
+                <Modal show={showVideoModal} onHide={() => setShowVideoModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Seleccionar Video para Mostrar</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <select value={selectedVideoToShow} onChange={(e) => setSelectedVideoToShow(e.target.value)}>
+                            <option value="">Selecciona un video</option>
+                            {videoList.map((video) => (
+                                <option key={video.id} value={video.name}>
+                                    {video.name}
+                                </option>
+                            ))}
+                        </select>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowVideoModal(false)}>
+                            Cerrar
+                        </Button>
+                        <Button variant="primary" onClick={handleShowSelectedVideo} disabled={!selectedVideoToShow}>
+                            {loading ? <Spinner animation="border" size="sm" /> : 'Mostrar Video'}
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </main>
-            <Footer /> 
+            <Footer />
         </div>
     );
 }
