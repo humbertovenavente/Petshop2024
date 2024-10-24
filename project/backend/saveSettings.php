@@ -12,9 +12,15 @@ header("Content-Type: application/json");
 
 // Configuración de la base de datos
 $host = '192.168.0.13';  
-$db = 'project';
+$db = 'project';  
 $user = 'humbe';  
 $pass = 'tu_contraseña'; 
+
+// Verificar si la solicitud es una "preflight" OPTIONS
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 // Conexión a la base de datos
 $conn = new mysqli($host, $user, $pass, $db);
@@ -26,26 +32,24 @@ if ($conn->connect_error) {
 
 // Leer los datos enviados en el cuerpo de la solicitud POST
 $data = json_decode(file_get_contents("php://input"), true);
+$limit = isset($data['limit']) ? (int)$data['limit'] : 10;
+$categories = isset($data['categories']) ? implode(',', $data['categories']) : '';
 
-if (isset($data['video_link']) && isset($data['name'])) {
-    $videoLink = $data['video_link'];
-    $name = $data['name'];
+// Verificar si la configuración ya existe
+$sqlCheck = "SELECT * FROM AdminSettings WHERE id = 1";
+$resultCheck = $conn->query($sqlCheck);
 
-    // Insertar un nuevo video con nombre en la tabla
-    $query = "INSERT INTO Video (video_link, name) VALUES (?, ?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param('ss', $videoLink, $name);
-
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['error' => $conn->error]);
-    }
-
-    $stmt->close();
+if ($resultCheck->num_rows > 0) {
+    // Actualizar la configuración
+    $sqlUpdate = "UPDATE AdminSettings SET selected_categories = '$categories', product_limit = $limit WHERE id = 1";
+    $conn->query($sqlUpdate);
 } else {
-    echo json_encode(['error' => 'El nombre o el enlace del video no fueron proporcionados.']);
+    // Insertar la configuración
+    $sqlInsert = "INSERT INTO AdminSettings (selected_categories, product_limit) VALUES ('$categories', $limit)";
+    $conn->query($sqlInsert);
 }
+
+echo json_encode(['success' => true]);
 
 $conn->close();
 ?>

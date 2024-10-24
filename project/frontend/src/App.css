@@ -306,6 +306,94 @@ button:hover {
   background-color: #0056b3;
 }
 
+/* Estilo básico del contenedor del grid */
+.product-grid {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* Estilos específicos para diferentes números de productos */
+
+/* Grid para 3 productos: un grande y dos pequeños */
+.grid-three {
+  grid-template-areas: 
+      "main main small1"
+      "main main small2";
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto;
+}
+
+/* Grid para 4 productos */
+.grid-four {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto;
+}
+
+/* Grid para 5 productos */
+.grid-five {
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: auto;
+}
+
+/* Grid para 6 productos */
+.grid-six {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+}
+
+/* Grid para 7 productos */
+.grid-seven {
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: auto;
+}
+
+/* Grid para 8 productos */
+.grid-eight {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
+}
+
+/* Grid para 9 productos */
+.grid-nine {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+}
+
+/* Grid para 10 productos */
+.grid-ten {
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: auto;
+}
+
+/* Estilo general de las tarjetas de productos */
+.product-card {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.view-button {
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.view-button:hover {
+  background-color: #0056b3;
+}
+
 
 /* Estilos responsivos */
 @media (max-width: 768px) {

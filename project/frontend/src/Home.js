@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
 import './App.css';
-
 const chunkArray = (array, size) => {
     const result = [];
     for (let i = 0; i < array.length; i += size) {
@@ -13,7 +12,6 @@ const chunkArray = (array, size) => {
     }
     return result;
 };
-
 function Home() {
     const [topProducts, setTopProducts] = useState([]);
     const [sliderData, setSliderData] = useState({
@@ -32,47 +30,84 @@ function Home() {
     const [videoUrl, setVideoUrl] = useState(''); // Estado para el enlace del video
     const [videoName, setVideoName] = useState(''); // Estado para el nombre del video
     const navigate = useNavigate();
+    const [products, setProducts] = useState([]);
+
+        const getGridClass = (count) => {
+        switch (count) {
+            case 3:
+                return 'grid-three';
+            case 4:
+                return 'grid-four';
+            case 5:
+                return 'grid-five';
+            case 6:
+                return 'grid-six';
+            case 7:
+                return 'grid-seven';
+            case 8:
+                return 'grid-eight';
+            case 9:
+                return 'grid-nine';
+            case 10:
+                return 'grid-ten';
+            default:
+                return 'grid-default';
+        }
+    };
+     
 
     useEffect(() => {
+
+        const fetchTopProducts2 = async () => {
+            try {
+                const response = await axios.get('http://192.168.0.13/getTopAllSells.php');
+                if (response.data && Array.isArray(response.data)) {
+                    setProducts(response.data);
+                } else {
+                    console.error('No se obtuvieron productos válidos');
+                }
+            } catch (error) {
+                console.error('Error fetching top-selling products:', error);
+            }
+        };
+
+               // Función para aplicar clases de grid según el número de productos
+
         const fetchTopProducts = async () => {
             try {
-                const response = await axios.get('http://172.16.71.159/topSells.php');
+                const response = await axios.get('http://192.168.0.13/topSells.php');
                 setTopProducts(response.data);
             } catch (error) {
                 console.error('Error al obtener los productos más vendidos', error);
             }
         };
-
         const fetchSliderData = async () => {
             try {
-                const response = await axios.get('http://172.16.71.159/getHome.php');
+                const response = await axios.get('http://192.168.0.13/getHome.php');
                 setSliderData(response.data);
             } catch (error) {
                 console.error('Error al obtener los datos del slider', error);
             }
         };
-
         const fetchFeaturedCategories = async () => {
             try {
-                const response = await axios.get('http://172.16.71.159/getFeaturedCategories.php');
+                const response = await axios.get('http://192.168.0.13/getFeaturedCategories.php');
                 setFeaturedCategories(response.data);
             } catch (error) {
                 console.error('Error al obtener las categorías destacadas', error);
             }
         };
-
         const fetchFaqData = async () => {
             try {
-                const response = await axios.get('http://172.16.71.159/getFaq.php');
+                const response = await axios.get('http://192.168.0.13/getFaq.php');
                 setFaqData(response.data);
             } catch (error) {
                 console.error('Error fetching FAQ data:', error);
             }
         };
-
         const fetchVideoData = async () => {
             try {
-                const response = await axios.get('http://172.16.71.159/getHomeVideo.php');
+                const response = await axios.get('http://192.168.0.13/getHomeVideo.php');
                 console.log(response.data); // Muestra la respuesta en la consola para depuración
                 // Verifica que response.data sea un array y tenga elementos
                 if (Array.isArray(response.data) && response.data.length > 0) {
@@ -92,8 +127,7 @@ function Home() {
         };
         
         
-        
-
+        fetchTopProducts2();
         fetchTopProducts();
         fetchSliderData();
         fetchFeaturedCategories();
@@ -104,11 +138,9 @@ function Home() {
     const handleViewProduct = (productId) => {
         navigate(`/ProductDetails/${productId}`);
     };
-
-    const handleViewCategory = (categoryId) => {
-        navigate(`/Category/${categoryId}`);
+    const handleViewCategory = (categoryId, categoryName) => {
+        navigate(`/category/${categoryId}/${categoryName}`);
     };
-
     return (
         <div id="root">
             <Header />
@@ -152,7 +184,6 @@ function Home() {
                         </Carousel.Caption>
                     </Carousel.Item>
                 </Carousel>
-
                 {/* Top Products Section */}
                 <div className="product-list">
                     <h2>The Best-Selling Products</h2>
@@ -180,14 +211,13 @@ function Home() {
                         ))}
                     </div>
                 </div>
-
                 {/* Top Categories Section */}
                 <div className="category-section">
                     <h2>Top Categories</h2>
                     <div className="card-grid">
                         {featuredCategories.length > 0 ? (
                             featuredCategories.map((category, index) => (
-                                <Card key={index} className="category-card" onClick={() => handleViewCategory(category.id_category)}>
+                                <Card key={index} className="category-card" onClick={() => handleViewCategory(category.id_category, category.name)}>
                                     <Card.Body>
                                         <Card.Title>{category.name}</Card.Title>
                                     </Card.Body>
@@ -198,7 +228,25 @@ function Home() {
                         )}
                     </div>
                 </div>
-
+                  {/*TOP PRODUCTS BY CATEGORY */}
+                <h1>Top Selling Products</h1>
+                <div className={`product-grid ${getGridClass(products.length)}`}>
+                    {products.map((product) => (
+                        <div key={product.id_product} className="product-card">
+                            <img 
+                                src={`data:image/jpeg;base64,${product.image}`} 
+                                alt={product.name} 
+                                className="product-image"
+                            />
+                            <h3>{product.name}</h3>
+                            <p>Precio: {product.price}</p>
+                            <p>Inventario: {product.inventory}</p> {/* Mostrando el inventario */}
+                            <Button variant="primary" onClick={() => handleViewProduct(product.id_product)}>
+                                                Ver Artículo
+                                            </Button>
+                        </div>
+                    ))}
+                </div>
                 {/* Accordion (FAQs) Section */}
                 <div className="accordion-section my-5">
                     <h2>Frequently Asked Questions</h2>
@@ -211,7 +259,6 @@ function Home() {
                         ))}
                     </Accordion>
                 </div>
-
                 {/* Video Section */}
                 <div className="video-section">
                     <h2>{videoName ? `Video: ${videoName}` : 'About Us Video'}</h2>
@@ -233,5 +280,4 @@ function Home() {
         </div>
     );
 }
-
 export default Home;

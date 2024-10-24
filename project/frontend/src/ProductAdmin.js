@@ -45,7 +45,7 @@ function ProductAdmin() {
   // Fetch products from backend
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://172.16.71.159/product.php');
+      const response = await axios.get('http://192.168.0.13/product.php');
       if (Array.isArray(response.data)) {
         setProducts(response.data);
       } else {
@@ -59,7 +59,7 @@ function ProductAdmin() {
   // Fetch categories (tags) from backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://172.16.71.159/category.php');
+      const response = await axios.get('http://192.168.0.13/category.php');
       if (Array.isArray(response.data)) {
         setCategories(response.data.map(cat => ({ value: cat.id_category, label: cat.name }))); // Format categories for react-select
       } else {
@@ -136,7 +136,7 @@ function ProductAdmin() {
         file_type: fileType  // El tipo de archivo de la imagen
       };
 
-      const response = await axios.post('http://172.16.71.159/addProduct.php', productData);
+      const response = await axios.post('http://192.168.0.13/addProduct.php', productData);
 
       if (response.data.error) {
         alert(`Error: ${response.data.error}`);
@@ -184,7 +184,7 @@ function ProductAdmin() {
         file_type: selectedFile ? fileType : newProduct.file_type // Use the existing file type if no new image
       };
 
-      const response = await axios.post('http://172.16.71.159/updateProduct.php', { 
+      const response = await axios.post('http://192.168.0.13/updateProduct.php', { 
         id_product: currentProductId,  // Pasar el ID del producto que se está editando
         ...productData
       });
@@ -231,7 +231,7 @@ function ProductAdmin() {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         setLoading(true);  // Start loading
-        await axios.post('http://172.16.71.159/deleteProduct.php', { id_product });
+        await axios.post('http://192.168.0.13/deleteProduct.php', { id_product });
         fetchProducts(); // Refresh the product list after deletion
       } catch (error) {
         console.error("Error deleting product:", error);

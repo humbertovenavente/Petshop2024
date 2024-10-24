@@ -3,7 +3,6 @@ import { Modal, Button, Spinner } from 'react-bootstrap';
 import Header from './header';
 import Footer from './footer';
 import axios from 'axios';
-
 function HomeAdmin() {
     const [slider1, setSlider1] = useState(null);
     const [slider2, setSlider2] = useState(null);
@@ -15,19 +14,15 @@ function HomeAdmin() {
     const [title3, setTitle3] = useState('');
     const [description3, setDescription3] = useState('');
     const [loading, setLoading] = useState(false);
-
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [savedCategories, setSavedCategories] = useState([]);
-
     // FAQ states
     const [faqData, setFaqData] = useState([]);
     const [currentFaq, setCurrentFaq] = useState({ id: null, question: '', answer: '' });
     const [showFaqModal, setShowFaqModal] = useState(false);
-
     // Modal for categories
     const [showCategoryModal, setShowCategoryModal] = useState(false);
-
     // Video states
     const [videoLink, setVideoLink] = useState('');
     const [newVideoLink, setNewVideoLink] = useState('');
@@ -36,11 +31,10 @@ function HomeAdmin() {
     const [selectedVideoName, setSelectedVideoName] = useState('');
     const [selectedVideoToShow, setSelectedVideoToShow] = useState('');
     const [showVideoModal, setShowVideoModal] = useState(false);
-
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
-                const response = await axios.get('http://172.16.71.159/getHome.php');
+                const response = await axios.get('http://192.168.0.13/getHome.php');
                 const data = response.data;
                 setSlider1(`data:image/jpeg;base64,${data.slider1}`);
                 setSlider2(`data:image/jpeg;base64,${data.slider2}`);
@@ -55,19 +49,17 @@ function HomeAdmin() {
                 console.error('Error fetching home data:', error);
             }
         };
-
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://172.16.71.159/category.php');
+                const response = await axios.get('http://192.168.0.13/category.php');
                 setCategories(response.data);
             } catch (error) {
                 console.error('Error fetching categories:', error);
             }
         };
-
         const fetchSavedCategories = async () => {
             try {
-                const response = await axios.get('http://172.16.71.159/getFeaturedCategories.php');
+                const response = await axios.get('http://192.168.0.13/getFeaturedCategories.php');
                 const data = response.data || [];
                 setSavedCategories(data);
                 setSelectedCategories(data.map(category => category.id_category));
@@ -75,21 +67,18 @@ function HomeAdmin() {
                 console.error('Error fetching saved categories:', error);
             }
         };
-
         const fetchFaqData = async () => {
             try {
-                const response = await axios.get('http://172.16.71.159/getFaq.php');
+                const response = await axios.get('http://192.168.0.13/getFaq.php');
                 setFaqData(response.data || []);
             } catch (error) {
                 console.error('Error fetching FAQ data:', error);
             }
         };
-
         const fetchVideos = async () => {
             try {
-                const response = await axios.get('http://172.16.71.159/getVideo.php');
+                const response = await axios.get('http://192.168.0.13/getVideo.php');
                 setVideoList(response.data);
-
                 if (response.data.length > 0) {
                     setVideoLink(response.data[0].video_link);
                 }
@@ -97,14 +86,12 @@ function HomeAdmin() {
                 console.error('Error fetching videos:', error);
             }
         };
-
         fetchHomeData();
         fetchCategories();
         fetchSavedCategories();
         fetchFaqData();
         fetchVideos();
     }, []);
-
     const handleFileChange = (e, setSlider) => {
         const file = e.target.files[0];
         const reader = new FileReader();
@@ -115,11 +102,10 @@ function HomeAdmin() {
             reader.readAsDataURL(file);
         }
     };
-
     const saveImage = async (field, imageData) => {
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.71.159/updateHome.php', {
+            const response = await axios.post('http://192.168.0.13/updateHome.php', {
                 field: field,
                 slider: imageData.split(',')[1],
             });
@@ -134,11 +120,10 @@ function HomeAdmin() {
             setLoading(false);
         }
     };
-
     const saveText = async (field, value) => {
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.71.159/updateHome.php', {
+            const response = await axios.post('http://192.168.0.13/updateHome.php', {
                 field: field,
                 text: value,
             });
@@ -153,7 +138,6 @@ function HomeAdmin() {
             setLoading(false);
         }
     };
-
     const toggleCategorySelection = (id_category) => {
         if (selectedCategories.includes(id_category)) {
             setSelectedCategories(selectedCategories.filter(id => id !== id_category));
@@ -161,11 +145,10 @@ function HomeAdmin() {
             setSelectedCategories([...selectedCategories, id_category]);
         }
     };
-
     const saveFeaturedCategories = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.71.159/saveFeaturedCategories.php', { categories: selectedCategories });
+            const response = await axios.post('http://192.168.0.13/saveFeaturedCategories.php', { categories: selectedCategories });
             if (response.data.error) {
                 alert('Error saving featured categories: ' + response.data.error);
             } else {
@@ -179,21 +162,18 @@ function HomeAdmin() {
             setLoading(false);
         }
     };
-
     const handleAddFaq = () => {
         setCurrentFaq({ id: null, question: '', answer: '' });
         setShowFaqModal(true);
     };
-
     const handleEditFaq = (faq) => {
         setCurrentFaq(faq);
         setShowFaqModal(true);
     };
-
     const handleSaveFaq = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.71.159/updateFaq.php', currentFaq);
+            const response = await axios.post('http://192.168.0.13/updateFaq.php', currentFaq);
             if (response.data.success) {
                 alert('FAQ updated successfully');
                 setShowFaqModal(false);
@@ -211,14 +191,12 @@ function HomeAdmin() {
             setLoading(false);
         }
     };
-
     const handleDeleteFaq = async (id) => {
         const confirmDelete = window.confirm("Are you sure you want to delete this FAQ?");
         if (!confirmDelete) return;
-
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.71.159/deleteFaq.php', { id });
+            const response = await axios.post('http://192.168.0.13/deleteFaq.php', { id });
             if (response.data.success) {
                 alert('FAQ deleted successfully');
                 setFaqData(faqData.filter(f => f.id !== id));
@@ -231,7 +209,6 @@ function HomeAdmin() {
             setLoading(false);
         }
     };
-
     const extractYouTubeId = (url) => {
         let videoId = '';
         if (url.includes('youtube.com/watch?v=')) {
@@ -245,7 +222,6 @@ function HomeAdmin() {
         }
         return videoId ? videoId : null;
     };
-
     const handleUpdateVideo = async () => {
         setLoading(true);
         try {
@@ -254,17 +230,14 @@ function HomeAdmin() {
                 setLoading(false);
                 return;
             }
-
             const videoId = extractYouTubeId(newVideoLink);
             if (!videoId) {
                 alert("Enlace de video inválido");
                 setLoading(false);
                 return;
             }
-
             const embedLink = `https://www.youtube.com/embed/${videoId}`;
-
-            const response = await axios.post('http://172.16.71.159/updateVideo.php', {
+            const response = await axios.post('http://192.168.0.13/updateVideo.php', {
                 video_link: embedLink,
                 name: selectedVideoName
             });
@@ -273,7 +246,6 @@ function HomeAdmin() {
             } else {
                 alert('Video actualizado correctamente');
                 setVideoLink(embedLink);
-
                 setVideoList(
                     videoList.map((video) =>
                         video.name === selectedVideoName ? { ...video, video_link: embedLink } : video
@@ -287,14 +259,12 @@ function HomeAdmin() {
             setShowEditModal(false);
         }
     };
-
     const handleShowSelectedVideo = async () => {
         const selectedVideo = videoList.find((video) => video.name === selectedVideoToShow);
         if (selectedVideo) {
             setVideoLink(selectedVideo.video_link);
-
             try {
-                await axios.post('http://172.16.71.159/updateHomeVideo.php', {
+                await axios.post('http://192.168.0.13/updateHomeVideo.php', {
                     video_link: selectedVideo.video_link
                 });
             } catch (error) {
@@ -303,13 +273,11 @@ function HomeAdmin() {
         }
         setShowVideoModal(false);
     };
-
     return (
         <div id="root">
             <Header />
             <main className="main">
                 <h1>Admin Home Settings</h1>
-
                 <div className="slider-section">
                     <h2>Slider 1</h2>
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setSlider1)} />
@@ -318,7 +286,6 @@ function HomeAdmin() {
                         {loading ? <Spinner animation="border" size="sm" /> : 'Save Image 1'}
                     </Button>
                 </div>
-
                 <div className="slider-section">
                     <h2>Slider 2</h2>
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setSlider2)} />
@@ -327,7 +294,6 @@ function HomeAdmin() {
                         {loading ? <Spinner animation="border" size="sm" /> : 'Save Image 2'}
                     </Button>
                 </div>
-
                 <div className="slider-section">
                     <h2>Slider 3</h2>
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setSlider3)} />
@@ -336,7 +302,6 @@ function HomeAdmin() {
                         {loading ? <Spinner animation="border" size="sm" /> : 'Save Image 3'}
                     </Button>
                 </div>
-
                 <div className="text-section">
                     <h2>Text 1</h2>
                     <input value={title1} onChange={(e) => setTitle1(e.target.value)} placeholder="Title 1" />
@@ -344,14 +309,12 @@ function HomeAdmin() {
                     <Button onClick={() => saveText('title1', title1)} disabled={loading || !title1}>
                         {loading ? <Spinner animation="border" size="sm" /> : 'Save Text 1'}
                     </Button>
-
                     <h2>Text 2</h2>
                     <input value={title2} onChange={(e) => setTitle2(e.target.value)} placeholder="Title 2" />
                     <input value={description2} onChange={(e) => setDescription2(e.target.value)} placeholder="Description 2" />
                     <Button onClick={() => saveText('title2', title2)} disabled={loading || !title2}>
                         {loading ? <Spinner animation="border" size="sm" /> : 'Save Text 2'}
                     </Button>
-
                     <h2>Text 3</h2>
                     <input value={title3} onChange={(e) => setTitle3(e.target.value)} placeholder="Title 3" />
                     <input value={description3} onChange={(e) => setDescription3(e.target.value)} placeholder="Description 3" />
@@ -359,12 +322,10 @@ function HomeAdmin() {
                         {loading ? <Spinner animation="border" size="sm" /> : 'Save Text 3'}
                     </Button>
                 </div>
-
                 <div className="featured-categories-section">
                     <Button variant="primary" onClick={() => setShowCategoryModal(true)}>
                         Select Featured Categories
                     </Button>
-
                     <Modal show={showCategoryModal} onHide={() => setShowCategoryModal(false)}>
                         <Modal.Header closeButton>
                             <Modal.Title>Select up to 5 Featured Categories</Modal.Title>
@@ -393,7 +354,6 @@ function HomeAdmin() {
                             </Button>
                         </Modal.Footer>
                     </Modal>
-
                     <h3>Your Top Categories Are:</h3>
                     <ul>
                         {Array.isArray(savedCategories) && savedCategories.length > 0 ? (
@@ -405,7 +365,6 @@ function HomeAdmin() {
                         )}
                     </ul>
                 </div>
-
                 <div className="faq-section">
                     <h2>Manage FAQs</h2>
                     <Button variant="success" onClick={handleAddFaq}>Add FAQ</Button>
@@ -421,7 +380,6 @@ function HomeAdmin() {
                         )) : <li>No FAQs available</li>}
                     </ul>
                 </div>
-
                 <Modal show={showFaqModal} onHide={() => setShowFaqModal(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>{currentFaq.id ? 'Edit FAQ' : 'Add FAQ'}</Modal.Title>
@@ -446,7 +404,6 @@ function HomeAdmin() {
                         </Button>
                     </Modal.Footer>
                 </Modal>
-
                 {/* Video Section */}
                 <div className="video-section">
                     <h2>Video Actual</h2>
@@ -463,9 +420,7 @@ function HomeAdmin() {
                         <p>No hay video disponible.</p>
                     )}
                 </div>
-
                 <Button onClick={() => setShowEditModal(true)}>Actualizar Video Existente</Button>
-
                 <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>Actualizar Video</Modal.Title>
@@ -495,9 +450,7 @@ function HomeAdmin() {
                         </Button>
                     </Modal.Footer>
                 </Modal>
-
                 <Button onClick={() => setShowVideoModal(true)}>Mostrar Video</Button>
-
                 <Modal show={showVideoModal} onHide={() => setShowVideoModal(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>Seleccionar Video para Mostrar</Modal.Title>
@@ -526,5 +479,4 @@ function HomeAdmin() {
         </div>
     );
 }
-
 export default HomeAdmin;

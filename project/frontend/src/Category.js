@@ -4,20 +4,23 @@ import { Row, Col, Card, Button, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
+import Carousel from 'react-multi-carousel';
+import 'react-multi-carousel/lib/styles.css';
 
 function Category() {
-    const [products, setProducts] = useState([]); 
-    const [categories, setCategories] = useState([]);  
+    const [products, setProducts] = useState([]); // Estado para productos filtrados
+    const [categories, setCategories] = useState([]); // Estado para categorías
+    const [topProducts, setTopProducts] = useState([]); // Estado para productos destacados
     const [filters, setFilters] = useState({
         category_id: '', 
         min_price: '',
         max_price: ''
     });
 
+    // Obtener las categorías
     useEffect(() => {
-        axios.get('http://172.16.71.159/category.php')
+        axios.get('http://192.168.0.13/category.php') // Cambia la URL según tu configuración
         .then(response => {
-            console.log('Categorías obtenidas:', response.data);
             setCategories(response.data);
         })
         .catch(error => {
@@ -25,6 +28,20 @@ function Category() {
         });
     }, []);
 
+    // Obtener los productos con más inventario (productos destacados)
+    useEffect(() => {
+        axios.get('http://192.168.0.13/topProducts.php') // Cambia la URL según tu configuración
+        .then(response => {
+            const productsData = Array.isArray(response.data) ? response.data : [];
+            setTopProducts(productsData);
+        })
+        .catch(error => {
+            console.error("Error al obtener productos destacados: ", error);
+            setTopProducts([]); // En caso de error, definimos como un array vacío
+        });
+    }, []);
+
+    // Manejar cambios en el formulario de búsqueda
     const handleInputChange = (e) => {
         setFilters({
             ...filters,
@@ -32,8 +49,8 @@ function Category() {
         });
     };
 
+    // Buscar productos
     const searchProducts = () => {
-           // Validar que los precios sean mayores o iguales a 1
         const minPrice = parseFloat(filters.min_price);
         const maxPrice = parseFloat(filters.max_price);
 
@@ -51,19 +68,37 @@ function Category() {
             return;
         }
 
-        console.log("Filtros enviados:", filters);
-        axios.post('http://172.16.71.159/searchCategory.php', {
+        axios.post('http://192.168.0.13/searchCategory.php', {
             category_id: filters.category_id, 
             min_price: filters.min_price ? filters.min_price : 0, 
             max_price: filters.max_price ? filters.max_price : Infinity
         })
         .then(response => {
-            console.log('Respuesta del backend:', response.data);
             setProducts(response.data);
         })
         .catch(error => {
             console.error("Error al buscar productos: ", error);
         });
+    };
+
+    // Configuración del carrusel
+    const responsive = {
+        superLargeDesktop: {
+            breakpoint: { max: 4000, min: 3000 },
+            items: 5
+        },
+        desktop: {
+            breakpoint: { max: 3000, min: 1024 },
+            items: 5
+        },
+        tablet: {
+            breakpoint: { max: 1024, min: 464 },
+            items: 2
+        },
+        mobile: {
+            breakpoint: { max: 464, min: 0 },
+            items: 1
+        }
     };
 
     return (
@@ -123,36 +158,35 @@ function Category() {
                 {/* Mostrar resultados de productos */}
                 <h3>Search Results</h3>
                 <Row>
-    {Array.isArray(products) && products.length > 0 ? (
-        products.map((product, index) => (
-            <Col key={index} md={4} className="mb-4">
-                <Card>
-                    <Card.Body>
-                        {/* Mostrar la imagen si está disponible */}
-                        {product.image ? (
-                            <img
-                                src={`data:image/jpeg;base64,${product.image}`} 
-                                alt={product.name}
-                                style={{ width: '100%', height: '400px', objectFit: 'cover' }}
-                            />
-                        ) : (
-                            <p>No Image Available</p>
-                        )}
-                        <Card.Title>{product.name || 'No Name Available'}</Card.Title>
-                        <Card.Text>Price: ${product.price || 'Not Available'}</Card.Text>
-                        <Card.Text>Category: {product.category_name || 'No Category'}</Card.Text>
-                        <Link to={`/ProductDetails/${product.id_product}`}>
-                            <Button variant="primary">View Product</Button>
-                        </Link>
-                    </Card.Body>
-                </Card>
-            </Col>
-        ))
-    ) : (
-        <p>No products found</p>
-    )}
-</Row>
-
+                    {Array.isArray(products) && products.length > 0 ? (
+                        products.map((product, index) => (
+                            <Col key={index} md={4} className="mb-4">
+                                <Card>
+                                    <Card.Body>
+                                        {/* Mostrar la imagen si está disponible */}
+                                        {product.image ? (
+                                            <img
+                                                src={`data:image/jpeg;base64,${product.image}`} 
+                                                alt={product.name}
+                                                style={{ width: '100%', height: '400px', objectFit: 'cover' }}
+                                            />
+                                        ) : (
+                                            <p>No Image Available</p>
+                                        )}
+                                        <Card.Title>{product.name || 'No Name Available'}</Card.Title>
+                                        <Card.Text>Price: ${product.price || 'Not Available'}</Card.Text>
+                                        <Card.Text>Category: {product.category_name || 'No Category'}</Card.Text>
+                                        <Link to={`/ProductDetails/${product.id_product}`}>
+                                            <Button variant="primary">View Product</Button>
+                                        </Link>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        ))
+                    ) : (
+                        <p>No products found</p>
+                    )}
+                </Row>
 
                 <hr /> {/* Separador entre la búsqueda y las categorías */}
 
@@ -176,6 +210,45 @@ function Category() {
                         <p>No categories available</p>
                     )}
                 </Row>
+
+                <hr /> {/* Separador entre las categorías y el carrusel */}
+
+                {/* Carrusel de productos destacados */}
+                <h3>Top Products by Inventory</h3>
+                {topProducts.length > 0 ? (
+                    <Carousel responsive={responsive} infinite={true} autoPlay={true} autoPlaySpeed={3000}>
+                        {topProducts.map((product, index) => (
+                            <div key={index} className="p-3">
+                                <Card className="h-100 shadow-sm">
+                                    <div className="d-flex justify-content-center" style={{ height: '300px', overflow: 'hidden' }}>
+                                        {product.image ? (
+                                            <img
+                                                src={product.image}
+                                                alt={product.name}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'cover'
+                                                }}
+                                            />
+                                        ) : (
+                                            <p>No Image Available</p>
+                                        )}
+                                    </div>
+                                    <Card.Body className="text-center">
+                                        <Card.Title>{product.name || 'No Name Available'}</Card.Title>
+                                        <Card.Text>Inventory: {product.inventory || 'Not Available'}</Card.Text>
+                                        <Link to={`/ProductDetails/${product.id_product}`}>
+                                            <Button variant="primary">View Product</Button>
+                                        </Link>
+                                    </Card.Body>
+                                </Card>
+                            </div>
+                        ))}
+                    </Carousel>
+                ) : (
+                    <p>No top products available</p>
+                )}
             </main>
             <Footer />
         </div>
