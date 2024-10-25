@@ -30,7 +30,7 @@ function UserAdmin() {
   // Fetch users from the backend
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://192.168.0.13/user.php');
+      const response = await axios.get('http://172.16.71.159/user.php');
       if (Array.isArray(response.data)) {
         setUser(response.data);
       } else {
@@ -98,7 +98,7 @@ function UserAdmin() {
         return;
       }
 
-      const response = await axios.post('http://192.168.0.13/addProfile.php', newUser);
+      const response = await axios.post('http://172.16.71.159/addProfile.php', newUser);
       
       if (response.data.success) {
         alert('User added successfully');
@@ -115,7 +115,7 @@ function UserAdmin() {
   // Update an existing user
   const handleUpdateUser = async () => {
     try {
-      const response = await axios.post('http://192.168.0.13/updateProfile2.php', newUser);  // Update endpoint
+      const response = await axios.post('http://172.16.71.159/updateProfile2.php', newUser);  // Update endpoint
       if (response.data.success) {
         alert('User updated successfully');
         fetchUsers();  // Refresh the user list after updating
@@ -141,7 +141,7 @@ function UserAdmin() {
   const handleDeleteUser = async (id_user) => {
     if (window.confirm("Are you sure you want to delete this profile?")) {
       try {
-        const response = await axios.post('http://192.168.0.13/deleteProfile.php', { id_user });
+        const response = await axios.post('http://172.16.71.159/deleteProfile.php', { id_user });
         if (response.data.success) {
           alert('User deleted successfully');
           fetchUsers();  // Refresh the user list after deletion

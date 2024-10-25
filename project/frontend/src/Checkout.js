@@ -35,7 +35,7 @@ function Checkout() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.post('http://192.168.0.13/profile.php', {
+        const response = await axios.post('http://172.16.71.159/profile.php', {
           email,
           password,
         });
@@ -75,7 +75,7 @@ function Checkout() {
   const handlePlaceOrder = async () => {
     try {
       // Realizar la petición para crear el pedido
-      const orderResponse = await axios.post('http://192.168.0.13/placeOrder.php', {
+      const orderResponse = await axios.post('http://172.16.71.159/placeOrder.php', {
         email,
         total: total + shipping,  // Aquí se envía el total correcto
         items: cartItems,

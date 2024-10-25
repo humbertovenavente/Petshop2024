@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 
 // Configuración de la base de datos
-$host = '192.168.0.13';
+$host = '172.16.71.159';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';

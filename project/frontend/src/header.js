@@ -13,7 +13,7 @@ function Header() {
 
   // Obtener categorías desde category2.php
   useEffect(() => {
-    fetch('http://192.168.0.13/category2.php')  // Cambia esta URL si es necesario
+    fetch('http://172.16.71.159/category2.php')  // Cambia esta URL si es necesario
       .then(response => response.json())
       .then(data => {
         console.log('Categorías obtenidas:', data);
@@ -38,15 +38,19 @@ function Header() {
 
   return (
     <>
-      <header className="header">
+        <header className="header">
         <div className="logo-and-search">
           <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="Logo" className="logo" />
           <input type="text" className="search-bar" placeholder="Search" />
         </div>
 
         <div className="account-and-cart">
-          {userRole !== 'guest' && <Link to="/Account" className="account-link">My Account</Link>}
+          {/* Mostrar "My Account" para todos los usuarios, incluidos invitados */}
+          <Link to={userRole === 'guest' ? '/login' : '/Account'} className="account-link">My Account</Link>
+
+          {/* Mostrar "My Orders" solo si el usuario tiene un rol distinto a 'guest' */}
           {userRole !== 'guest' && <Link to="/MyOrders" className="order-link">My Orders</Link>}
+
           <Link to="/cart">
             <img src="https://img.icons8.com/ios-filled/50/000000/shopping-cart.png" alt="Shopping Cart" className="cart-icon" />
           </Link>

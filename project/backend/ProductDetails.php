@@ -3,20 +3,17 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Habilitar CORS
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
-// Conexión a la base de datos
-$host = '192.168.0.13';
+$host = '172.16.71.159';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
 $conn = new mysqli($host, $user, $pass, $db);
 
-// Verificar la conexión a la base de datos
 if ($conn->connect_error) {
     die(json_encode(['error' => "Conexión fallida: " . $conn->connect_error]));
 }
@@ -24,34 +21,38 @@ if ($conn->connect_error) {
 $productId = $_GET['productId'];
 
 // Obtener el producto
-$sqlProduct = "SELECT id_product, name, description, price, color, size, inventory, stock, image FROM Product WHERE id_product = ?";
+$sqlProduct = "SELECT id_product, name, description, price, color, size, inventory, stock, image, file_type FROM Product WHERE id_product = ?";
 $stmtProduct = $conn->prepare($sqlProduct);
 $stmtProduct->bind_param("i", $productId);
 $stmtProduct->execute();
 $resultProduct = $stmtProduct->get_result();
 $product = $resultProduct->fetch_assoc();
 
-// Convertir la imagen en Base64
+// Convertir la imagen en Base64 si existe
 if ($product && !empty($product['image'])) {
     $product['image'] = base64_encode($product['image']);
 }
 
-// Obtener las categorías del producto
-$sqlCategories = "SELECT c.name FROM Category c
-                  INNER JOIN ProductCategory pc ON c.id_category = pc.id_category
-                  WHERE pc.id_product = ?";
-$stmtCategories = $conn->prepare($sqlCategories);
-$stmtCategories->bind_param("i", $productId);
-$stmtCategories->execute();
-$resultCategories = $stmtCategories->get_result();
+// Obtener los comentarios y los nombres de los usuarios asociados
+$sqlComments = "SELECT c.id_comment, c.comment, c.id_user, c.id_parent, u.name 
+                FROM Comments c
+                JOIN User u ON c.id_user = u.id_user
+                WHERE c.id_product = ?";
+$stmtComments = $conn->prepare($sqlComments);
+$stmtComments->bind_param("i", $productId);
+$stmtComments->execute();
+$resultComments = $stmtComments->get_result();
 
-$categories = [];
-while ($row = $resultCategories->fetch_assoc()) {
-    $categories[] = $row['name'];
+$comments = [];
+while ($row = $resultComments->fetch_assoc()) {
+    $comments[] = $row;
 }
 
 if ($product) {
-    echo json_encode(['product' => $product, 'categories' => $categories]);
+    echo json_encode([
+        'product' => $product,
+        'comments' => $comments
+    ]);
 } else {
     echo json_encode(['error' => 'Producto no encontrado']);
 }
