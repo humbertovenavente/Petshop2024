@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
 import './App.css';
+
 const chunkArray = (array, size) => {
     const result = [];
     for (let i = 0; i < array.length; i += size) {
@@ -60,7 +61,7 @@ function Home() {
 
         const fetchTopProducts2 = async () => {
             try {
-                const response = await axios.get('http://72.16.71.159/getTopAllSells.php');
+                const response = await axios.get('http://172.16.71.159/getTopAllSells.php');
                 if (response.data && Array.isArray(response.data)) {
                     setProducts(response.data);
                 } else {
@@ -75,7 +76,7 @@ function Home() {
 
         const fetchTopProducts = async () => {
             try {
-                const response = await axios.get('http://72.16.71.159/topSells.php');
+                const response = await axios.get('http://172.16.71.159/topSells.php');
                 setTopProducts(response.data);
             } catch (error) {
                 console.error('Error al obtener los productos más vendidos', error);
@@ -83,7 +84,7 @@ function Home() {
         };
         const fetchSliderData = async () => {
             try {
-                const response = await axios.get('http://72.16.71.159/getHome.php');
+                const response = await axios.get('http://172.16.71.159/getHome.php');
                 setSliderData(response.data);
             } catch (error) {
                 console.error('Error al obtener los datos del slider', error);
@@ -91,7 +92,7 @@ function Home() {
         };
         const fetchFeaturedCategories = async () => {
             try {
-                const response = await axios.get('http://72.16.71.159/getFeaturedCategories.php');
+                const response = await axios.get('http://172.16.71.159/getFeaturedCategories.php');
                 setFeaturedCategories(response.data);
             } catch (error) {
                 console.error('Error al obtener las categorías destacadas', error);
@@ -99,7 +100,7 @@ function Home() {
         };
         const fetchFaqData = async () => {
             try {
-                const response = await axios.get('http://72.16.71.159/getFaq.php');
+                const response = await axios.get('http://172.16.71.159/getFaq.php');
                 setFaqData(response.data);
             } catch (error) {
                 console.error('Error fetching FAQ data:', error);
@@ -107,7 +108,7 @@ function Home() {
         };
         const fetchVideoData = async () => {
             try {
-                const response = await axios.get('http://72.16.71.159/getHomeVideo.php');
+                const response = await axios.get('http://172.16.71.159/getHomeVideo.php');
                 console.log(response.data); // Muestra la respuesta en la consola para depuración
                 // Verifica que response.data sea un array y tenga elementos
                 if (Array.isArray(response.data) && response.data.length > 0) {
