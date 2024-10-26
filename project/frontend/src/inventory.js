@@ -12,7 +12,7 @@ function InventoryAdmin() {
   // Función para obtener los productos desde el backend
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://172.16.71.159/inventory.php');
+      const response = await axios.get('http://192.168.0.16/inventory.php');
       if (Array.isArray(response.data)) {
         setProducts(response.data);
       } else {

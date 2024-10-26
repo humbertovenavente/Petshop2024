@@ -52,7 +52,7 @@ function CategoryAdmin() {
 
     const handleAddCategory = async () => {
         try {
-            await axios.post('http://172.16.71.159/addCategory.php', newCategory);
+            await axios.post('http://192.168.0.16/addCategory.php', newCategory);
             fetchCategories(); // Actualizar las categorías después de agregar
             setShowModal(false);
         } catch (error) {
@@ -62,7 +62,7 @@ function CategoryAdmin() {
 
     const handleUpdateCategory = async () => {
         try {
-            await axios.post('http://172.16.71.159/updateCategory.php', {
+            await axios.post('http://192.168.0.16/updateCategory.php', {
                 id_category: currentCategoryId,
                 name: newCategory.name,
             });
@@ -84,7 +84,7 @@ function CategoryAdmin() {
     const handleDeleteCategory = async (id_category) => {
         if (window.confirm('Are you sure you want to delete this category?')) {
             try {
-                await axios.post('http://172.16.71.159/deleteCategory.php', { id_category });
+                await axios.post('http://192.168.0.16/deleteCategory.php', { id_category });
                 fetchCategories(); // Actualizar las categorías después de eliminar
             } catch (error) {
                 console.error('Error deleting category:', error);

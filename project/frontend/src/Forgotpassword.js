@@ -13,7 +13,7 @@ function Header() {
 
     useEffect(() => {
         // Obtener categorías desde el backend
-        fetch('http://172.16.71.159/category2.php')
+        fetch('http://192.168.0.16/category2.php')
             .then(response => response.json())
             .then(data => setCategories(data))
             .catch(error => console.error('Error fetching categories:', error));

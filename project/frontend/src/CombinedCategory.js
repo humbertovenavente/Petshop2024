@@ -6,7 +6,7 @@ function CombinedCategory() {
     const [products, setProducts] = useState([]);
     
     useEffect(() => {
-        fetch(`http://172.16.71.159/CombinedCategory.php?id1=${id1}&id2=${id2}`)
+        fetch(`http://192.168.0.16/CombinedCategory.php?id1=${id1}&id2=${id2}`)
             .then(response => response.json())
             .then(data => {
                 setProducts(data);

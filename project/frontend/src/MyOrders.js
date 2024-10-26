@@ -13,7 +13,7 @@ function MyOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.post('http://172.16.71.159/getOrders.php', { email });
+        const response = await axios.post('http://192.168.0.16/getOrders.php', { email });
         setOrders(response.data.orders || []);  // Aseguramos que siempre haya un arreglo
       } catch (error) {
         console.error('Error fetching orders:', error);

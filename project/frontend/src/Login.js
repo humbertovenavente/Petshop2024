@@ -25,7 +25,7 @@ function Login() {
     setError(null); // Resetear el estado de error antes de la nueva solicitud
 
     // Enviar los datos al backend para autenticación
-    axios.post('http://172.16.71.159/login.php', values)
+    axios.post('http://192.168.0.16/login.php', values)
       .then(response => {
         const { data } = response;
 

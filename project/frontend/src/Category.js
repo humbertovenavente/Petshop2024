@@ -19,7 +19,7 @@ function Category() {
 
     // Obtener las categorías
     useEffect(() => {
-        axios.get('http://172.16.71.159/category.php') // Cambia la URL según tu configuración
+        axios.get('http://192.168.0.16/category.php') // Cambia la URL según tu configuración
         .then(response => {
             setCategories(response.data);
         })
@@ -30,7 +30,7 @@ function Category() {
 
     // Obtener los productos con más inventario (productos destacados)
     useEffect(() => {
-        axios.get('http://172.16.71.159/topProducts.php') // Cambia la URL según tu configuración
+        axios.get('http://192.168.0.16/topProducts.php') // Cambia la URL según tu configuración
         .then(response => {
             const productsData = Array.isArray(response.data) ? response.data : [];
             setTopProducts(productsData);
@@ -68,7 +68,7 @@ function Category() {
             return;
         }
 
-        axios.post('http://172.16.71.159/searchCategory.php', {
+        axios.post('http://192.168.0.16/searchCategory.php', {
             category_id: filters.category_id, 
             min_price: filters.min_price ? filters.min_price : 0, 
             max_price: filters.max_price ? filters.max_price : Infinity

@@ -27,7 +27,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchUserId = async () => {
       try {
-        const response = await axios.post('http://172.16.71.159/getUserId.php', { email });
+        const response = await axios.post('http://192.168.0.16/getUserId.php', { email });
         if (response.data.id_user) {
           setUserId(response.data.id_user); 
         } else {
@@ -47,7 +47,7 @@ function ProductDetails() {
 
   const fetchProductDetails = useCallback(async () => {
     try {
-      const response = await axios.get(`http://172.16.71.159/ProductDetails.php?productId=${productId}`);
+      const response = await axios.get(`http://192.168.0.16/ProductDetails.php?productId=${productId}`);
       setProduct(response.data.product);
       setComments(response.data.comments);
     } catch (error) {
@@ -73,7 +73,7 @@ function ProductDetails() {
     }
 
     try {
-      const response = await axios.post('http://172.16.71.159/AddComment.php', {
+      const response = await axios.post('http://192.168.0.16/AddComment.php', {
         id_product: productId,
         id_user: userId,
         comment: newComment,
@@ -102,7 +102,7 @@ function ProductDetails() {
     if (!confirmDelete) return; 
 
     try {
-      const response = await axios.post('http://172.16.71.159/DeleteComment.php', {
+      const response = await axios.post('http://192.168.0.16/DeleteComment.php', {
         id_comment: commentId
       });
 
@@ -134,7 +134,7 @@ function ProductDetails() {
     }
 
     try {
-      const response = await axios.post('http://172.16.71.159/UpdateComment.php', {
+      const response = await axios.post('http://192.168.0.16/UpdateComment.php', {
         id_comment: editingComment,
         comment: editText
       });
@@ -169,7 +169,7 @@ function ProductDetails() {
     }
 
     try {
-      const response = await axios.post('http://172.16.71.159/AddComment.php', {
+      const response = await axios.post('http://192.168.0.16/AddComment.php', {
         id_product: productId,
         id_user: userId,
         comment: replyText,
@@ -215,6 +215,44 @@ function ProductDetails() {
 
   const handleGoBack = () => {
     navigate(-1);
+  };
+
+  // Renderizar un comentario y sus replies recursivamente con colores para cada nivel
+  const renderComment = (comment, level = 0) => {
+    const colors = [ '#7f4ca', '#E6E6FA', '#C8E6C9', '#ADD8E6', '#FADADD', '#F5F5DC'];
+
+    return (
+      <li key={comment.id_comment} style={{ backgroundColor: colors[level % colors.length], padding: '10px', marginBottom: '5px', borderRadius: '5px' }}>
+        {editingComment === comment.id_comment ? (
+          <>
+            <Form.Control
+              type="text"
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+            />
+            <Button variant="primary" onClick={handleUpdateComment}>Update</Button>
+            <Button variant="secondary" onClick={() => setEditingComment(null)}>Cancel</Button>
+          </>
+        ) : (
+          <>
+            <p><strong>{comment.name}:</strong> {comment.comment}</p>
+            <Button variant="link" onClick={() => handleReply(comment.id_comment)}>Reply</Button>
+
+            {comment.id_user === userId && (
+              <>
+                <Button variant="link" onClick={() => handleEditComment(comment.id_comment, comment.comment)}>Edit</Button>
+                <Button variant="link" onClick={() => handleDeleteComment(comment.id_comment)}>Delete</Button>
+              </>
+            )}
+
+            {/* Renderizar replies con un color diferente */}
+            <ul>
+              {comments.filter(c => c.id_parent === comment.id_comment).map(reply => renderComment(reply, level + 1))}
+            </ul>
+          </>
+        )}
+      </li>
+    );
   };
 
   if (!product) {
@@ -267,74 +305,20 @@ function ProductDetails() {
 
         {/* Sección de comentarios */}
         <h3 className="mt-5">Comments</h3>
-
-        {message && (
+        <div>       
+           {message && (
           <p style={{ color: messageType === 'success' ? 'green' : 'red' }}>{message}</p>
         )}
+        </div>
 
-        
+
         <ul>
-          {comments.filter(c => c.id_parent === null).map(comment => (
-            <li key={comment.id_comment}>
-              {editingComment === comment.id_comment ? (
-                <>
-                  <Form.Control
-                    type="text"
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                  />
-                  <Button variant="primary" onClick={handleUpdateComment}>Update</Button>
-                  <Button variant="secondary" onClick={() => setEditingComment(null)}>Cancel</Button>
-                </>
-              ) : (
-                <>
-                  <p><strong>{comment.name}:</strong> {comment.comment}</p>
-                  <Button variant="link" onClick={() => handleReply(comment.id_comment)}>Reply</Button>
-
-                  {comment.id_user === userId && (
-                    <>
-                      <Button variant="link" onClick={() => handleEditComment(comment.id_comment, comment.comment)}>Edit</Button>
-                      <Button variant="link" onClick={() => handleDeleteComment(comment.id_comment)}>Delete</Button>
-                    </>
-                  )}
-
-                  <ul>
-                    {comments.filter(c => c.id_parent === comment.id_comment).map(reply => (
-                      <li key={reply.id_comment}>
-                        {editingComment === reply.id_comment ? (
-                          <>
-                            <Form.Control
-                              type="text"
-                              value={editText}
-                              onChange={(e) => setEditText(e.target.value)}
-                            />
-                            <Button variant="primary" onClick={handleUpdateComment}>Update</Button>
-                            <Button variant="secondary" onClick={() => setEditingComment(null)}>Cancel</Button>
-                          </>
-                        ) : (
-                          <>
-                            <p><strong>{reply.name}:</strong> {reply.comment}</p>
-
-                            {reply.id_user === userId && (
-                              <>
-                                <Button variant="link" onClick={() => handleEditComment(reply.id_comment, reply.comment)}>Edit</Button>
-                                <Button variant="link" onClick={() => handleDeleteComment(reply.id_comment)}>Delete</Button>
-                              </>
-                            )}
-                          </>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </li>
-          ))}
+          {comments.filter(c => c.id_parent === null).map(comment => renderComment(comment))}
         </ul>
 
         {/* Añadir comentario */}
         <h3 className="mt-5">Add a Comment</h3>
-        
+     
         <Form.Control
           type="text"
           placeholder={replyingTo ? "Replying to comment..." : "Write a comment..."}
