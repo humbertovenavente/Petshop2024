@@ -209,19 +209,19 @@ function HomeAdmin() {
             setLoading(false);
         }
     };
-    const extractYouTubeId = (url) => {
-        let videoId = '';
-        if (url.includes('youtube.com/watch?v=')) {
-            videoId = url.split('v=')[1];
-            const ampersandPosition = videoId.indexOf('&');
-            if (ampersandPosition !== -1) {
-                videoId = videoId.substring(0, ampersandPosition);
-            }
-        } else if (url.includes('youtu.be/')) {
-            videoId = url.split('youtu.be/')[1];
+    const extractVideoEmbedLink = (url) => {
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            const videoId = url.includes('youtube.com')
+                ? url.split('v=')[1].split('&')[0]
+                : url.split('/').pop();
+            return `https://www.youtube.com/embed/${videoId}`;
+        } else if (url.includes('vimeo.com')) {
+            const videoId = url.split('/').pop().split('?')[0];
+            return `https://player.vimeo.com/video/${videoId}`;
         }
-        return videoId ? videoId : null;
+        return null;
     };
+    
     const handleUpdateVideo = async () => {
         setLoading(true);
         try {
@@ -230,13 +230,12 @@ function HomeAdmin() {
                 setLoading(false);
                 return;
             }
-            const videoId = extractYouTubeId(newVideoLink);
-            if (!videoId) {
+            const embedLink = extractVideoEmbedLink(newVideoLink);
+            if (!embedLink) {
                 alert("Enlace de video inválido");
                 setLoading(false);
                 return;
             }
-            const embedLink = `https://www.youtube.com/embed/${videoId}`;
             const response = await axios.post('http://192.168.0.16/updateVideo.php', {
                 video_link: embedLink,
                 name: selectedVideoName
@@ -412,9 +411,10 @@ function HomeAdmin() {
                             width="100%"
                             height="600"
                             src={videoLink}
-                            title="Video"
                             frameBorder="0"
+                            allow="autoplay; fullscreen; picture-in-picture"
                             allowFullScreen
+                            title="Embedded Video"
                         ></iframe>
                     ) : (
                         <p>No hay video disponible.</p>
@@ -480,5 +480,3 @@ function HomeAdmin() {
     );
 }
 export default HomeAdmin;
-
-

@@ -260,22 +260,24 @@ function Home() {
                         ))}
                     </Accordion>
                 </div>
-                {/* Video Section */}
-                <div className="video-section">
-                    <h2>{videoName ? `Video: ${videoName}` : 'About Us Video'}</h2>
-                    {videoUrl ? (
-                        <iframe
-                            width="100%"
-                            height="600"
-                            src={videoUrl.replace("watch?v=", "embed/")} // Convertir el enlace en embed
-                            title="Video"
-                            frameBorder="0"
-                            allowFullScreen
-                        ></iframe>
-                    ) : (
-                        <p>No hay video disponible.</p>
-                    )}
-                </div>
+               {/* Video Section */}
+<div className="video-section">
+    <h2>{videoName ? `Video: ${videoName}` : 'About Us Video'}</h2>
+    {videoUrl ? (
+        <iframe
+            width="100%"
+            height="600"
+            src={videoUrl}  // usar videoUrl directamente ya que es un enlace de incrustación
+            frameBorder="0"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            title="Embedded Video"
+        ></iframe>
+    ) : (
+        <p>No hay video disponible.</p>
+    )}
+</div>
+
             </main>
             <Footer />
         </div>

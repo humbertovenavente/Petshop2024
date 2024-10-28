@@ -60,42 +60,52 @@ function ProductDetails() {
   }, [fetchProductDetails]);
 
   const handleAddComment = async () => {
+    console.log("Intentando agregar comentario..."); // Verifica que esta línea se imprima
+
     if (newComment.trim() === '') {
-      setMessage('Please write a comment before submitting.');
-      setMessageType('error');
-      return;
+        setMessage('Please write a comment before submitting.');
+        setMessageType('error');
+        return;
     }
 
     if (!userId) {
-      setMessage('No se puede añadir comentario sin iniciar sesión.');
-      setMessageType('error');
-      return;
+        setMessage('No se puede añadir comentario sin iniciar sesión.');
+        setMessageType('error');
+        return;
     }
 
     try {
-      const response = await axios.post('http://192.168.0.16/AddComment.php', {
-        id_product: productId,
-        id_user: userId,
-        comment: newComment,
-        id_parent: replyingTo
-      });
+        console.log("Datos enviados:", {
+            id_product: productId,
+            id_user: userId,
+            comment: newComment,
+            id_parent: replyingTo
+        }); // Muestra los datos que se enviarán
 
-      if (response.data.status === 'success') {
-        setMessage(response.data.message); 
-        setMessageType('success');
-        setNewComment('');
-        setReplyingTo(null); 
-        fetchProductDetails(); 
-      } else {
-        setMessage(response.data.message);
-        setMessageType('error');
-      }
+        const response = await axios.post('http://192.168.0.16/AddComment.php', {
+            id_product: productId,
+            id_user: userId,
+            comment: newComment,
+            id_parent: replyingTo
+        });
+
+        if (response.data.status === 'success') {
+            setMessage(response.data.message); 
+            setMessageType('success');
+            setNewComment('');
+            setReplyingTo(null); 
+            fetchProductDetails(); 
+        } else {
+            setMessage(response.data.message);
+            setMessageType('error');
+        }
     } catch (error) {
-      console.error("Error adding comment:", error);
-      setMessage('Error while adding comment.');
-      setMessageType('error');
+        console.error("Error adding comment:", error);
+        setMessage('Error while adding comment.');
+        setMessageType('error');
     }
-  };
+};
+
 
   const handleDeleteComment = async (commentId) => {
     const confirmDelete = window.confirm("Are you sure to delete this message?");
@@ -219,7 +229,7 @@ function ProductDetails() {
 
   // Renderizar un comentario y sus replies recursivamente con colores para cada nivel
   const renderComment = (comment, level = 0) => {
-    const colors = [ '#7f4ca', '#E6E6FA', '#C8E6C9', '#ADD8E6', '#FADADD', '#F5F5DC'];
+    const colors = [ '#B0B0B0', '#E6E6FA', '#C8E6C9', '#ADD8E6', '#FADADD', '#F5F5DC', '#FFD580'];
 
     return (
       <li key={comment.id_comment} style={{ backgroundColor: colors[level % colors.length], padding: '10px', marginBottom: '5px', borderRadius: '5px' }}>
