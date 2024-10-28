@@ -102,8 +102,7 @@ if ($stmt->execute()) {
         "Thank you for your regristration. Please click the following link to verify your account: <a href='$verification_link'>Verificar cuenta</a>"
     );
     
-// aca
-
+// AQUI
     try {
         $response = $sendgrid->send($email_sendgrid);
         echo json_encode(['message' => 'User created successfully. Kindly check your email to verify your account.']);

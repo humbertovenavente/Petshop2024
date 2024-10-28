@@ -11,6 +11,7 @@ import Footer from './footer';
 import Header from './header';
 import HomeAdmin from './HomeAdmin';
 import HomeAdmin2 from './HomeAdmin2';
+import ReactivateAccount from './ReactivateAccount';
 
 
 import ProductDetails from './ProductDetails';
@@ -83,6 +84,9 @@ function App() {
     <Route path='/header' element={ <Header/>}></Route>
     <Route path='/HomeAdmin' element={ <HomeAdmin/>}></Route>
     <Route path='/HomeAdmin2' element={ <HomeAdmin2/>}></Route>
+    <Route path="/reactivate" element={<ReactivateAccount />} />
+
+    
     <Route path='/Account' element={ <Account/>}></Route>
     <Route path='/UserAdmin' element={ <UserAdmin/>}></Route>
     <Route path='/CategoryAdmin' element={ <CategoryAdmin/>}></Route>

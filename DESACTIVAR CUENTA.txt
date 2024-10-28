@@ -1,0 +1,23 @@
+DROP PROCEDURE IF EXISTS disableUser;
+
+DELIMITER //
+
+CREATE PROCEDURE disableUser()
+BEGIN
+    DECLARE today_date DATE;
+    SET today_date = CURDATE();
+
+    -- Desactivar usuarios que no hayan iniciado sesión en más de un año
+    UPDATE User
+    SET status = 0
+    WHERE status = 1
+      AND DATEDIFF(today_date, last_login) >= 365;
+
+    -- Seleccionar los usuarios desactivados recientemente para enviarles el correo
+    SELECT email, name, lastname, verification_token
+    FROM User
+    WHERE status = 0 AND DATEDIFF(today_date, last_login) >= 365;
+END //
+
+DELIMITER ;
+
