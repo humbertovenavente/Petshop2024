@@ -246,6 +246,7 @@ function ProductAdmin() {
     <div id="root">
       <Header />
       <main>
+        
         <div>
           <h1>Product Management</h1>
           {error && <p className="text-danger">{error}</p>} {/* Mostrar mensaje de error si existe */}

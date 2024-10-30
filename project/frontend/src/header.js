@@ -142,6 +142,8 @@ function Header() {
             <Link to="/ProductAdmin" className="nav-link">Manage Product</Link>
             <Link to="/HomeAdmin" className="nav-link">Manage Home</Link>
             <Link to="/HomeAdmin2" className="nav-link">Manage Home 2</Link>
+            <Link to="/EditCategory" className="nav-link">Edit Category</Link>
+
           </>
         )}
       </nav>

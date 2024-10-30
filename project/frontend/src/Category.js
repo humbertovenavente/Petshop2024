@@ -1,6 +1,7 @@
+// Category.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Row, Col, Card, Button, Form } from 'react-bootstrap';
+import { Row, Col, Card, Button, Form, Tabs, Tab } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
@@ -16,29 +17,39 @@ function Category() {
         min_price: '',
         max_price: ''
     });
+    const [selectedCategories, setSelectedCategories] = useState([]); // Categorías seleccionadas
+    const [categoryDescriptions, setCategoryDescriptions] = useState({}); // Descripciones de categorías
 
-    // Obtener las categorías
+    // Obtener las categorías y sus descripciones al cargar el componente
     useEffect(() => {
-        axios.get('http://192.168.0.16/category.php') // Cambia la URL según tu configuración
-        .then(response => {
-            setCategories(response.data);
-        })
-        .catch(error => {
-            console.error("Error al obtener categorías: ", error);
-        });
+        axios.get('http://192.168.0.16/getSelectedCategories.php')
+            .then(response => {
+                const descriptions = {};
+                const selected = response.data.filter(cat => cat.selected); // Solo categorías seleccionadas
+                selected.forEach(category => {
+                    descriptions[category.id_category] = category.description || '';
+                });
+
+                setCategories(response.data);
+                setSelectedCategories(selected.map(cat => cat.id_category)); // Solo IDs seleccionados
+                setCategoryDescriptions(descriptions);
+            })
+            .catch(error => {
+                console.error("Error al obtener categorías: ", error);
+            });
     }, []);
 
-    // Obtener los productos con más inventario (productos destacados)
+    // Obtener los productos destacados
     useEffect(() => {
-        axios.get('http://192.168.0.16/topProducts.php') // Cambia la URL según tu configuración
-        .then(response => {
-            const productsData = Array.isArray(response.data) ? response.data : [];
-            setTopProducts(productsData);
-        })
-        .catch(error => {
-            console.error("Error al obtener productos destacados: ", error);
-            setTopProducts([]); // En caso de error, definimos como un array vacío
-        });
+        axios.get('http://192.168.0.16/topProducts.php')
+            .then(response => {
+                const productsData = Array.isArray(response.data) ? response.data : [];
+                setTopProducts(productsData);
+            })
+            .catch(error => {
+                console.error("Error al obtener productos destacados: ", error);
+                setTopProducts([]); // En caso de error, definimos como un array vacío
+            });
     }, []);
 
     // Manejar cambios en el formulario de búsqueda
@@ -249,6 +260,24 @@ function Category() {
                 ) : (
                     <p>No top products available</p>
                 )}
+
+                <hr /> {/* Separador para la nueva sección */}
+
+                {/* Nueva sección: Tabla dinámica de categorías */}
+                <h3>Category Table</h3>
+                <Tabs defaultActiveKey={0} id="category-tabs" className="mb-3">
+                    {selectedCategories.map((id_category, index) => {
+                        const category = categories.find(cat => cat.id_category === id_category);
+                        return (
+                            <Tab eventKey={index} title={category?.name || `Section ${index + 1}`} key={id_category}>
+                                <div className="p-3">
+                                    <h5>{category?.name}</h5>
+                                    <p>{categoryDescriptions[id_category]}</p>
+                                </div>
+                            </Tab>
+                        );
+                    })}
+                </Tabs>
             </main>
             <Footer />
         </div>

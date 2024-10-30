@@ -21,6 +21,7 @@ import CombinedCategory from './CombinedCategory';
 import Account from './Account';
 import UserAdmin from './UserAdmin';
 import CategoryAdmin from './CategoryAdmin';
+import EditCategory from './EditCategory';
 import Category from './Category';
 import CategoryProducts from './CategoryProducts';
 
@@ -90,6 +91,7 @@ function App() {
     <Route path='/Account' element={ <Account/>}></Route>
     <Route path='/UserAdmin' element={ <UserAdmin/>}></Route>
     <Route path='/CategoryAdmin' element={ <CategoryAdmin/>}></Route>
+    <Route path='/EditCategory' element={ <EditCategory/>}></Route>
     <Route path='/ProductAdmin' element={ <ProductAdmin/>}></Route>
     <Route path='/Category' element={ <Category/>}></Route>
     <Route path="/category/:categoryId/:categoryName" element={<CategoryProducts />} />
