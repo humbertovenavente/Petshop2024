@@ -16,7 +16,7 @@ function EditCategory() {
 
     // Obtener categorías, descripciones y sección guardada al montar el componente
     useEffect(() => {
-        axios.get('http://192.168.0.16/getSelectedCategories.php')
+        axios.get('http://172.16.69.227/getSelectedCategories.php')
             .then(response => {
                 const descriptions = {};
                 const initialSelectedCategories = [];
@@ -42,7 +42,7 @@ function EditCategory() {
 
     // Guardar la selección de categorías y el número de secciones en el backend
     const saveSelectedCategories = () => {
-        axios.post('http://192.168.0.16/saveCategory.php', {
+        axios.post('http://172.16.69.227/saveCategory.php', {
             selectedCategories: selectedCategories,
             section: section
         })
@@ -59,7 +59,7 @@ function EditCategory() {
     const saveDescriptions = () => {
         categories.forEach(category => {
             const description = categoryDescriptions[category.id_category] || '';
-            axios.post('http://192.168.0.16/updateCategory2.php', {
+            axios.post('http://172.16.69.227/updateCategory2.php', {
                 id_category: category.id_category,
                 description: description
             })
@@ -89,9 +89,9 @@ function EditCategory() {
     };
 
     return (
-        <div>
-            <Header />
-            <main className="container my-5">
+        <div id="root">
+        <Header />
+        <main className="container my-5">
                 <h1>Edit Categories</h1>
 
                 {/* Botones para abrir los modales */}

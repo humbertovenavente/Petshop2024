@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'CLI') {
 }
 
 // Configuración de la base de datos
-$host = '192.168.0.16';
+$host = '172.16.69.227';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';

@@ -11,7 +11,7 @@ function Footer() {
     try {
       if (email) {
         // Actualizar el last_login antes de hacer el logout
-        await axios.post('http://192.168.0.16/lastlogin.php', { email });
+        await axios.post('http://172.16.69.227/lastlogin.php', { email });
       }
   
       // Guardar los artículos del carrito antes de limpiar el localStorage
@@ -32,9 +32,9 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        <Link to="/about">About Us</Link>
-        <Link to="/social">Social</Link>
-        <Link to="/contact">Contact Us</Link>
+        <Link to="/aboutus">About Us</Link>
+        <Link to="/aboutus">Social</Link>
+        <Link to="/aboutus">Contact Us</Link>
 
         {/* Mostrar el botón de Log Out solo si el rol es '1', '2' o '3' */}
         {(userRole === '1' || userRole === '2' || userRole === '3') && (

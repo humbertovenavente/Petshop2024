@@ -21,7 +21,7 @@ function ManageOrder() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('http://192.168.0.16/getAllOrders.php'); 
+      const response = await fetch('http://172.16.69.227/getAllOrders.php'); 
       const data = await response.json();
       if (data.success) {
         setOrders(data.orders); 

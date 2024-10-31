@@ -16,7 +16,7 @@ function HomeAdmin2() {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const response = await axios.get('http://192.168.0.16/getSettings.php');
+                const response = await axios.get('http://172.16.69.227/getSettings.php');
                 const { categories, limit } = response.data;
                 setSelectedCategories(categories || []);
                 setLimit(limit || 10);
@@ -27,7 +27,7 @@ function HomeAdmin2() {
 
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://192.168.0.16/category.php');
+                const response = await axios.get('http://172.16.69.227/category.php');
                 setCategories(response.data);
             } catch (error) {
                 console.error('Error fetching categories', error);
@@ -49,7 +49,7 @@ function HomeAdmin2() {
     const saveSettings = async () => {
         setLoading(true);
         try {
-            await axios.post('http://192.168.0.16/saveSettings.php', {
+            await axios.post('http://172.16.69.227/saveSettings.php', {
                 categories: selectedCategories,
                 limit: limit
             });

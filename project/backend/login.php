@@ -10,7 +10,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");  
 
 // Configuración de la base de datos
-$host = '192.168.0.16';
+$host = '172.16.69.227';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';

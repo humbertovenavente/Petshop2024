@@ -12,6 +12,7 @@ import Header from './header';
 import HomeAdmin from './HomeAdmin';
 import HomeAdmin2 from './HomeAdmin2';
 import ReactivateAccount from './ReactivateAccount';
+import AboutUs from './aboutus';
 
 
 import ProductDetails from './ProductDetails';
@@ -74,6 +75,7 @@ function App() {
     <Routes>
     <Route path='/' element={ <Home/>}></Route>
     <Route path='/signup' element={ <Signup/>}></Route>
+    <Route path='/aboutus' element={ <AboutUs/>}></Route>
     <Route path='/forgotpassword' element={ <Forgotpassword/>}></Route>
     <Route path='/ResetPassword' element={ <ResetPassword/>}></Route>
     <Route path="/admin" element={<ProtectedRoute allowedRoles={[1, 2, 3]}><Admin /></ProtectedRoute>} />
