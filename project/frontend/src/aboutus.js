@@ -13,14 +13,14 @@ function AboutUs() {
                 <p>At Michigan, we are passionate about pets and dedicated to providing the best products and services for our furry, feathered, and scaly friends. Established in [Year], our pet shop has grown from a small local store to a trusted name in the community, offering a wide range of high-quality pet supplies and accessories.</p>
                 
                 <div className="image-gallery">
-                    <img src={require('./assets/imagen1.jpeg')} alt="Imagen 1" />
+                    <img src={require('./assets/imagen1.jpg')} alt="Imagen 1" />
                 </div>
                 
                 <h3>Our Mission</h3>
                 <p>Our mission is to enhance the lives of pets and their owners by offering exceptional products, expert advice, and outstanding customer service. We believe that pets are family, and we strive to ensure that every pet has a happy and healthy life.</p>
                 
                 <div className="image-gallery">
-                    <img src={require('./assets/imagen2.jpeg')} alt="Imagen 2" />
+                    <img src={require('./assets/imagen2.jpg')} alt="Imagen 2" />
                 </div>
 
                 <h3>What We Offer</h3>
@@ -32,14 +32,14 @@ function AboutUs() {
                 </ul>
 
                 <div className="image-gallery">
-                    <img src={require('./assets/imagen3.jpeg')} alt="Imagen 3" />
+                    <img src={require('./assets/imagen3.jpg')} alt="Imagen 3" />
                 </div>
 
                 <h3>Our Team</h3>
                 <p>Our dedicated team is made up of passionate pet lovers who understand the importance of quality care for pets. With years of experience in the pet industry, we are committed to providing you with the best service and advice possible.</p>
 
                 <div className="image-gallery">
-                    <img src={require('./assets/imagen4.jpeg')} alt="Imagen 4" />
+                    <img src={require('./assets/imagen4.jpg')} alt="Imagen 4" />
                 </div>
 
                 <h3>Community Involvement</h3>
@@ -50,13 +50,13 @@ function AboutUs() {
                 <h4>Contact Us</h4>
                 <p>For more information about our products and services, please feel free to contact us:</p>
                 <ul>
-                    <li><strong>Email:</strong> humbertovenavente7@gmail.com</li>
+                    <li><strong>Email:</strong> humberto107_hotmail.com</li>
                     <li><strong>Phone:</strong> (123) 456-7890</li>
                     <li><strong>Address:</strong> 123 Pet Lane, Pet City, ST 12345</li>
                 </ul>
 
                 <div className="image-gallery">
-                    <img src={require('./assets/imagen5.jpeg')} alt="Imagen 5" />
+                    <img src={require('./assets/imagen5.jpg')} alt="Imagen 5" />
                 </div>
             </main>
             <Footer />

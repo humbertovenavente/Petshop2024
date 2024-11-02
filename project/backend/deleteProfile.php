@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Configuración de la base de datos
-$host = '172.16.69.227';  
+$host = '192.168.0.14';  
 $db = 'project';
 $user = 'humbe';  
 $pass = 'tu_contraseña';
@@ -21,7 +21,8 @@ $conn = new mysqli($host, $user, $pass, $db);
 
 // Verificar la conexión
 if ($conn->connect_error) {
-    die(json_encode(['error' => "Conexión fallida: " . $conn->connect_error]));
+    echo json_encode(['success' => false, 'message' => "Conexión fallida: " . $conn->connect_error]);
+    exit();
 }
 
 // Leer los datos enviados en el cuerpo de la solicitud POST
@@ -29,7 +30,7 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 // Verificar que el id_user está presente
 if (!isset($data['id_user'])) {
-    echo json_encode(['error' => 'Falta el id_user']);
+    echo json_encode(['success' => false, 'message' => 'Falta el id_user']);
     exit();
 }
 
@@ -39,10 +40,8 @@ $id_user = $data['id_user'];
 $sql = "DELETE FROM User WHERE id_user = ?";
 $stmt = $conn->prepare($sql);
 
-// Verificar si la preparación de la consulta falló
 if (!$stmt) {
-    echo json_encode(['error' => "Error en la preparación de la consulta: " . $conn->error]);
-    $conn->close();
+    echo json_encode(['success' => false, 'message' => "Error en la preparación de la consulta: " . $conn->error]);
     exit();
 }
 
@@ -51,12 +50,11 @@ $stmt->bind_param("i", $id_user);
 
 // Ejecutar la consulta y verificar si fue exitosa
 if ($stmt->execute()) {
-    echo json_encode(['message' => 'Usuario eliminado exitosamente']);
+    echo json_encode(['success' => true, 'message' => 'Usuario eliminado exitosamente']);
 } else {
-    echo json_encode(['error' => 'Error al eliminar el usuario', 'details' => $stmt->error]);
+    echo json_encode(['success' => false, 'message' => 'Error al eliminar el usuario']);
 }
 
 // Cerrar la declaración y la conexión
 $stmt->close();
 $conn->close();
-?>

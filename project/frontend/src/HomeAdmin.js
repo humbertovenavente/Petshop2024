@@ -34,7 +34,7 @@ function HomeAdmin() {
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
-                const response = await axios.get('http://172.16.69.227/getHome.php');
+                const response = await axios.get('http://192.168.0.14/getHome.php');
                 const data = response.data;
                 setSlider1(`data:image/jpeg;base64,${data.slider1}`);
                 setSlider2(`data:image/jpeg;base64,${data.slider2}`);
@@ -51,7 +51,7 @@ function HomeAdmin() {
         };
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://172.16.69.227/category.php');
+                const response = await axios.get('http://192.168.0.14/category.php');
                 setCategories(response.data);
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -59,7 +59,7 @@ function HomeAdmin() {
         };
         const fetchSavedCategories = async () => {
             try {
-                const response = await axios.get('http://172.16.69.227/getFeaturedCategories.php');
+                const response = await axios.get('http://192.168.0.14/getFeaturedCategories.php');
                 const data = response.data || [];
                 setSavedCategories(data);
                 setSelectedCategories(data.map(category => category.id_category));
@@ -69,7 +69,7 @@ function HomeAdmin() {
         };
         const fetchFaqData = async () => {
             try {
-                const response = await axios.get('http://172.16.69.227/getFaq.php');
+                const response = await axios.get('http://192.168.0.14/getFaq.php');
                 setFaqData(response.data || []);
             } catch (error) {
                 console.error('Error fetching FAQ data:', error);
@@ -77,7 +77,7 @@ function HomeAdmin() {
         };
         const fetchVideos = async () => {
             try {
-                const response = await axios.get('http://172.16.69.227/getVideo.php');
+                const response = await axios.get('http://192.168.0.14/getVideo.php');
                 setVideoList(response.data);
                 if (response.data.length > 0) {
                     setVideoLink(response.data[0].video_link);
@@ -105,17 +105,17 @@ function HomeAdmin() {
     const saveImage = async (field, imageData) => {
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.69.227/updateHome.php', {
+            const response = await axios.post('http://192.168.0.14/updateHome.php', {
                 field: field,
                 slider: imageData.split(',')[1],
             });
             if (response.data.error) {
-                alert(`Error guardando ${field}: ${response.data.error}`);
+                alert(`Error saving ${field}: ${response.data.error}`);
             } else {
-                alert(`${field} guardado correctamente`);
+                alert(`${field} saved successfully`);
             }
         } catch (error) {
-            console.error(`Error guardando ${field}:`, error);
+            console.error(`Error saving ${field}:`, error);
         } finally {
             setLoading(false);
         }
@@ -123,17 +123,17 @@ function HomeAdmin() {
     const saveText = async (field, value) => {
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.69.227/updateHome.php', {
+            const response = await axios.post('http://192.168.0.14/updateHome.php', {
                 field: field,
                 text: value,
             });
             if (response.data.error) {
-                alert(`Error guardando ${field}: ${response.data.error}`);
+                alert(`Error saving ${field}: ${response.data.error}`);
             } else {
-                alert(`${field} guardado correctamente`);
+                alert(`${field} successfully saved`);
             }
         } catch (error) {
-            console.error(`Error guardando ${field}:`, error);
+            console.error(`Error saving ${field}:`, error);
         } finally {
             setLoading(false);
         }
@@ -148,7 +148,7 @@ function HomeAdmin() {
     const saveFeaturedCategories = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.69.227/saveFeaturedCategories.php', { categories: selectedCategories });
+            const response = await axios.post('http://192.168.0.14/saveFeaturedCategories.php', { categories: selectedCategories });
             if (response.data.error) {
                 alert('Error saving featured categories: ' + response.data.error);
             } else {
@@ -173,7 +173,7 @@ function HomeAdmin() {
     const handleSaveFaq = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.69.227/updateFaq.php', currentFaq);
+            const response = await axios.post('http://192.168.0.14/updateFaq.php', currentFaq);
             if (response.data.success) {
                 alert('FAQ updated successfully');
                 setShowFaqModal(false);
@@ -196,7 +196,7 @@ function HomeAdmin() {
         if (!confirmDelete) return;
         setLoading(true);
         try {
-            const response = await axios.post('http://172.16.69.227/deleteFaq.php', { id });
+            const response = await axios.post('http://192.168.0.14/deleteFaq.php', { id });
             if (response.data.success) {
                 alert('FAQ deleted successfully');
                 setFaqData(faqData.filter(f => f.id !== id));
@@ -226,24 +226,24 @@ function HomeAdmin() {
         setLoading(true);
         try {
             if (!newVideoLink || !selectedVideoName) {
-                alert("Por favor selecciona un video y proporciona un nuevo enlace válido");
+                alert("Please add a valid video");
                 setLoading(false);
                 return;
             }
             const embedLink = extractVideoEmbedLink(newVideoLink);
             if (!embedLink) {
-                alert("Enlace de video inválido");
+                alert("Invalid link");
                 setLoading(false);
                 return;
             }
-            const response = await axios.post('http://172.16.69.227/updateVideo.php', {
+            const response = await axios.post('http://192.168.0.14/updateVideo.php', {
                 video_link: embedLink,
                 name: selectedVideoName
             });
             if (response.data.error) {
-                alert(`Error actualizando el video: ${response.data.error}`);
+                alert(`Error updating video: ${response.data.error}`);
             } else {
-                alert('Video actualizado correctamente');
+                alert('Video updated successfully ');
                 setVideoLink(embedLink);
                 setVideoList(
                     videoList.map((video) =>
@@ -252,7 +252,7 @@ function HomeAdmin() {
                 );
             }
         } catch (error) {
-            console.error('Error actualizando el video:', error);
+            console.error('Error updating video:', error);
         } finally {
             setLoading(false);
             setShowEditModal(false);
@@ -263,19 +263,19 @@ function HomeAdmin() {
         if (selectedVideo) {
             setVideoLink(selectedVideo.video_link);
             try {
-                await axios.post('http://172.16.69.227/updateHomeVideo.php', {
+                await axios.post('http://192.168.0.14/updateHomeVideo.php', {
                     video_link: selectedVideo.video_link
                 });
             } catch (error) {
-                console.error('Error actualizando el video en Home:', error);
+                console.error('Error updating video:', error);
             }
         }
         setShowVideoModal(false);
     };
     return (
-        <div id="root">
+        <div id="root" >
             <Header />
-            <main className="main">
+            <main className="main container my-5">
                 <h1>Admin Home Settings</h1>
                 <div className="slider-section">
                     <h2>Slider 1</h2>
@@ -411,23 +411,23 @@ function HomeAdmin() {
                             width="100%"
                             height="600"
                             src={videoLink}
-                            frameBorder="0"
+    
                             allow="autoplay; fullscreen; picture-in-picture"
                             allowFullScreen
                             title="Embedded Video"
                         ></iframe>
                     ) : (
-                        <p>No hay video disponible.</p>
+                        <p>No video available</p>
                     )}
                 </div>
-                <Button onClick={() => setShowEditModal(true)}>Actualizar Video Existente</Button>
+                <Button onClick={() => setShowEditModal(true)}>Update video</Button>
                 <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Actualizar Video</Modal.Title>
+                        <Modal.Title>Update video</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <select value={selectedVideoName} onChange={(e) => setSelectedVideoName(e.target.value)}>
-                            <option value="">Selecciona un video</option>
+                            <option value="">Select video</option>
                             {videoList.map((video) => (
                                 <option key={video.id} value={video.name}>
                                     {video.name}
@@ -438,26 +438,26 @@ function HomeAdmin() {
                             type="text"
                             value={newVideoLink}
                             onChange={(e) => setNewVideoLink(e.target.value)}
-                            placeholder="Nuevo enlace del video"
+                            placeholder="New video"
                         />
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-                            Cerrar
+                            Close
                         </Button>
                         <Button variant="primary" onClick={handleUpdateVideo} disabled={loading || !selectedVideoName}>
                             {loading ? <Spinner animation="border" size="sm" /> : 'Actualizar Video'}
                         </Button>
                     </Modal.Footer>
                 </Modal>
-                <Button onClick={() => setShowVideoModal(true)}>Mostrar Video</Button>
+                <Button onClick={() => setShowVideoModal(true)}>Check video</Button>
                 <Modal show={showVideoModal} onHide={() => setShowVideoModal(false)}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Seleccionar Video para Mostrar</Modal.Title>
+                        <Modal.Title>Choose video</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <select value={selectedVideoToShow} onChange={(e) => setSelectedVideoToShow(e.target.value)}>
-                            <option value="">Selecciona un video</option>
+                            <option value="">Select video</option>
                             {videoList.map((video) => (
                                 <option key={video.id} value={video.name}>
                                     {video.name}
@@ -467,7 +467,7 @@ function HomeAdmin() {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={() => setShowVideoModal(false)}>
-                            Cerrar
+                            Close
                         </Button>
                         <Button variant="primary" onClick={handleShowSelectedVideo} disabled={!selectedVideoToShow}>
                             {loading ? <Spinner animation="border" size="sm" /> : 'Mostrar Video'}

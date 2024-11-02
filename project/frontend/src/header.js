@@ -15,7 +15,7 @@ function Header() {
 
   // Obtener categorías desde category2.php
   useEffect(() => {
-    fetch('http://172.16.69.227/category2.php')
+    fetch('http://192.168.0.14/category2.php')
       .then(response => response.json())
       .then(data => {
         setCategories(data);
@@ -34,7 +34,7 @@ function Header() {
 
     if (term.length > 2) { // Realizar la búsqueda solo si hay más de 2 caracteres
       try {
-        const response = await fetch(`http://172.16.69.227/searchProducts.php?term=${term}`);
+        const response = await fetch(`http://192.168.0.14/searchProducts.php?term=${term}`);
         const data = await response.json();
         setSearchResults(data);
       } catch (error) {
@@ -143,6 +143,7 @@ function Header() {
             <Link to="/HomeAdmin" className="nav-link">Manage Home</Link>
             <Link to="/HomeAdmin2" className="nav-link">Manage Home 2</Link>
             <Link to="/EditCategory" className="nav-link">Edit Category</Link>
+            <Link to="/shipping-config">Shipping Cost</Link>
 
           </>
         )}

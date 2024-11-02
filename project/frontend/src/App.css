@@ -109,11 +109,12 @@ main {
   width: 100%;
   z-index: 999;
   font-size: 22px;
+  flex-wrap: wrap;
 }
 
 .nav-link {
   color: black;
-  margin: 0 30px;
+  margin: 0 15px;
   text-decoration: none;
   font-size: 20px;
 }
@@ -528,7 +529,19 @@ button:hover {
   .cart-icon {
     width: 30px;
   }
+
+  .nav-bar {
+    font-size: 18px;
+    padding: 10px 0;
+  }
+
+  .nav-link {
+    margin: 0 10px; /* Reduce aún más el margen */
+    font-size: 16px;
+  }
 }
+
+
 
 @media (max-width: 480px) {
   .header {
@@ -560,7 +573,7 @@ button:hover {
   }
 
   .nav-link {
-    margin: 0 10px;
+    margin: 0 5px;
     font-size: 14px;
   }
 }

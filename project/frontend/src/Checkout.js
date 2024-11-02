@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form } from 'react-bootstrap';
+import { Button, Modal, Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Header from './header';
 import Footer from './footer';
+import { shippingConfig } from './shipping'; // Importar configuración de envío
 
 function Checkout() {
   const [cartItems, setCartItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [shipping, setShipping] = useState(0);
   const [orderConfirmation, setOrderConfirmation] = useState(false);
-  const [orderId, setOrderId] = useState(null); // Para manejar el número de orden
+  const [orderId, setOrderId] = useState(null);
   const [shippingAddress, setShippingAddress] = useState({
     address: '',
     city: '',
@@ -23,9 +24,8 @@ function Checkout() {
     expiration: '',
     cvv: ''
   });
-
+  const [warningMessage, setWarningMessage] = useState('');
   const navigate = useNavigate();
-
   const [showAddressConfirmation, setShowAddressConfirmation] = useState(false);
   const [showCreditConfirmation, setShowCreditConfirmation] = useState(false);
 
@@ -35,7 +35,7 @@ function Checkout() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.post('http://172.16.69.227/profile.php', {
+        const response = await axios.post('http://192.168.0.14/profile.php', {
           email,
           password,
         });
@@ -69,49 +69,63 @@ function Checkout() {
     const totalAmount = inStockItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     setTotal(totalAmount);
 
-    setShipping(totalAmount >= 500 ? 0 : 35);
+    // Usar configuración dinámica para el cálculo del envío
+    setShipping(totalAmount >= shippingConfig.freeShippingThreshold ? 0 : shippingConfig.shippingCost);
   }, [email, password]);
 
+  const isOrderDataComplete = () => {
+    return (
+      shippingAddress.address && 
+      shippingAddress.city && 
+      shippingAddress.country && 
+      shippingAddress.zip &&
+      creditCard.name &&
+      creditCard.cardNumber &&
+      creditCard.expiration &&
+      creditCard.cvv
+    );
+  };
+
   const handlePlaceOrder = async () => {
+    if (!isOrderDataComplete()) {
+      setWarningMessage("Missing information on shipping address or credit card, please edit it.");
+      return;
+    }
+
     try {
-      // Realizar la petición para crear el pedido
-      const orderResponse = await axios.post('http://172.16.69.227/placeOrder.php', {
+      const orderResponse = await axios.post('http://192.168.0.14/placeOrder.php', {
         email,
-        total: total + shipping,  // Aquí se envía el total correcto
+        total: total + shipping,
         items: cartItems,
       });
   
       if (orderResponse.data.id_order) {
-        // Si la orden fue creada correctamente
-        setOrderId(orderResponse.data.id_order); // Obtener el número de orden (id_order)
-        setOrderConfirmation(true); // Mostrar la confirmación de orden
-  
-        // Limpiar el carrito una vez se completa la orden
-        localStorage.removeItem('cart');  // Aquí limpiamos el carrito
-        setCartItems([]);  // Actualizamos el estado para reflejar el carrito vacío
+        setOrderId(orderResponse.data.id_order);
+        setOrderConfirmation(true);
+        localStorage.removeItem('cart');
+        setCartItems([]);
       } else {
-        alert("An error occured. Try again.");
+        alert("An error occurred. Try again.");
       }
     } catch (error) {
       console.error("Error placing order:", error);
-      alert("An error occured. Try again.");
+      alert("An error occurred. Try again.");
     }
   };
-  
-  
 
   const handleEditShipping = () => {
-    setShowAddressConfirmation(true); // Mostrar modal de confirmación
+    setShowAddressConfirmation(true);
   };
 
   const handleEditCreditCard = () => {
-    setShowCreditConfirmation(true); // Mostrar modal de confirmación
+    setShowCreditConfirmation(true);
   };
 
   const handleGoBack = () => {
-    navigate(-1);  // Regresar a la página anterior
+    navigate(-1);
   };
 
+  // Define handleRemoveItem to remove an item from the cart
   const handleRemoveItem = (itemId) => {
     const updatedItems = cartItems.filter((item) => item.id_product !== itemId);
     setCartItems(updatedItems);
@@ -119,6 +133,7 @@ function Checkout() {
     setTotal(updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0));
   };
 
+  // Define handleQuantityChange to change the quantity of items in the cart
   const handleQuantityChange = (e, itemId) => {
     const newQuantity = parseInt(e.target.value);
     const updatedItems = cartItems.map((item) => {
@@ -138,7 +153,8 @@ function Checkout() {
       <main className="container my-5">
         <h1>Checkout</h1>
 
-        {/* shipping address */}
+        {warningMessage && <Alert variant="danger">{warningMessage}</Alert>}
+
         <h2>Shipping Address</h2>
         <p>Address: {shippingAddress.address || 'No disponible'}</p>
         <p>City: {shippingAddress.city || 'No disponible'}</p>
@@ -146,7 +162,6 @@ function Checkout() {
         <p>Zip Code: {shippingAddress.zip || 'No disponible'}</p>
         <Button onClick={handleEditShipping}>Edit Shipping Address</Button>
 
-        {/* CC*/}
         <h2>Credit Card Information</h2>
         <p>Name on Card: {creditCard.name || 'No disponible'}</p>
         <p>Card Number: {creditCard.cardNumber || 'No disponible'}</p>
@@ -154,7 +169,6 @@ function Checkout() {
         <p>CVV: {creditCard.cvv || 'No disponible'}</p>
         <Button onClick={handleEditCreditCard}>Edit Credit Card</Button>
 
-        {/* Products */}
         <h2>Review Item and Shipping</h2>
         {cartItems.map((item) => (
           <div key={item.id_product} className="card mb-3">
@@ -198,26 +212,32 @@ function Checkout() {
             </div>
           </div>
         ))}
-          {/* Condition regarding shipping */}
-        <p>Shipping: {total >= 500 ? 'Free Shipping' : `$${shipping}`}</p>
+        
+        <p>Shipping: {total >= shippingConfig.freeShippingThreshold ? 'Free Shipping' : `$${shippingConfig.shippingCost}`}</p>
 
         <div className="card p-3">
           <p><strong>Quantity of products:</strong> {cartItems.length}</p>
           <p><strong>Total:</strong> ${(total + shipping).toFixed(2)}</p>
-          <Button variant="success" onClick={handlePlaceOrder}>Place your order</Button>
+          <Button 
+            variant="success" 
+            onClick={handlePlaceOrder} 
+            disabled={!isOrderDataComplete()}
+          >
+            Place your order
+          </Button>
         </div>
 
         <Button variant="secondary" onClick={handleGoBack} className="mt-3">
           Back to Cart
         </Button>
 
-        {/* Modal de confirmación para la dirección */}
+        {/* Modales de confirmación */}
         <Modal show={showAddressConfirmation} onHide={() => setShowAddressConfirmation(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Edit Shipping Address</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-          Please go to your account to edit this information. Would you like to edit it?
+            Please go to your account to edit this information. Would you like to edit it?
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowAddressConfirmation(false)}>
@@ -229,7 +249,6 @@ function Checkout() {
           </Modal.Footer>
         </Modal>
 
-        {/* Modal de confirmación para la tarjeta de crédito */}
         <Modal show={showCreditConfirmation} onHide={() => setShowCreditConfirmation(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Edit Credit Card</Modal.Title>
@@ -247,7 +266,6 @@ function Checkout() {
           </Modal.Footer>
         </Modal>
 
-        {/* Modal de confirmación de pedido */}
         <Modal show={orderConfirmation} onHide={() => setOrderConfirmation(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Order Confirmation</Modal.Title>
@@ -256,7 +274,7 @@ function Checkout() {
             Order confirmed. Your order number is: {orderId}. What would you like to do?
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => navigate('/')}>Go back to  Home</Button>
+            <Button variant="secondary" onClick={() => navigate('/')}>Go back to Home</Button>
             <Button variant="primary" onClick={() => navigate('/MyOrders')}>View my Order</Button>
           </Modal.Footer>
         </Modal>

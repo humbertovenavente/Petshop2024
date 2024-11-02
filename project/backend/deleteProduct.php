@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Database connection
-$host = '172.16.69.227';
+$host = '192.168.0.14';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
@@ -52,7 +52,7 @@ $stmt->bind_param("i", $id_product);
 if ($stmt->execute()) {
     echo json_encode(['message' => 'Product deleted successfully']);
 } else {
-    echo json_encode(['error' => 'Error deleting product', 'details' => $stmt->error]);
+    echo json_encode(['error' => 'Error deleting product', 'details' => $stmt->error]); // Muestra detalles del error
 }
 
 $stmt->close();

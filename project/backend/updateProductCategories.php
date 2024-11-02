@@ -8,7 +8,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
-$servername = "172.16.69.227";
+$servername = "192.168.0.14";
 $username = "humbe";
 $password = "tu_contraseña";
 $dbname = "project";

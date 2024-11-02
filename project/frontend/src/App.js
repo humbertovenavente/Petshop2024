@@ -14,6 +14,7 @@ import HomeAdmin2 from './HomeAdmin2';
 import ReactivateAccount from './ReactivateAccount';
 import AboutUs from './aboutus';
 
+import AdminShippingConfig from './adminshipping';
 
 import ProductDetails from './ProductDetails';
 
@@ -112,6 +113,9 @@ function App() {
     <Route path='/Home' element={ <Home/>}></Route>
     <Route path="/cart" element={<Cart />} />
     <Route path="/checkout" element={<Checkout />} />
+    <Route path="/shipping-config" element={<AdminShippingConfig />} />
+
+
     <Route path='/Tracking' element={ <Tracking/>}></Route>
     <Route path="/orderDetails/:orderId" element={<Tracking />} />
     <Route path="/editOrder/:id_order" element={<EditOrder />} />

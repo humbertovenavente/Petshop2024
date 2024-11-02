@@ -1,4 +1,3 @@
-// Category.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Row, Col, Card, Button, Form, Tabs, Tab } from 'react-bootstrap';
@@ -15,14 +14,15 @@ function Category() {
     const [filters, setFilters] = useState({
         category_id: '', 
         min_price: '',
-        max_price: ''
+        max_price: '',
+        search_term: '' // Nuevo estado para el término de búsqueda por texto
     });
     const [selectedCategories, setSelectedCategories] = useState([]); // Categorías seleccionadas
     const [categoryDescriptions, setCategoryDescriptions] = useState({}); // Descripciones de categorías
 
     // Obtener las categorías y sus descripciones al cargar el componente
     useEffect(() => {
-        axios.get('http://172.16.69.227/getSelectedCategories.php')
+        axios.get('http://192.168.0.14/getSelectedCategories.php')
             .then(response => {
                 const descriptions = {};
                 const selected = response.data.filter(cat => cat.selected); // Solo categorías seleccionadas
@@ -41,7 +41,7 @@ function Category() {
 
     // Obtener los productos destacados
     useEffect(() => {
-        axios.get('http://172.16.69.227/topProducts.php')
+        axios.get('http://192.168.0.14/topProducts.php')
             .then(response => {
                 const productsData = Array.isArray(response.data) ? response.data : [];
                 setTopProducts(productsData);
@@ -79,10 +79,11 @@ function Category() {
             return;
         }
 
-        axios.post('http://172.16.69.227/searchCategory.php', {
+        axios.post('http://192.168.0.14/searchCategory.php', {
             category_id: filters.category_id, 
             min_price: filters.min_price ? filters.min_price : 0, 
-            max_price: filters.max_price ? filters.max_price : Infinity
+            max_price: filters.max_price ? filters.max_price : Infinity,
+            search_term: filters.search_term // Enviar el término de búsqueda al backend
         })
         .then(response => {
             setProducts(response.data);
@@ -122,7 +123,7 @@ function Category() {
                 {/* Formulario de búsqueda */}
                 <Form className="mb-4">
                     <Row>
-                        <Col md={4}>
+                        <Col md={3}>
                             <Form.Group>
                                 <Form.Label>Category</Form.Label>
                                 <Form.Control
@@ -140,25 +141,36 @@ function Category() {
                                 </Form.Control>
                             </Form.Group>
                         </Col>
-                        <Col md={4}>
+                        <Col md={3}>
                             <Form.Group>
-                                <Form.Label>Minimun Price</Form.Label>
+                                <Form.Label>Minimum Price</Form.Label>
                                 <Form.Control
                                     type="number"
                                     name="min_price"
                                     onChange={handleInputChange}
-                                    placeholder="Minimun Price"
+                                    placeholder="Minimum Price"
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={4}>
+                        <Col md={3}>
                             <Form.Group>
-                                <Form.Label>Max Price</Form.Label>
+                                <Form.Label>Maximum Price</Form.Label>
                                 <Form.Control
                                     type="number"
                                     name="max_price"
                                     onChange={handleInputChange}
                                     placeholder="Max Price"
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={3}>
+                            <Form.Group>
+                                <Form.Label>Search Term</Form.Label> {/* Nuevo campo de búsqueda */}
+                                <Form.Control
+                                    type="text"
+                                    name="search_term"
+                                    onChange={handleInputChange}
+                                    placeholder="Search by name or description"
                                 />
                             </Form.Group>
                         </Col>
@@ -174,7 +186,6 @@ function Category() {
                             <Col key={index} md={4} className="mb-4">
                                 <Card>
                                     <Card.Body>
-                                        {/* Mostrar la imagen si está disponible */}
                                         {product.image ? (
                                             <img
                                                 src={`data:image/jpeg;base64,${product.image}`} 
@@ -186,7 +197,6 @@ function Category() {
                                         )}
                                         <Card.Title>{product.name || 'No Name Available'}</Card.Title>
                                         <Card.Text>Price: ${product.price || 'Not Available'}</Card.Text>
-                                        <Card.Text>Category: {product.category_name || 'No Category'}</Card.Text>
                                         <Link to={`/ProductDetails/${product.id_product}`}>
                                             <Button variant="primary">View Product</Button>
                                         </Link>
@@ -225,7 +235,7 @@ function Category() {
                 <hr /> {/* Separador entre las categorías y el carrusel */}
 
                 {/* Carrusel de productos destacados */}
-                <h3>Top Products by Inventory</h3>
+                <h3>Top Products</h3>
                 {topProducts.length > 0 ? (
                     <Carousel responsive={responsive} infinite={true} autoPlay={true} autoPlaySpeed={3000}>
                         {topProducts.map((product, index) => (

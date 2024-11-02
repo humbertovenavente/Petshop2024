@@ -1,81 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-function Header() {
-    const userRole = parseInt(localStorage.getItem('userRole')) || 'guest';
-    const [isDropdownOpen, setDropdownOpen] = useState(false);
-    const [categories, setCategories] = useState([]);
-    const [activeCategory, setActiveCategory] = useState(null); 
+function ForgotPassword() {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    const handleDropdownToggle = () => {
-        setDropdownOpen(!isDropdownOpen);
-    };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setLoading(true);
 
-    useEffect(() => {
-        // Obtener categorías desde el backend
-        fetch('http://172.16.69.227/category2.php')
-            .then(response => response.json())
-            .then(data => setCategories(data))
-            .catch(error => console.error('Error fetching categories:', error));
-    }, []);
+    axios.post('/api/forgot-password', { email })
+      .then((response) => {
+        setLoading(false);
+        if (response.data.success) {
+          alert('Reset password email was sent to you, please check your email');
+          navigate('/login');
+        } else if (response.data.error) {
+          alert(response.data.error);
+        }
+      })
+      .catch(() => {
+        setLoading(false);
+        alert('Something went wrong. Please try again later.');
+      });
+  };
 
-    const handleCategoryHover = (category) => {
-        setActiveCategory(category);
-    };
+  return (
+    <div className='d-flex justify-content-center align-items-center vh-100' style={{ backgroundColor: 'darkorange' }}>
+      <div className='bg-white p-3 rounded w-25'>
+        <form onSubmit={handleSubmit}>
+          <h2>Forgot Password</h2>
 
-    return (
-        <>
-            <header className="header">
-                <div className="logo-and-search">
-                    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="Logo" className="logo" />
-                    <input type="text" className="search-bar" placeholder="Search" />
-                </div>
+          <div className='mb-3'>
+            <label htmlFor='email'>Email</label>
+            <input
+              type="email"
+              placeholder='Enter email'
+              className='form-control rounded-0'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-                <div className="account-and-cart">
-                    {userRole !== 'guest' && <Link to="/Account" className="account-link">My Account</Link>}
-                    {userRole !== 'guest' && <Link to="/MyOrders" className="order-link">My Orders</Link>}
-                    <Link to="/cart">
-                        <img src="https://img.icons8.com/ios-filled/50/000000/shopping-cart.png" alt="Shopping Cart" className="cart-icon" />
-                    </Link>
-                </div>
-            </header>
+          <button type='submit' className='btn btn-success w-100' disabled={loading}>
+            {loading ? (
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            ) : (
+              'Send email'
+            )}
+          </button>
 
-            <nav className="nav-bar">
-                <Link to="/" className="nav-link">Home</Link>
-
-                <div className="dropdown">
-                    <button className="nav-link dropdown-toggle" onClick={handleDropdownToggle}>
-                        Categories
-                    </button>
-                    {isDropdownOpen && (
-                        <ul className="dropdown-menu">
-                            <li><Link to="/Category">All Categories</Link></li>
-
-                            {categories.map(category => (
-                                <li key={category.main_category_id} onMouseEnter={() => handleCategoryHover(category)}>
-                                    <Link to={`/category/${category.main_category_id}/${category.main_category_name}`}>
-                                        {category.main_category_name}
-                                    </Link>
-
-                                    {activeCategory === category && category.related_categories && (
-                                        <ul className="submenu">
-                                            {category.related_categories.map(related => (
-                                                <li key={related.id}>
-                                                    <Link to={`/category/${category.main_category_id}/related/${related.id}`}>
-                                                        {related.name}
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-            </nav>
-        </>
-    );
+          <p></p>
+          <Link to="/login" className='btn btn-default border w-100 bg-light rounded-0 text-decoration-none'>Back</Link>
+        </form>
+      </div>
+    </div>
+  );
 }
 
-export default Header;
+export default ForgotPassword;

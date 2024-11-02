@@ -2,13 +2,14 @@ import Header from './header';
 import Footer from './footer';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 function UserAdmin() {
-  const [user, setUser] = useState([]); // State to store the list of users
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
-  const [isEditing, setIsEditing] = useState(false); // State to control edit mode
+  const [user, setUser] = useState([]); // Lista de usuarios
+  const [showModal, setShowModal] = useState(false); // Control de visibilidad del modal
+  const [isEditing, setIsEditing] = useState(false); // Modo de edición
+  const [isLoading, setIsLoading] = useState(false); // Indicador de carga
   const [newUser, setNewUser] = useState({
     name: '',
     lastname: '',
@@ -18,19 +19,19 @@ function UserAdmin() {
     city: '',
     country: '',
     zipcode: '',
-    id_rol: '1', // Default role
-    status: '1'  // Default status (Active)
+    id_rol: '1', // Rol predeterminado
+    status: '1'  // Estado predeterminado
   });
-  const [searchTerm, setSearchTerm] = useState('');  // Estado para el término de búsqueda
-  const [roleFilter, setRoleFilter] = useState('');  // Estado para filtrar por rol
-  const [statusFilter, setStatusFilter] = useState('');  // Estado para filtrar por estado
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
-  // Fetch users from the backend
+  // Obtener usuarios del backend
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://172.16.69.227/user.php');
+      const response = await axios.get('http://192.168.0.14/user.php');
       if (Array.isArray(response.data)) {
         setUser(response.data);
       } else {
@@ -41,16 +42,23 @@ function UserAdmin() {
     }
   };
 
-  // Handle form input changes for newUser
+  useEffect(() => {
+    const role = localStorage.getItem('userRole'); 
+    if (role !== '3' && role !== '2') {  
+      navigate('/');
+    } else {
+      fetchUsers(); 
+    }
+  }, [navigate]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewUser(prevState => ({
       ...prevState,
-      [name]: name === 'id_rol' || name === 'status' ? parseInt(value, 10) : value
+      [name]: value
     }));
   };
 
-  // Open the modal for adding a new user
   const handleShowModal = () => {
     setNewUser({
       name: '',
@@ -62,19 +70,18 @@ function UserAdmin() {
       city: '',
       country: '',
       zipcode: '',
-      id_rol: '1', // Default role when adding
-      status: '1'  // Default status (Active) when adding
+      id_rol: '1',
+      status: '1'
     });
-    setIsEditing(false); // Set to adding mode
-    setShowModal(true);  // Show the modal
+    setIsEditing(false);
+    setShowModal(true);
   };
 
-  // Close the modal
   const handleCloseModal = () => setShowModal(false);
 
-  // Open the modal for editing a user
   const handleEditUser = (userToEdit) => {
     setNewUser({
+      id_user: userToEdit.id_user,
       name: userToEdit.name,
       lastname: userToEdit.lastname,
       email: userToEdit.email,
@@ -83,14 +90,13 @@ function UserAdmin() {
       city: userToEdit.city,
       country: userToEdit.country,
       zipcode: userToEdit.zipcode,
-      id_rol: String(userToEdit.id_rol),  // Ensure the role is a string
-      status: String(userToEdit.status)   // Ensure the status is a string
+      id_rol: String(userToEdit.id_rol),
+      status: String(userToEdit.status)
     });
-    setIsEditing(true);  // Set to editing mode
-    setShowModal(true);  // Show the modal
+    setIsEditing(true);
+    setShowModal(true);
   };
 
-  // Add a new user
   const handleAddUser = async () => {
     try {
       if (!newUser.name || !newUser.email || !newUser.password) {
@@ -98,66 +104,72 @@ function UserAdmin() {
         return;
       }
 
-      const response = await axios.post('http://172.16.69.227/addProfile.php', newUser);
-      
+      const response = await axios.post('http://192.168.0.14/addProfile.php', newUser);
       if (response.data.success) {
         alert('User added successfully');
-        fetchUsers();  // Refresca la lista de usuarios
-        setShowModal(false);  // Cierra el modal
-      } else if (response.data.error) {
-        alert(`Error: ${response.data.error}`);
+        await fetchUsers(); // Refresca la lista de usuarios
+        setShowModal(false);
+      } else {
+        alert(`Error: ${response.data.message}`);
       }
     } catch (error) {
       console.error("Error adding user:", error);
     }
   };
 
-  // Update an existing user
   const handleUpdateUser = async () => {
     try {
-      const response = await axios.post('http://172.16.69.227/updateProfile2.php', newUser);  // Update endpoint
+      const response = await axios.post('http://192.168.0.14/updateProfile2.php', newUser);
       if (response.data.success) {
         alert('User updated successfully');
-        fetchUsers();  // Refresh the user list after updating
-        setShowModal(false);  // Close the modal
-      } else if (response.data.error) {
-        alert(`Error: ${response.data.error}`);
+        await fetchUsers(); // Refresca la lista de usuarios
+        setShowModal(false);
+      } else {
+        alert(`Error: ${response.data.message}`);
       }
     } catch (error) {
       console.error("Error updating user:", error);
     }
   };
 
-  // Save changes: either add or update a user
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
+    setIsLoading(true); // Mostrar el indicador de carga
     if (isEditing) {
-      handleUpdateUser();
+      await handleUpdateUser();
     } else {
-      handleAddUser();
+      await handleAddUser();
     }
+    setIsLoading(false); // Ocultar el indicador de carga
+    setShowModal(false); // Cerrar el modal después de la alerta
+    fetchUsers(); // Refrescar la lista de usuarios para reflejar los cambios
   };
+  
 
-  // Delete a user
   const handleDeleteUser = async (id_user) => {
+    if (!id_user) {
+      alert("Error: User ID is missing.");
+      return;
+    }
     if (window.confirm("Are you sure you want to delete this profile?")) {
       try {
-        const response = await axios.post('http://172.16.69.227/deleteProfile.php', { id_user });
+        const response = await axios.post('http://192.168.0.14/deleteProfile.php', { id_user });
+        console.log("Response from deleteProfile.php:", response.data);
         if (response.data.success) {
-          alert('User deleted successfully');
-          fetchUsers();  // Refresh the user list after deletion
+          alert(response.data.message || 'User deleted successfully');
+          await fetchUsers(); // Refresca la lista de usuarios
         } else {
-          alert(`Error: ${response.data.error}`);
+          alert(`Error: ${response.data.message}`);
         }
       } catch (error) {
         console.error("Error deleting user:", error);
+        alert("Error deleting user. Please try again.");
       }
     }
   };
 
-  // Filtrar usuarios por nombre, email, rol y estado
   const filteredUsers = user.filter(userItem => {
-    const matchesRole = roleFilter ? userItem.id_rol === roleFilter : true;  // Filtrar por rol
-    const matchesStatus = statusFilter ? userItem.status === statusFilter : true;  // Filtrar por estado
+    const matchesRole = roleFilter ? userItem.id_rol === roleFilter : true;
+    const matchesStatus = statusFilter ? userItem.status === statusFilter : true;
     const matchesSearchTerm = userItem.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                               userItem.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
                               userItem.lastname.toLowerCase().includes(searchTerm.toLowerCase());
@@ -165,24 +177,12 @@ function UserAdmin() {
     return matchesRole && matchesStatus && matchesSearchTerm;
   });
 
-  // Fetch users on component mount
-  useEffect(() => {
-    const role = localStorage.getItem('userRole'); 
-    if (role !== '3' && role !== '2') {  
-      navigate('/'); // Redirect if no access
-    } else {
-      fetchUsers();  // Fetch users when the component loads
-    }
-  }, [navigate]);
-
   return (
     <div id="root">
       <Header /> 
       <main>
         <div className="mb-3">
           <h1>Users Administration</h1>
-
-          <h3>Filter</h3>
           <input 
             type="text" 
             placeholder="Search by name or email" 
@@ -192,7 +192,6 @@ function UserAdmin() {
           />
 
           <div className="mb-3">
-            {/* Filtro por Rol */}
             <select 
               className="form-control" 
               value={roleFilter} 
@@ -206,7 +205,6 @@ function UserAdmin() {
           </div>
 
           <div className="mb-3">
-            {/* Filtro por Estado */}
             <select 
               className="form-control" 
               value={statusFilter} 
@@ -217,7 +215,6 @@ function UserAdmin() {
               <option value="0">Inactive</option>
             </select>
           </div>
-
         </div>
 
         <div>
@@ -237,10 +234,10 @@ function UserAdmin() {
                 <th>City</th>
                 <th>Country</th>
                 <th>Zip Code</th>
-                <th>Role</th> {/* Para mostrar el rol traducido */}
-                <th>Status</th> {/* Para mostrar el estado traducido */}
+                <th>Role</th>
+                <th>Status</th>
                 <th>Last Login</th>
-                <th>Options</th> {/* Para las opciones de editar y eliminar */}
+                <th>Options</th>
               </tr>
             </thead>
             <tbody>
@@ -267,7 +264,7 @@ function UserAdmin() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="12">No users found</td>
+                  <td colSpan="13">No users found</td>
                 </tr>
               )}
             </tbody>
@@ -293,15 +290,18 @@ function UserAdmin() {
                 <label>Email</label>
                 <input type="email" name="email" value={newUser.email} onChange={handleInputChange} className="form-control" />
               </div>
-              <div className="form-group">
-                <label>Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={newUser.password}
-                  onChange={handleInputChange}
-                  className="form-control"/>
-              </div>
+
+              {!isEditing && (
+                <div className="form-group">
+                  <label>Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={newUser.password}
+                    onChange={handleInputChange}
+                    className="form-control"/>
+                </div>
+              )}
 
               <div className="form-group">
                 <label>Telephone</label>
@@ -344,8 +344,12 @@ function UserAdmin() {
             <Button variant="secondary" onClick={handleCloseModal}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleSaveChanges}>
-              {isEditing ? 'Save Changes' : 'Add User'}
+            <Button variant="primary" onClick={handleSaveChanges} disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Loading...
+                </>
+              ) : isEditing ? 'Save Changes' : 'Add User'}
             </Button>
           </Modal.Footer>
         </Modal>

@@ -14,7 +14,7 @@ const VerifyAccount = () => {
     console.log("Token:", token); // Verificar si el token se captura correctamente
   
     if (token) {
-      axios.post('http://172.16.69.227/verify.php', { token })
+      axios.post('http://192.168.0.14/verify.php', { token })
         .then(response => {
           console.log("Respuesta del servidor:", response.data); // Verificar respuesta del servidor
   

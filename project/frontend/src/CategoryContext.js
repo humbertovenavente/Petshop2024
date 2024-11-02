@@ -11,7 +11,7 @@ export const CategoryProvider = ({ children }) => {
   // Función para obtener categorías del backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://172.16.69.227/category.php');
+      const response = await axios.get('http://192.168.0.14/category.php');
       setCategories(response.data); // Guardar las categorías en el contexto
     } catch (error) {
       console.error('Error fetching categories:', error);

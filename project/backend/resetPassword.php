@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
 
 // Conexión a la base de datos
-$host = '172.16.69.227';
+$host = '192.168.0.14';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña'; // Asegúrate de que la contraseña sea correcta

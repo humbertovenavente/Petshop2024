@@ -25,7 +25,7 @@ function Login() {
     setError(null); // Resetear el estado de error antes de la nueva solicitud
 
     // Enviar los datos al backend para autenticación
-    axios.post('http://172.16.69.227/login.php', values)
+    axios.post('http://192.168.0.14/login.php', values)
       .then(response => {
         const { data } = response;
 
@@ -99,7 +99,7 @@ function Login() {
           </div>
 
           <div className="text-end mb-3">
-            <Link to="/forgotpassword" className="text-decoration-none">Forgot password?</Link>
+            <Link to="/Forgotpassword" className="text-decoration-none">Forgot password?</Link>
           </div>
 
           <div className='d-grid gap-2'>

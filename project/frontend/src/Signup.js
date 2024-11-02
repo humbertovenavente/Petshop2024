@@ -46,7 +46,7 @@ function Signup() {
 
     setLoading(true);  // Mostrar loading mientras se envía la solicitud
 
-    axios.post('http://172.16.69.227/signup.php', values, {
+    axios.post('http://192.168.0.14/signup.php', values, {
       withCredentials: true,  // Esto es necesario si envías cookies o credenciales
     })
     .then(res => {

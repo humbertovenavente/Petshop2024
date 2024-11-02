@@ -12,7 +12,7 @@ function InventoryAdmin() {
   // Función para obtener los productos desde el backend
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://172.16.69.227/inventory.php');
+      const response = await axios.get('http://192.168.0.14/inventory.php');
       if (Array.isArray(response.data)) {
         setProducts(response.data);
       } else {
@@ -20,7 +20,7 @@ function InventoryAdmin() {
       }
     } catch (error) {
       setProducts([]);
-      setError("Error al obtener los productos");
+      setError("Error obtaining porducts");
     }
   };
 
@@ -28,7 +28,7 @@ function InventoryAdmin() {
   useEffect(() => {
     const userRole = localStorage.getItem('userRole');  // Obtener el rol del usuario
     if (userRole !== '2' && userRole !== '3') {
-      setError('No tienes acceso a esta página.');
+      setError('Access denied.');
       navigate('/');  // Redirigir al home si no es empleado ni administrador
     } else {
       fetchProducts();  // Llamar a la función solo si el usuario tiene acceso
@@ -51,18 +51,18 @@ function InventoryAdmin() {
       <Header />
       <main>
         <div>
-          <h1>Inventario de Productos</h1>
+          <h1>Product Inventory</h1>
 
           <table className="table table-striped">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Inventario</th>  {/* Mostramos el inventario */}
-                <th>Ventas</th>  {/* Mostrar las ventas */}
+                <th>Name</th>
+                <th>Price</th>
+                <th>Inventory</th> 
+                <th>Sales</th>  
                 <th>Color</th>
-                <th>Tamaño</th>
+                <th>Size</th>
               </tr>
             </thead>
             <tbody>
@@ -72,15 +72,15 @@ function InventoryAdmin() {
                     <td>{product.id_product}</td>
                     <td>{product.name}</td>
                     <td>{product.price}</td>
-                    <td>{product.inventory}</td>  {/* Mostrar inventario */}
-                    <td>{product.ventas}</td>  {/* Mostrar ventas */}
+                    <td>{product.inventory}</td>  
+                    <td>{product.ventas}</td> 
                     <td>{product.color}</td>
                     <td>{product.size}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7">No se encontraron productos</td>
+                  <td colSpan="7">No products available</td>
                 </tr>
               )}
             </tbody>

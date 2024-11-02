@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Conexión a la base de datos
-$host = '172.16.69.227'; 
+$host = '192.168.0.14'; 
 $db = 'project';  
 $user = 'humbe';  
 $pass = 'tu_contraseña';  
@@ -31,20 +31,11 @@ $data = json_decode($input, true);
 $category_id = isset($data['category_id']) ? $data['category_id'] : null;
 $min_price = isset($data['min_price']) ? $data['min_price'] : 0;
 $max_price = isset($data['max_price']) ? $data['max_price'] : PHP_INT_MAX;
-
-if (!$category_id || !$min_price || !$max_price) {
-    echo json_encode([
-        'error' => 'Parámetros incompletos.',
-        'category_id' => $category_id,
-        'min_price' => $min_price,
-        'max_price' => $max_price
-    ]);
-    exit;
-}
+$search_term = isset($data['search_term']) ? $data['search_term'] : '';
 
 // Preparar la llamada al procedimiento almacenado
-$stmt = $conn->prepare("CALL searchCategory(?, ?, ?)");
-$stmt->bind_param('idd', $category_id, $min_price, $max_price);
+$stmt = $conn->prepare("CALL searchCategory(?, ?, ?, ?)"); // Ajustar para incluir search_term
+$stmt->bind_param('idds', $category_id, $min_price, $max_price, $search_term); // Cambiar a 4 parámetros
 
 // Ejecutar el procedimiento almacenado
 $stmt->execute();
@@ -70,5 +61,4 @@ if ($result->num_rows > 0) {
 // Cerrar la conexión y la declaración
 $stmt->close();
 $conn->close();
-
 ?>

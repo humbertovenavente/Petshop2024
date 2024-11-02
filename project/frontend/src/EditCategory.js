@@ -16,7 +16,7 @@ function EditCategory() {
 
     // Obtener categorías, descripciones y sección guardada al montar el componente
     useEffect(() => {
-        axios.get('http://172.16.69.227/getSelectedCategories.php')
+        axios.get('http://192.168.0.14/getSelectedCategories.php')
             .then(response => {
                 const descriptions = {};
                 const initialSelectedCategories = [];
@@ -42,7 +42,7 @@ function EditCategory() {
 
     // Guardar la selección de categorías y el número de secciones en el backend
     const saveSelectedCategories = () => {
-        axios.post('http://172.16.69.227/saveCategory.php', {
+        axios.post('http://192.168.0.14/saveCategory.php', {
             selectedCategories: selectedCategories,
             section: section
         })
@@ -59,7 +59,7 @@ function EditCategory() {
     const saveDescriptions = () => {
         categories.forEach(category => {
             const description = categoryDescriptions[category.id_category] || '';
-            axios.post('http://172.16.69.227/updateCategory2.php', {
+            axios.post('http://192.168.0.14/updateCategory2.php', {
                 id_category: category.id_category,
                 description: description
             })
