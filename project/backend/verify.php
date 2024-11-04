@@ -9,7 +9,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Configuración de la base de datos
-$host = '192.168.0.14';
+$host = '192.168.0.74';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';

@@ -2,7 +2,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
-$host = '192.168.0.14';
+$host = '192.168.0.74';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';

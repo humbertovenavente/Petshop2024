@@ -29,7 +29,7 @@ function CategoryAdmin() {
   // Función para obtener las categorías desde el backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://192.168.0.14/category.php');
+      const response = await axios.get('http://192.168.0.74/category.php');
       console.log("Respuesta de la API:", response.data);
       if (Array.isArray(response.data)) {
         setCategories(response.data);
@@ -64,7 +64,7 @@ function CategoryAdmin() {
   // Función para agregar una nueva categoría
   const handleAddCategory = async () => {
     try {
-      const response = await axios.post('http://192.168.0.14/addCategory.php', newCategory);
+      const response = await axios.post('http://192.168.0.74/addCategory.php', newCategory);
       console.log("Category added:", response.data);
       fetchCategories(); // Refrescar la lista de categorías después de agregar
       setShowModal(false); // Cerrar el modal
@@ -77,7 +77,7 @@ function CategoryAdmin() {
   const handleDeleteCategory = async (id_category) => {
     if (window.confirm("Are you sure to delete this category?")) {
       try {
-        const response = await axios.post('http://192.168.0.14/deleteCategory.php', { id_category });
+        const response = await axios.post('http://192.168.0.74/deleteCategory.php', { id_category });
         console.log("Category deleted:", response.data);
         fetchCategories(); // Refrescar la lista de categorías después de eliminar
       } catch (error) {

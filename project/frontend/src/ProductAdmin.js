@@ -45,7 +45,7 @@ function ProductAdmin() {
   // Fetch products from backend
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://192.168.0.14/product.php');
+      const response = await axios.get('http://192.168.0.74/product.php');
       if (Array.isArray(response.data)) {
         setProducts(response.data);
       } else {
@@ -59,7 +59,7 @@ function ProductAdmin() {
   // Fetch categories (tags) from backend
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://192.168.0.14/category.php');
+      const response = await axios.get('http://192.168.0.74/category.php');
       if (Array.isArray(response.data)) {
         setCategories(response.data.map(cat => ({ value: cat.id_category, label: cat.name }))); // Format categories for react-select
       } else {
@@ -136,7 +136,7 @@ function ProductAdmin() {
         file_type: fileType  // El tipo de archivo de la imagen
       };
 
-      const response = await axios.post('http://192.168.0.14/addProduct.php', productData);
+      const response = await axios.post('http://192.168.0.74/addProduct.php', productData);
 
       if (response.data.error) {
         alert(`Error: ${response.data.error}`);
@@ -184,7 +184,7 @@ function ProductAdmin() {
         file_type: selectedFile ? fileType : newProduct.file_type // Use the existing file type if no new image
       };
 
-      const response = await axios.post('http://192.168.0.14/updateProduct.php', { 
+      const response = await axios.post('http://192.168.0.74/updateProduct.php', { 
         id_product: currentProductId,  // Pasar el ID del producto que se está editando
         ...productData
       });
@@ -232,7 +232,7 @@ function ProductAdmin() {
     if (window.confirm("Are you sure you want to delete this product?")) {
         try {
             setLoading(true);
-            const response = await axios.post('http://192.168.0.14/deleteProduct.php', { id_product });
+            const response = await axios.post('http://192.168.0.74/deleteProduct.php', { id_product });
             if (response.data.error) {
                 alert(`Error: ${response.data.error}`);
             } else {

@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
-$host = '192.168.0.14';
+$host = '192.168.0.74';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';

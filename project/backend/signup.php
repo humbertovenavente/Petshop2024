@@ -9,7 +9,7 @@ $origin = $_SERVER['HTTP_ORIGIN'];
 
 // Lista de orígenes permitidos
 $allowed_origins = [
-    'http://192.168.0.4:3000',
+    'http://192.168.0.73:3000',
     'http://localhost:3000'
 ];
 
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 
 // Configuración de la base de datos
-$host = '192.168.0.14';
+$host = '192.168.0.74';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
@@ -96,13 +96,14 @@ if ($stmt->execute()) {
     $email_sendgrid->setFrom("humberto107_@hotmail.com", "Michigan");
     $email_sendgrid->setSubject("Verify your account");
     $email_sendgrid->addTo($email, $name . " " . $lastname);
-    $verification_link = "http://192.168.0.4:3000/verify?token=$verification_token";
+    $verification_link = "http://192.168.0.73:3000/verify?token=$verification_token";
         $email_sendgrid->addContent(
         "text/html", 
         "Thank you for your regristration. Please click the following link to verify your account: <a href='$verification_link'>Verificar cuenta</a>"
     );
     
-// AQUI
+// aqui  
+
     try {
         $response = $sendgrid->send($email_sendgrid);
         echo json_encode(['message' => 'User created successfully. Kindly check your email to verify your account.']);

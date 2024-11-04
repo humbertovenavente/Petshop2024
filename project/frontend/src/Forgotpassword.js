@@ -11,18 +11,22 @@ function ForgotPassword() {
     event.preventDefault();
     setLoading(true);
 
-    axios.post('/api/forgot-password', { email })
+    // Enviar email al backend para restablecer la contraseña
+    axios.post('http://192.168.0.74/forgotpassword.php', {email})
       .then((response) => {
         setLoading(false);
         if (response.data.success) {
+          // Mostrar mensaje de éxito usando alert()
           alert('Reset password email was sent to you, please check your email');
-          navigate('/login');
+          navigate('/login'); // Redirigir al login después de que el usuario haga clic en OK
         } else if (response.data.error) {
+          // Mostrar mensaje de error usando alert()
           alert(response.data.error);
         }
       })
       .catch(() => {
         setLoading(false);
+        // Mostrar mensaje de error en caso de fallo general
         alert('Something went wrong. Please try again later.');
       });
   };
@@ -61,4 +65,4 @@ function ForgotPassword() {
   );
 }
 
-export default ForgotPassword;
+export default ForgotPassword;

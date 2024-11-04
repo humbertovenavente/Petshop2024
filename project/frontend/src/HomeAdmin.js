@@ -34,7 +34,7 @@ function HomeAdmin() {
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
-                const response = await axios.get('http://192.168.0.14/getHome.php');
+                const response = await axios.get('http://192.168.0.74/getHome.php');
                 const data = response.data;
                 setSlider1(`data:image/jpeg;base64,${data.slider1}`);
                 setSlider2(`data:image/jpeg;base64,${data.slider2}`);
@@ -51,7 +51,7 @@ function HomeAdmin() {
         };
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://192.168.0.14/category.php');
+                const response = await axios.get('http://192.168.0.74/category.php');
                 setCategories(response.data);
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -59,7 +59,7 @@ function HomeAdmin() {
         };
         const fetchSavedCategories = async () => {
             try {
-                const response = await axios.get('http://192.168.0.14/getFeaturedCategories.php');
+                const response = await axios.get('http://192.168.0.74/getFeaturedCategories.php');
                 const data = response.data || [];
                 setSavedCategories(data);
                 setSelectedCategories(data.map(category => category.id_category));
@@ -69,7 +69,7 @@ function HomeAdmin() {
         };
         const fetchFaqData = async () => {
             try {
-                const response = await axios.get('http://192.168.0.14/getFaq.php');
+                const response = await axios.get('http://192.168.0.74/getFaq.php');
                 setFaqData(response.data || []);
             } catch (error) {
                 console.error('Error fetching FAQ data:', error);
@@ -77,7 +77,7 @@ function HomeAdmin() {
         };
         const fetchVideos = async () => {
             try {
-                const response = await axios.get('http://192.168.0.14/getVideo.php');
+                const response = await axios.get('http://192.168.0.74/getVideo.php');
                 setVideoList(response.data);
                 if (response.data.length > 0) {
                     setVideoLink(response.data[0].video_link);
@@ -105,7 +105,7 @@ function HomeAdmin() {
     const saveImage = async (field, imageData) => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.14/updateHome.php', {
+            const response = await axios.post('http://192.168.0.74/updateHome.php', {
                 field: field,
                 slider: imageData.split(',')[1],
             });
@@ -123,7 +123,7 @@ function HomeAdmin() {
     const saveText = async (field, value) => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.14/updateHome.php', {
+            const response = await axios.post('http://192.168.0.74/updateHome.php', {
                 field: field,
                 text: value,
             });
@@ -148,7 +148,7 @@ function HomeAdmin() {
     const saveFeaturedCategories = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.14/saveFeaturedCategories.php', { categories: selectedCategories });
+            const response = await axios.post('http://192.168.0.74/saveFeaturedCategories.php', { categories: selectedCategories });
             if (response.data.error) {
                 alert('Error saving featured categories: ' + response.data.error);
             } else {
@@ -173,7 +173,7 @@ function HomeAdmin() {
     const handleSaveFaq = async () => {
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.14/updateFaq.php', currentFaq);
+            const response = await axios.post('http://192.168.0.74/updateFaq.php', currentFaq);
             if (response.data.success) {
                 alert('FAQ updated successfully');
                 setShowFaqModal(false);
@@ -196,7 +196,7 @@ function HomeAdmin() {
         if (!confirmDelete) return;
         setLoading(true);
         try {
-            const response = await axios.post('http://192.168.0.14/deleteFaq.php', { id });
+            const response = await axios.post('http://192.168.0.74/deleteFaq.php', { id });
             if (response.data.success) {
                 alert('FAQ deleted successfully');
                 setFaqData(faqData.filter(f => f.id !== id));
@@ -236,7 +236,7 @@ function HomeAdmin() {
                 setLoading(false);
                 return;
             }
-            const response = await axios.post('http://192.168.0.14/updateVideo.php', {
+            const response = await axios.post('http://192.168.0.74/updateVideo.php', {
                 video_link: embedLink,
                 name: selectedVideoName
             });
@@ -263,7 +263,7 @@ function HomeAdmin() {
         if (selectedVideo) {
             setVideoLink(selectedVideo.video_link);
             try {
-                await axios.post('http://192.168.0.14/updateHomeVideo.php', {
+                await axios.post('http://192.168.0.74/updateHomeVideo.php', {
                     video_link: selectedVideo.video_link
                 });
             } catch (error) {

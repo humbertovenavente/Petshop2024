@@ -12,7 +12,7 @@ header("Content-Type: application/json");
 
 
 // Conexión a la base de datos
-$host = '192.168.0.14';
+$host = '192.168.0.74';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';

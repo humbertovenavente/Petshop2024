@@ -13,7 +13,7 @@ if (php_sapi_name() === 'cli') {
 if ($_SERVER['REQUEST_METHOD'] !== 'CLI') {
     // Obtener el origen de la solicitud
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
-    $allowed_origins = ['http://192.168.0.12:3000', 'http://localhost:3000'];
+    $allowed_origins = ['http://192.168.0.73:3000', 'http://localhost:3000'];
 
     if (in_array($origin, $allowed_origins)) {
         header("Access-Control-Allow-Origin: $origin");
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'CLI') {
 }
 
 // Configuración de la base de datos
-$host = '192.168.0.14';
+$host = '192.168.0.74';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
@@ -75,14 +75,16 @@ if ($result) {
             $email_sendgrid->setFrom("humberto107_@hotmail.com", "Michigan");
             $email_sendgrid->setSubject("Account Deactivation Due to Inactivity");
             $email_sendgrid->addTo($email, "$name $lastname");
-            $reactivation_link = "http://192.168.0.12:3000/reactivate?token=$verification_token";
+            $reactivation_link = "http://192.168.0.73:3000/reactivate?token=$verification_token";
             
             $email_sendgrid->addContent(
                 "text/html",
                 "Due to inactivity, your account has been disabled. Please click <a href='$reactivation_link'>here</a> to reactivate your account."
             );
             
-            //aqui
+            
+
+        // aqui  
             
             try {
                 $response = $sendgrid->send($email_sendgrid);

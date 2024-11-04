@@ -10,7 +10,7 @@ function ReactivateAccount() {
   useEffect(() => {
     if (token) {
       // Cambia la URL a la ruta correcta en tu servidor
-      fetch('http://192.168.0.14/reactivate.php', {
+      fetch('http://192.168.0.74/reactivate.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

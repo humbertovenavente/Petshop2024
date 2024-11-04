@@ -13,7 +13,7 @@ function Tracking() {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const response = await axios.post('http://192.168.0.14/getOrders2.php', { id_order: orderId });
+        const response = await axios.post('http://192.168.0.74/getOrders2.php', { id_order: orderId });
         if (response.data.success) {
           setOrderDetails(response.data.orderDetails);
         } else {

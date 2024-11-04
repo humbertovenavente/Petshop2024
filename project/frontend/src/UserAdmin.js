@@ -31,7 +31,7 @@ function UserAdmin() {
   // Obtener usuarios del backend
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://192.168.0.14/user.php');
+      const response = await axios.get('http://192.168.0.74/user.php');
       if (Array.isArray(response.data)) {
         setUser(response.data);
       } else {
@@ -104,7 +104,7 @@ function UserAdmin() {
         return;
       }
 
-      const response = await axios.post('http://192.168.0.14/addProfile.php', newUser);
+      const response = await axios.post('http://192.168.0.74/addProfile.php', newUser);
       if (response.data.success) {
         alert('User added successfully');
         await fetchUsers(); // Refresca la lista de usuarios
@@ -119,7 +119,7 @@ function UserAdmin() {
 
   const handleUpdateUser = async () => {
     try {
-      const response = await axios.post('http://192.168.0.14/updateProfile2.php', newUser);
+      const response = await axios.post('http://192.168.0.74/updateProfile2.php', newUser);
       if (response.data.success) {
         alert('User updated successfully');
         await fetchUsers(); // Refresca la lista de usuarios
@@ -152,7 +152,7 @@ function UserAdmin() {
     }
     if (window.confirm("Are you sure you want to delete this profile?")) {
       try {
-        const response = await axios.post('http://192.168.0.14/deleteProfile.php', { id_user });
+        const response = await axios.post('http://192.168.0.74/deleteProfile.php', { id_user });
         console.log("Response from deleteProfile.php:", response.data);
         if (response.data.success) {
           alert(response.data.message || 'User deleted successfully');

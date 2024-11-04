@@ -27,7 +27,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchUserId = async () => {
       try {
-        const response = await axios.post('http://192.168.0.14/getUserId.php', { email });
+        const response = await axios.post('http://192.168.0.74/getUserId.php', { email });
         if (response.data.id_user) {
           setUserId(response.data.id_user); 
         } else {
@@ -47,7 +47,7 @@ function ProductDetails() {
 
   const fetchProductDetails = useCallback(async () => {
     try {
-      const response = await axios.get(`http://192.168.0.14/ProductDetails.php?productId=${productId}`);
+      const response = await axios.get(`http://192.168.0.74/ProductDetails.php?productId=${productId}`);
       setProduct(response.data.product);
       setComments(response.data.comments);
     } catch (error) {
@@ -82,7 +82,7 @@ function ProductDetails() {
             id_parent: replyingTo
         }); // Muestra los datos que se enviarán
 
-        const response = await axios.post('http://192.168.0.14/AddComment.php', {
+        const response = await axios.post('http://192.168.0.74/AddComment.php', {
             id_product: productId,
             id_user: userId,
             comment: newComment,
@@ -112,7 +112,7 @@ function ProductDetails() {
     if (!confirmDelete) return; 
 
     try {
-      const response = await axios.post('http://192.168.0.14/DeleteComment.php', {
+      const response = await axios.post('http://192.168.0.74/DeleteComment.php', {
         id_comment: commentId
       });
 
@@ -144,7 +144,7 @@ function ProductDetails() {
     }
 
     try {
-      const response = await axios.post('http://192.168.0.14/UpdateComment.php', {
+      const response = await axios.post('http://192.168.0.74/UpdateComment.php', {
         id_comment: editingComment,
         comment: editText
       });
@@ -179,7 +179,7 @@ function ProductDetails() {
     }
 
     try {
-      const response = await axios.post('http://192.168.0.14/AddComment.php', {
+      const response = await axios.post('http://192.168.0.74/AddComment.php', {
         id_product: productId,
         id_user: userId,
         comment: replyText,
@@ -255,7 +255,7 @@ function ProductDetails() {
               </>
             )}
 
-            {/* Renderizar replies con un color diferente */}
+            
             <ul>
               {comments.filter(c => c.id_parent === comment.id_comment).map(reply => renderComment(reply, level + 1))}
             </ul>

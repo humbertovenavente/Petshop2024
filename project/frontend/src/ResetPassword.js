@@ -43,7 +43,7 @@ function ResetPassword() {
 
         try {
             // Enviar la solicitud de restablecimiento al backend
-            const response = await axios.post('http://192.168.0.14/resetPassword.php', {
+            const response = await axios.post('http://192.168.0.74/resetPassword.php', {
                 email,
                 token,
                 newPassword

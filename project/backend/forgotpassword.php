@@ -11,7 +11,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
 // Conexión a la base de datos
-$host = '192.168.0.14';
+$host = '192.168.0.74';
 $db = 'project';
 $user = 'humbe';
 $pass = 'tu_contraseña';
@@ -69,7 +69,7 @@ if ($stmt->execute()) {
     $email_sendgrid->setFrom("humberto107_@hotmail.com", "Michigan");
     $email_sendgrid->setSubject("Reset Your Password");
     $email_sendgrid->addTo($email, $user['name'] . " " . $user['lastname']);
-    $reset_link = "http://192.168.0.4:3000/resetpassword?token=$reset_token&email=$email";
+    $reset_link = "http://192.168.0.73:3000/resetpassword?token=$reset_token&email=$email";
 
     
     $email_sendgrid->addContent(
@@ -77,7 +77,8 @@ if ($stmt->execute()) {
         "You requested a password reset. Click the following link to reset your password: <a href='$reset_link'>Reset Password</a>"
     );
     
-    // aca 
+// aqui  
+
     
 
     try {
