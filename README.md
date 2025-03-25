@@ -1,2 +1,4 @@
-# proyecto2024
-Proyecto Base de Datos y Diseño Web 2024 Jose Najar 
+# PetShop2024
+This is a project using React js as a frontend, PHP as the backend, and MySQL as database
+
+Keep in mind that in this case, documentation is in spanish since this is an internal project
